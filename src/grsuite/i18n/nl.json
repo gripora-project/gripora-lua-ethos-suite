@@ -74,6 +74,29 @@
         "translation": "Nitro"
       }
     },
+    "DRIVE_AIDS_CONFIG": {
+      "tbl_dynamic": {
+        "english": "Dynamic",
+        "max_length": 7,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "Dynamic"
+      },
+      "tbl_off": {
+        "english": "Off",
+        "max_length": 3,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "Off"
+      },
+      "tbl_static": {
+        "english": "Static",
+        "max_length": 6,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "Static"
+      }
+    },
     "ESC_SENSOR_CONFIG": {
       "tbl_off": {
         "english": "Off",
@@ -397,6 +420,13 @@
       "needs_translation": false,
       "reverse_text": false,
       "translation": "Bedien."
+    },
+    "menu_section_drive_aids": {
+      "english": "Drive Aids",
+      "max_length": 10,
+      "needs_translation": true,
+      "reverse_text": false,
+      "translation": "Drive Aids"
     },
     "menu_section_flight_tuning": {
       "english": "Flight Tuning",
@@ -1775,6 +1805,78 @@
           "needs_translation": false,
           "reverse_text": false,
           "translation": "Servo's"
+        }
+      },
+      "drive_aids": {
+        "abs_corner_freq": {
+          "english": "Rate Added at Lock",
+          "max_length": 18,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Rate Added at Lock"
+        },
+        "abs_corner_hold": {
+          "english": "Hold at Lock",
+          "max_length": 12,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Hold at Lock"
+        },
+        "abs_dyn_freq": {
+          "english": "Full Brake Rate",
+          "max_length": 15,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Full Brake Rate"
+        },
+        "abs_dyn_hold": {
+          "english": "Full Brake Hold",
+          "max_length": 15,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Full Brake Hold"
+        },
+        "abs_floor": {
+          "english": "Release Floor",
+          "max_length": 13,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Release Floor"
+        },
+        "abs_freq": {
+          "english": "Pulse Rate",
+          "max_length": 10,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Pulse Rate"
+        },
+        "abs_hold": {
+          "english": "Hold",
+          "max_length": 4,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Hold"
+        },
+        "abs_mode": {
+          "english": "Mode",
+          "max_length": 4,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Mode"
+        },
+        "abs_name": {
+          "english": "ABS",
+          "max_length": 3,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "ABS"
+        },
+        "abs_trigger": {
+          "english": "Trigger",
+          "max_length": 7,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Trigger"
         }
       },
       "elrs_telemetry": {
@@ -10218,6 +10320,20 @@
           "needs_translation": true,
           "reverse_text": false,
           "translation": "Fly level with it on for a few seconds, then land and disarm: the trim is saved."
+        },
+        "mod_help_drive_aids_off": {
+          "english": "Turns ABS and the other drive aids off; the gyro keeps steering. Handy to compare with and without.",
+          "max_length": 99,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Turns ABS and the other drive aids off; the gyro keeps steering. Handy to compare with and without."
+        },
+        "mod_help_gyro_off": {
+          "english": "Gyro off: steering and throttle go straight from your radio. Put it on a switch you can reach while driving.",
+          "max_length": 108,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Gyro off: steering and throttle go straight from your radio. Put it on a switch you can reach while driving."
         },
         "mod_help_manual": {
           "english": "Stabilization off, with your rates kept. A good bail-out.",

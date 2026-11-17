@@ -1,0 +1,7 @@
+{
+  "id": "drive-aids-config",
+  "name": "The drive aids config codec matches the firmware's nine-field layout",
+  "step": "Check the drive aids config codec and ABS page",
+  "script": "bin/drive_aids_config/verify_drive_aids_config.lua",
+  "rationale": "The ABS page (Flight Tuning -> Drive Aids -> ABS) saves by writing back what it\nread. The command ids, the order of the nine U8 fields and their ranges and defaults\nare pinned here against the firmware handler (gripora-firmware msp.c,\nMSP2_GRIPORA_DRIVE_AIDS_CONFIG 0x5F3F / MSP2_GRIPORA_SET_DRIVE_AIDS_CONFIG 0x5F40,\npg/drive_aids.h): the firmware refuses the whole write if any value is out of\nrange. Later aids append fields, so a longer reply must still decode its first\nnine and the write must stay nine bytes; a shorter reply is refused. The harness\nalso checks that the page builds every field, refuses saves while armed, does not\nreboot, follows the current PID profile (the settings are stored per profile),\nand that its menu row and icon exist."
+}

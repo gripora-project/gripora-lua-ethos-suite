@@ -8,7 +8,7 @@ sidebar_label: Pages
 Reference documentation for each configuration and settings page reachable
 within the GRSuite Ethos system tool.
 
-**Coverage:** 88 reachable pages in navigation hierarchy. Drafts require review.
+**Coverage:** 89 reachable pages in navigation hierarchy. Drafts require review.
 
 The *Conditions* column names what hides, greys out or locks a page; the sentences
 and structure follow [_template.md](../_template.md).
@@ -26,6 +26,7 @@ is there. The rule is in [.agents/rules/documentation.md](../../.agents/rules/do
 | Rates | [flight_tuning/rates.md](flight_tuning/rates.md) | Requires a running background task and a flight controller connection. | draft |
 | Flight Feel | [flight_tuning/master_gains.md](flight_tuning/master_gains.md) | Requires a running background task and a flight controller connection. | draft |
 | Tune Advisor | [flight_tuning/tune_advisor.md](flight_tuning/tune_advisor.md) | Requires a running background task and a flight controller connection. | reviewed |
+| ABS | [flight_tuning/drive_aids_abs.md](flight_tuning/drive_aids_abs.md) | Requires a running background task and a flight controller connection. | reviewed |
 | Filters | [flight_tuning/filters.md](flight_tuning/filters.md) | Requires a running background task and a flight controller connection. | draft |
 | PID Controller | [flight_tuning/pid_controller.md](flight_tuning/pid_controller.md) | Requires a running background task and a flight controller connection. | draft |
 | PID Bandwidth | [flight_tuning/pid_bandwidth.md](flight_tuning/pid_bandwidth.md) | Requires a running background task and a flight controller connection. | draft |

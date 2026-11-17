@@ -11618,6 +11618,20 @@
           "reverse_text": false,
           "max_length": 109
         },
+        "mod_help_gyro_off": {
+          "english": "Gyro off: steering and throttle go straight from your radio. Put it on a switch you can reach while driving.",
+          "translation": "Gyro off: steering and throttle go straight from your radio. Put it on a switch you can reach while driving.",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 108
+        },
+        "mod_help_drive_aids_off": {
+          "english": "Turns ABS and the other drive aids off; the gyro keeps steering. Handy to compare with and without.",
+          "translation": "Turns ABS and the other drive aids off; the gyro keeps steering. Handy to compare with and without.",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 99
+        },
         "sty_title": {
           "english": "Flying style",
           "translation": "Flying style",
@@ -12122,6 +12136,78 @@
           "reverse_text": false,
           "max_length": 35
         }
+      },
+      "drive_aids": {
+        "abs_name": {
+          "english": "ABS",
+          "translation": "ABS",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 3
+        },
+        "abs_mode": {
+          "english": "Mode",
+          "translation": "Mode",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 4
+        },
+        "abs_trigger": {
+          "english": "Trigger",
+          "translation": "Trigger",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 7
+        },
+        "abs_freq": {
+          "english": "Pulse Rate",
+          "translation": "Pulse Rate",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 10
+        },
+        "abs_floor": {
+          "english": "Release Floor",
+          "translation": "Release Floor",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 13
+        },
+        "abs_hold": {
+          "english": "Hold",
+          "translation": "Hold",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 4
+        },
+        "abs_dyn_freq": {
+          "english": "Full Brake Rate",
+          "translation": "Full Brake Rate",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 15
+        },
+        "abs_dyn_hold": {
+          "english": "Full Brake Hold",
+          "translation": "Full Brake Hold",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 15
+        },
+        "abs_corner_freq": {
+          "english": "Rate Added at Lock",
+          "translation": "Rate Added at Lock",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 18
+        },
+        "abs_corner_hold": {
+          "english": "Hold at Lock",
+          "translation": "Hold at Lock",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 12
+        }
       }
     },
     "menu_section_controls": {
@@ -12158,6 +12244,13 @@
       "needs_translation": true,
       "reverse_text": false,
       "max_length": 14
+    },
+    "menu_section_drive_aids": {
+      "english": "Drive Aids",
+      "translation": "Drive Aids",
+      "needs_translation": true,
+      "reverse_text": false,
+      "max_length": 10
     },
     "curve_none": {
       "english": "None",
@@ -13222,6 +13315,29 @@
         "needs_translation": false,
         "reverse_text": false,
         "max_length": 3
+      }
+    },
+    "DRIVE_AIDS_CONFIG": {
+      "tbl_off": {
+        "english": "Off",
+        "translation": "Off",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 3
+      },
+      "tbl_static": {
+        "english": "Static",
+        "translation": "Static",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 6
+      },
+      "tbl_dynamic": {
+        "english": "Dynamic",
+        "translation": "Dynamic",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 7
       }
     }
   },

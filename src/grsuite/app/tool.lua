@@ -362,6 +362,8 @@ local MENUS = {
       {title = "@i18n(app.modules.master_gains.name)@", icon = lcd.loadMask("app/gfx/master_gains.png"), script = "app/pages/master_gains.lua", group = "@i18n(app.menu_section_flight_tuning)@"},
       -- Reads what the FC measured in flight and suggests changes to the pages above.
       {title = "@i18n(app.modules.tune_advisor.name)@", icon = lcd.loadMask("app/gfx/tune_advisor.png"), script = "app/pages/tune_advisor.lua", group = "@i18n(app.menu_section_flight_tuning)@"},
+      -- Drive aids (ABS first; traction control and the rest join this group).
+      {title = "@i18n(app.modules.drive_aids.abs_name)@", icon = lcd.loadMask("app/gfx/esc_motors_throttle.png"), script = "app/pages/drive_aids_abs.lua", group = "@i18n(app.menu_section_drive_aids)@"},
       -- Advanced used to be a submenu of its own; it is now a group on this
       -- screen so every tuning page is one tap from Flight Tuning.
       {title = "@i18n(app.modules.filters.name)@", icon = lcd.loadMask("app/gfx/filters.png"), script = "app/pages/filters.lua", group = "@i18n(app.menu_section_advanced)@"},

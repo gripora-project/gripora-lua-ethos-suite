@@ -27,14 +27,14 @@ local MSG_LOADING_BODY = "@i18n(app.modules.modes.loading_config)@"
 local MSG_SAVING_BODY = "@i18n(app.modules.modes.saving_config)@"
 
 local MODE_LOGIC_OPTIONS = {{"OR", 0}, {"AND", 1}}
+-- Fallback names for a box the FC reported without one: the active BOXITEM
+-- entries of gripora-firmware msp/msp_box.c, by permanent id. Ids the firmware
+-- keeps only as reserved (commented-out BOXITEMs) are left out.
 local MODE_NAME_BY_ID = {
   [0] = "ARM",
-  [1] = "ANGLE",
-  [6] = "ATT HOLD",
-  [12] = "PASSTHROUGH",
+  [12] = "GYRO OFF",
   [13] = "BEEPER",
   [15] = "LEDLOW",
-  [19] = "OSD DISABLE",
   [20] = "TELEMETRY",
   [26] = "BLACKBOX",
   [27] = "FAILSAFE",
@@ -44,26 +44,12 @@ local MODE_NAME_BY_ID = {
   [34] = "CAMERA CONTROL 3",
   [36] = "PREARM",
   [37] = "GPS BEEP SATELLITE COUNT",
-  [39] = "VTX PIT MODE",
   [40] = "USER1",
   [41] = "USER2",
   [42] = "USER3",
   [43] = "USER4",
-  [47] = "TRAINER",
-  [48] = "VTX CONTROL DISABLE",
   [52] = "BEEPER MUTE",
-  [53] = "RESCUE",
-  [55] = "GOVERNOR",
-  [56] = "GOVERNOR SUSPEND",
-  [57] = "GOVERNOR BYPASS",
-  [58] = "AUTO HOVER",
-  [59] = "MANUAL",
-  [60] = "AUTO TRIM",
-  [61] = "GPS LOITER",
-  [62] = "GPS RTH",
-  [63] = "THRUST VECTOR",
-  [64] = "THRUST VECTOR ATTITUDE HOLD",
-  [65] = "TRADITIONAL",
+  [66] = "DRIVE AIDS OFF",
 }
 local AUX_CHANNEL_COUNT = 20
 local RANGE_MIN = 875

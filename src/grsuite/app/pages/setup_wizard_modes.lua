@@ -40,15 +40,16 @@ local T = {
   next = "@i18n(app.modules.setup_wizard.btn_next)@",
 }
 
--- Permanent box ids (msp/msp_box.c) and the names the FC reports for them,
--- before and after the firmware#182 rename.
+-- Permanent box ids (gripora-firmware msp/msp_box.c) and the names the FC
+-- reports for them, the same list as the configurator's StepModes.svelte.
+-- ARM is the only one the car can't drive without; GYRO OFF (12, which the
+-- firmware reports under that name) and DRIVE AIDS OFF (66) are optional.
+-- The aircraft modes this list used to offer (MANUAL 59, ATT HOLD 6,
+-- TRAINER 47, AUTO TRIM 60) are removed from the firmware.
 local MODES = {
   {id = 0, names = {"ARM"}, required = true, help = "@i18n(app.modules.setup_wizard.mod_help_arm)@"},
-  {id = 59, names = {"MANUAL", "GYRO OFF"}, help = "@i18n(app.modules.setup_wizard.mod_help_manual)@"},
-  {id = 6, names = {"ATT HOLD"}, help = "@i18n(app.modules.setup_wizard.mod_help_att_hold)@"},
-  {id = 47, names = {"TRAINER"}, help = "@i18n(app.modules.setup_wizard.mod_help_trainer)@"},
-  {id = 60, names = {"AUTO TRIM"}, help = "@i18n(app.modules.setup_wizard.mod_help_auto_trim)@"},
-  {id = 12, names = {"PASSTHROUGH", "SETUP"}, help = "@i18n(app.modules.setup_wizard.mod_help_passthrough)@"},
+  {id = 12, names = {"GYRO OFF"}, help = "@i18n(app.modules.setup_wizard.mod_help_gyro_off)@"},
+  {id = 66, names = {"DRIVE AIDS OFF"}, help = "@i18n(app.modules.setup_wizard.mod_help_drive_aids_off)@"},
 }
 
 local AUX_OFFSET = 4
