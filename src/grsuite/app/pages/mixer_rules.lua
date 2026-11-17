@@ -81,50 +81,68 @@ local OPER_OPTIONS = {
 
 -- input: wire values 0-26 and 30-35, matching gripora-configurator's
 -- Mixer.js inputNames -- 0 None, 1-4 Stabilized R/P/Y/T, 5-8 RC Command
--- R/P/Y/T, 9-12 RC Channel R/P/Y/T, 13-26 CH #5-#18 and 30-35 CH #19-#24
--- (raw numbered channels beyond the named first four -- no AUX-style naming
--- so the list doesn't switch numbering schemes partway through). The
--- thrust-vector inputs (27-29) aren't offered here.
+-- R/P/Y/T, 9-26 RC Channel 1-18 and 30-35 CH #19-#24. The thrust-vector
+-- inputs (27-29) aren't offered here.
 --
--- The 9-12 RC Channel Roll/Pitch/Yaw/Throttle "bypass" entries read that
--- logical axis's RC input *after* gripora-firmware's rcmap indirection
--- (rx.c's readRxChannels(): rawChannel = rxConfig()->rcmap[axis]) -- so
--- "Roll" means whatever physical channel the pilot's radio has mapped to
--- it, never a fixed "Roll = CH1" (AETR vs TAER vs custom maps all differ;
--- see gripora-configurator's src/js/Mixer.js inputLabel() for the same
--- resolution done there). lib/msp_rx_map.lua reports that mapping in the
--- same order (aileron=Roll, elevator=Pitch, rudder=Yaw, throttle=Throttle);
+-- The RC Channel inputs are the firmware's RC functions, read *after*
+-- gripora-firmware's rcmap indirection (rx.c's readRxChannels(): rawChannel
+-- = rxConfig()->rcmap[function] for the first 8): wire 9-16 are roll,
+-- pitch, yaw, throttle and aux 1-4, wherever the pilot's RX map puts them,
+-- and only 17-26 (CH #9-#18) are receiver channels as numbered. See
+-- gripora-configurator's src/js/Mixer.js inputLabel() for the same
+-- resolution done there. lib/msp_rx_map.lua reports that mapping
+-- (aileron=Roll, elevator=Pitch, rudder=Yaw, throttle=Throttle, aux1-4);
 -- bypassLabel() below shows the pilot's actual channel when that data is
--- available, falling back to the plain function name otherwise.
-local RCCH_BYPASS_ROLE_LABELS = {
-  "@i18n(app.modules.mixer_rules.input_role_roll)@",
-  "@i18n(app.modules.mixer_rules.input_role_pitch)@",
-  "@i18n(app.modules.mixer_rules.input_role_yaw)@",
-  "@i18n(app.modules.mixer_rules.input_role_throttle)@",
+-- available ("CH #1 (Steering)"), falling back to the function's name
+-- otherwise.
+--
+-- Gripora drives a car: yaw is Steering, and roll and pitch are unused,
+-- parked on spare channels (lib/setup_wizard_controls.lua carMap()). They
+-- are listed only when a rule already reads one, so that rule still shows
+-- and saves what it has.
+local AUX_FMT = "@i18n(app.modules.mixer_rules.input_role_aux_fmt)@"
+local RX_FUNCTIONS = {
+  {field = "aileron", parked = true,
+    role = "@i18n(app.modules.mixer_rules.input_role_roll)@",
+    fallback = "@i18n(app.modules.mixer_rules.input_rcch_roll)@"},
+  {field = "elevator", parked = true,
+    role = "@i18n(app.modules.mixer_rules.input_role_pitch)@",
+    fallback = "@i18n(app.modules.mixer_rules.input_rcch_pitch)@"},
+  {field = "rudder",
+    role = "@i18n(app.modules.mixer_rules.input_role_steering)@",
+    fallback = "@i18n(app.modules.mixer_rules.input_rcch_steering)@"},
+  {field = "throttle",
+    role = "@i18n(app.modules.mixer_rules.input_role_throttle)@",
+    fallback = "@i18n(app.modules.mixer_rules.input_rcch_throttle)@"},
 }
-local RCCH_BYPASS_FALLBACK_LABELS = {
-  "@i18n(app.modules.mixer_rules.input_rcch_roll)@",
-  "@i18n(app.modules.mixer_rules.input_rcch_pitch)@",
-  "@i18n(app.modules.mixer_rules.input_rcch_yaw)@",
-  "@i18n(app.modules.mixer_rules.input_rcch_throttle)@",
-}
-local RCCH_BYPASS_RXMAP_FIELDS = {"aileron", "elevator", "rudder", "throttle"}
+for n = 1, 4 do
+  local name = string.format(AUX_FMT, n)
+  RX_FUNCTIONS[#RX_FUNCTIONS + 1] = {field = "aux" .. n, role = name, fallback = name}
+end
 
-local function bypassChannel(roleIdx, rxMap)
-  local channel = rxMap and rxMap[RCCH_BYPASS_RXMAP_FIELDS[roleIdx]]
+local function bypassChannel(fnIdx, rxMap)
+  local channel = rxMap and rxMap[RX_FUNCTIONS[fnIdx].field]
   return type(channel) == "number" and (channel + 1) or nil
 end
 
-local function bypassLabel(roleIdx, rxMap)
-  local channel = bypassChannel(roleIdx, rxMap)
+local function bypassLabel(fnIdx, rxMap)
+  local channel = bypassChannel(fnIdx, rxMap)
   if channel then
     return string.format("@i18n(app.modules.mixer_rules.input_rcch_fmt)@", channel) ..
-      " (" .. RCCH_BYPASS_ROLE_LABELS[roleIdx] .. ")"
+      " (" .. RX_FUNCTIONS[fnIdx].role .. ")"
   end
-  return RCCH_BYPASS_FALLBACK_LABELS[roleIdx]
+  return RX_FUNCTIONS[fnIdx].fallback
 end
 
-local function buildInputOptions(rxMap)
+local function poolUsesInput(pool, value)
+  if not pool then return false end
+  for i = 1, #pool do
+    if pool[i] and pool[i].input == value then return true end
+  end
+  return false
+end
+
+local function buildInputOptions(rxMap, pool)
   local options = {
     {"@i18n(app.modules.mixer_rules.input_none)@", 0},
     {"@i18n(app.modules.mixer_rules.input_stab_roll)@", 1},
@@ -137,24 +155,25 @@ local function buildInputOptions(rxMap)
     {"@i18n(app.modules.mixer_rules.input_rccmd_throttle)@", 8},
   }
 
-  -- Combined bypass-Roll/Pitch/Yaw/Throttle (wire 9-12) + raw CH#5-18 (wire
-  -- 13-26) run, sorted into ascending physical-channel order once rxMap
-  -- resolves all four bypass channels -- otherwise the bypass group's fixed
-  -- Roll/Pitch/Yaw/Throttle order can show e.g. "CH #2 (Roll)" ahead of
-  -- "CH #1 (Throttle)", then jump straight to "CH #5" right after, which
-  -- reads as out of order even though every value is correct. Falls back to
-  -- wire-value order (bypass group by function, then CH#5-18) when rxMap
-  -- hasn't resolved every bypass channel yet, since there's nothing to sort
+  -- The RC functions (wire 9-16) + raw CH#9-18 (wire 17-26) run, sorted
+  -- into ascending receiver-channel order once rxMap resolves every
+  -- function listed -- otherwise the functions' fixed order can show e.g.
+  -- "CH #3 (AUX 1)" after "CH #9", which reads as out of order even though
+  -- every value is correct. Falls back to wire-value order (functions, then
+  -- CH#9-18) when rxMap hasn't resolved them, since there's nothing to sort
   -- by then.
   local channelRun = {}
-  for roleIdx = 1, 4 do
-    channelRun[#channelRun + 1] = {
-      label = bypassLabel(roleIdx, rxMap),
-      value = 8 + roleIdx,
-      channel = bypassChannel(roleIdx, rxMap),
-    }
+  for fnIdx = 1, #RX_FUNCTIONS do
+    local value = 8 + fnIdx
+    if not RX_FUNCTIONS[fnIdx].parked or poolUsesInput(pool, value) then
+      channelRun[#channelRun + 1] = {
+        label = bypassLabel(fnIdx, rxMap),
+        value = value,
+        channel = bypassChannel(fnIdx, rxMap),
+      }
+    end
   end
-  for ch = 5, 18 do
+  for ch = 9, 18 do
     channelRun[#channelRun + 1] = {
       label = string.format("@i18n(app.modules.mixer_rules.input_rcch_fmt)@", ch),
       value = 13 + (ch - 5),
@@ -186,9 +205,10 @@ local function buildInputOptions(rxMap)
   return options
 end
 
--- Rebuilt with the real rxMap once open() below fetches it; this default
--- (rxMap=nil, so bypassLabel() falls back to the plain function names) is
--- what summaryFor()/labelFor() see if either is ever called before that.
+-- Rebuilt with the real rxMap and pool once open() below fetches them; this
+-- default (rxMap=nil, so bypassLabel() falls back to the plain function
+-- names) is what summaryFor()/labelFor() see if either is ever called
+-- before that.
 local INPUT_OPTIONS = buildInputOptions(nil)
 
 -- output: 29 entries -- 0 None, 1-24 Servo 1-24 (the wire value is the
@@ -549,7 +569,7 @@ local function open(opts)
         return
       end
       if pendingPool and rxMapDone and namesDone then
-        INPUT_OPTIONS = buildInputOptions(rxMap)
+        INPUT_OPTIONS = buildInputOptions(rxMap, pendingPool)
         OUTPUT_OPTIONS = buildOutputOptions(servoNames)
         local listState = {pool = pendingPool, selected = 1}
         closeDialog()

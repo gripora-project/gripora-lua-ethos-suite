@@ -646,15 +646,16 @@ check("sensors: after the restart the wizard reloads and reopens the step",
 check("sensors: the restart dialog closes once the FC is back", restartDialog and restartDialog.closed)
 replies[0x5F00], replies[0x5F05] = nil, nil
 
--- Receiver: detect the channel order from the sticks.
+-- Receiver: a car's steering and throttle, roll and pitch parked.
 do
   local raw = {1500, 1500, 1500, 1000, 1000, 1000, 1000, 1000}
   replies[114] = function() return u16list(raw) end
   openPage(14, "receiver")
   settle()
-  check("receiver: the check screen", shows("rx_check"))
+  check("receiver: the check screen", shows("rx_check_car"))
+  check("receiver: the car order needs no change", not shows("rx_car_hint"))
   press(T("rx_wrong"))
-  check("receiver: asks for throttle first", shows("rx_move_throttle"))
+  check("receiver: asks for steering first", shows("rx_move_steering"))
   local function move(channel)
     raw[channel + 1] = 2000
     tick(0.3)
@@ -662,14 +663,19 @@ do
     tick(0.3)
   end
   move(2)
-  check("receiver: then roll", shows("rx_move_roll"))
-  move(1)
-  move(0)
+  check("receiver: then the trigger", shows("rx_move_trigger"))
   before = #sent
   move(3)
   local map = writesOf(65, before + 1)
-  check("receiver: the detected order is written",
-    #map == 1 and bytes(map[1].payload) == "1,0,3,2,4,5,6,7", map[1] and bytes(map[1].payload))
+  check("receiver: the detected order is written, roll and pitch on CH7/CH8",
+    #map == 1 and bytes(map[1].payload) == "6,7,2,3,0,1,4,5", map[1] and bytes(map[1].payload))
+  check("receiver: an order other than the car's offers it", shows("rx_car_hint"))
+  before = #sent
+  press(T("rx_car_order"))
+  map = writesOf(65, before + 1)
+  check("receiver: Car order writes RT1234AE",
+    #map == 1 and bytes(map[1].payload) == "6,7,0,1,2,3,4,5", map[1] and bytes(map[1].payload))
+  check("receiver: and is no longer offered", not shows("rx_car_hint"))
   replies[114] = nil
 end
 

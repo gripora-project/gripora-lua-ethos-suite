@@ -23,7 +23,7 @@ Requires a running background task and a flight controller connection.
 
 | Setting | What it does |
 | --- | --- |
-| TODO | Inspect the page and its helpers; automatic extraction found no controls. |
+| Steering, Throttle, AUX 1–4, CH #9–#24 | One row per function: the fallback mode (Auto, Hold or Set) and, for Set, the value in µs. Steering, Throttle and AUX 1–4 are functions, whatever receiver channel the channel map puts them on; from CH #9 the rows are receiver channels. Roll and pitch, which a car doesn't use, have no row: their settings are kept as they are. |
 
 ## Notes
 

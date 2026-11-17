@@ -21,6 +21,12 @@
 -- that file's inFlight()) showing exactly that -- a channel value that
 -- tracked isArmed one-for-one and never moved with the stick.
 --
+-- Gripora drives a car: steering is the yaw slot (rudder here) and throttle
+-- the throttle slot; roll and pitch are unused but keep their slots, parked
+-- on spare channels (lib/setup_wizard_controls.lua carMap()). The firmware's
+-- default map is "RT1234AE": CH1 steering, CH2 throttle, CH3-CH6 aux 1-4,
+-- roll and pitch on CH7/CH8.
+--
 -- Restores what lib/flight_stats.lua's inFlight() needs to read
 -- the *radio's own* throttle channel (a local, instant, always-accurate
 -- signal) rather than the FC's telemetry-reported throttle_percent -- see
@@ -36,15 +42,16 @@ local mspcodec = requireModule("lib/mspcodec.lua")
 
 local READ_COMMAND = 64
 
+-- The firmware's default, "RT1234AE".
 local SIMULATOR_RESPONSE = {
-  0, -- aileron (roll)
-  1, -- elevator (pitch)
-  3, -- rudder (yaw) -- AETR default: physical CH4
-  2, -- throttle -- AETR default: physical CH3
-  4, -- aux1
-  5, -- aux2
-  6, -- aux3
-  7, -- aux4
+  6, -- aileron (roll), unused: parked on CH7
+  7, -- elevator (pitch), unused: parked on CH8
+  0, -- rudder (yaw): steering, CH1
+  1, -- throttle: CH2
+  2, -- aux1
+  3, -- aux2
+  4, -- aux3
+  5, -- aux4
 }
 
 local msp_rx_map = {

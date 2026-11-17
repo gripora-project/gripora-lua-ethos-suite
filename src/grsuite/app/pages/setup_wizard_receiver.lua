@@ -3,14 +3,18 @@
 -- The configurator's StepReceiver.svelte also sets up the receiver port and
 -- protocol. The radio talks to the flight controller through the receiver,
 -- so that part stays in the Configurator: if this page is open, the link
--- already works. What is left is the channel order and direction check:
+-- already works. What is left is the channel order and direction check.
+-- Gripora drives a car, so only steering and throttle are asked for; roll
+-- and pitch stay parked on spare channels (lib/setup_wizard_controls.lua).
 --
---   check   four live bars (roll, pitch, yaw, throttle, read as the
---           configurator does: the raw receiver channel the RX map points at,
---           scaled by rc_center and rc_deflection). Both sticks bottom-left,
---           and every bar should go left. "Bars are wrong" offers Detect.
---   detect  move throttle, roll, pitch and yaw in turn; the channel that
---           clearly moves is that function's (lib/setup_wizard_controls.lua
+--   check   two live bars (steering, throttle, read as the configurator
+--           does: the raw receiver channel the RX map points at, scaled by
+--           rc_center and rc_deflection). Wheel full left, trigger full
+--           brake, and both bars should go left. "Car order" sets the order
+--           car radios send (CH1 steering, CH2 throttle) when the map is
+--           anything else; "Bars are wrong" offers Detect.
+--   detect  turn the wheel, then pull the trigger; the channel that clearly
+--           moves is that function's (lib/setup_wizard_controls.lua
 --           movedChannel()), and the map is written (MSP_SET_RX_MAP).
 --
 -- A reversed bar is fixed on the radio, not here, as the configurator says.
@@ -26,42 +30,29 @@ local rcConfig = requireModule("lib/msp_rc_config.lua")
 
 local T = {
   title = "@i18n(app.modules.setup_wizard.rx_title)@",
-  check = "@i18n(app.modules.setup_wizard.rx_check)@",
-  order = "@i18n(app.modules.setup_wizard.rx_order_fmt)@",
+  check = "@i18n(app.modules.setup_wizard.rx_check_car)@",
+  order = "@i18n(app.modules.setup_wizard.rx_order_car_fmt)@",
+  carHint = "@i18n(app.modules.setup_wizard.rx_car_hint)@",
+  carOrder = "@i18n(app.modules.setup_wizard.rx_car_order)@",
   reversed = "@i18n(app.modules.setup_wizard.rx_reversed)@",
   detectTitle = "@i18n(app.modules.setup_wizard.rx_detect_title)@",
   wrong = "@i18n(app.modules.setup_wizard.rx_wrong)@",
   restart = "@i18n(app.modules.setup_wizard.rx_restart)@",
 }
 
+-- The controls, each with its slot in the RX map (3 = yaw, 4 = throttle).
 local FUNCTIONS = {
-  {name = "@i18n(app.modules.setup_wizard.axis_roll)@",
-    move = "@i18n(app.modules.setup_wizard.rx_move_roll)@"},
-  {name = "@i18n(app.modules.setup_wizard.axis_pitch)@",
-    move = "@i18n(app.modules.setup_wizard.rx_move_pitch)@"},
-  {name = "@i18n(app.modules.setup_wizard.axis_yaw)@",
-    move = "@i18n(app.modules.setup_wizard.rx_move_yaw)@"},
-  {name = "@i18n(app.modules.setup_wizard.axis_throttle)@",
-    move = "@i18n(app.modules.setup_wizard.rx_move_throttle)@"},
+  {name = "@i18n(app.modules.setup_wizard.axis_steering)@", slot = 3,
+    move = "@i18n(app.modules.setup_wizard.rx_move_steering)@"},
+  {name = "@i18n(app.modules.setup_wizard.axis_throttle)@", slot = 4,
+    move = "@i18n(app.modules.setup_wizard.rx_move_trigger)@"},
 }
+local STEERING, THROTTLE = 1, 2
 
--- The order the configurator asks for them in: throttle, then roll, pitch, yaw.
-local DETECT_ORDER = {4, 1, 2, 3}
-
--- Which function each stick's axes carry, by the radio's stick mode
--- (system.getStickMode(), 1..4): {left stick, right stick}, each {x =, y =}
--- as FUNCTIONS indices (1 roll, 2 pitch, 3 yaw, 4 throttle).
-local STICKS = {
-  {{x = 3, y = 2}, {x = 1, y = 4}},   -- mode 1: rudder/elevator, aileron/throttle
-  {{x = 3, y = 4}, {x = 1, y = 2}},   -- mode 2: rudder/throttle, aileron/elevator
-  {{x = 1, y = 2}, {x = 3, y = 4}},   -- mode 3: aileron/elevator, rudder/throttle
-  {{x = 1, y = 4}, {x = 3, y = 2}},   -- mode 4: aileron/throttle, rudder/elevator
-}
-
--- A stick this far out (of 1) counts as in the corner.
+-- A control this far out (of 1) counts as at its end.
 local TARGET = 0.85
 -- Room the bars need, in text lines.
-local BARS_LINES = 6
+local BARS_LINES = 4
 
 local function new(wiz)
   local self = {liveRc = "raw"}
@@ -76,7 +67,7 @@ local function new(wiz)
     map = function(ok, err) return rxMap.buildReadMessage(ok, err) end,
     rc = function(ok, err) return rcConfig.buildReadMessage(ok, err) end,
   }, function(results)
-    map = results.map and rxMap.toList(results.map) or {0, 1, 2, 3, 4, 5, 6, 7}
+    map = results.map and rxMap.toList(results.map) or controls.carMap(0, 1)
     if results.rc then
       centre = results.rc.rc_center or centre
       span = results.rc.rc_deflection or span
@@ -84,9 +75,9 @@ local function new(wiz)
     wiz.rebuild()
   end)
 
-  -- -1..1 for function i (1 = roll ... 4 = throttle), or nil when unknown.
+  -- -1..1 for control i (STEERING or THROTTLE), or nil when unknown.
   local function reading(i)
-    local raw = map and wiz.rcRaw[(map[i] or 0) + 1]
+    local raw = map and wiz.rcRaw[(map[FUNCTIONS[i].slot] or 0) + 1]
     if not raw or raw <= 0 then return nil end
     local f = (raw - centre) / span
     if f < -1 then f = -1 elseif f > 1 then f = 1 end
@@ -109,15 +100,20 @@ local function new(wiz)
     bus.publish("msp.request", rxMap.buildWriteMessage(map))
   end
 
-  -- One bar per function, the target (full left) marked at its left end.
+  local function useCarOrder()
+    writeMap(controls.carMap(0, 1))
+    wiz.rebuild()
+  end
+
+  -- One bar per control, the target (full left) marked at its left end.
   local function drawBars(x, y, w, h, colors)
     lcd.font(FONT_S)
     local _, th = lcd.getTextSize("Ag")
-    local rowH = math.min(math.floor(h / 4), th + 14)
+    local rowH = math.min(math.floor(h / #FUNCTIONS), th + 14)
     local labelW = 0
-    for i = 1, 4 do labelW = math.max(labelW, (lcd.getTextSize(FUNCTIONS[i].name))) end
+    for i = 1, #FUNCTIONS do labelW = math.max(labelW, (lcd.getTextSize(FUNCTIONS[i].name))) end
     labelW = labelW + 10
-    for i = 1, 4 do
+    for i = 1, #FUNCTIONS do
       local ry = y + (i - 1) * rowH
       local f = reading(i)
       local there = f and f <= -TARGET
@@ -127,45 +123,36 @@ local function new(wiz)
     end
   end
 
-  -- The two sticks as the radio's stick mode has them, each a square with
-  -- the target corner (bottom left) marked and a dot where the stick is.
-  local mode = (system and system.getStickMode and system.getStickMode()) or 2
-  local sticks = STICKS[mode] or STICKS[2]
-  local stickNames = {
-    FUNCTIONS[sticks[1].x].name .. " / " .. FUNCTIONS[sticks[1].y].name,
-    FUNCTIONS[sticks[2].x].name .. " / " .. FUNCTIONS[sticks[2].y].name,
-  }
-  local function drawSticks(x, y, w, h, colors)
+  -- Steering across, throttle up and down: a square with the target corner
+  -- (bottom left) marked and a dot where the two are.
+  local padName = FUNCTIONS[STEERING].name .. " / " .. FUNCTIONS[THROTTLE].name
+  local function drawPad(x, y, w, h, colors)
     lcd.font(FONT_XS)
     local _, lh = lcd.getTextSize("Ag")
-    local gap = math.max(8, math.floor(w * 0.06))
-    local s = math.min(math.floor((w - gap) / 2) - 4, h - lh - 6)
+    local s = math.min(w - 8, h - lh - 6)
     if s < 30 then return end
-    local x0 = x + math.floor((w - (2 * s + gap)) / 2)
+    local gx = x + math.floor((w - s) / 2)
     local y0 = y + math.floor((h - s - lh - 4) / 2)
     local r = math.max(3, math.floor(s * 0.07))
-    for k = 1, 2 do
-      local gx = x0 + (k - 1) * (s + gap)
-      local cx, cy = gx + math.floor(s / 2), y0 + math.floor(s / 2)
-      lcd.color(colors.surface)
-      lcd.drawRectangle(gx, y0, s, s)
-      lcd.drawLine(cx, y0 + 4, cx, y0 + s - 4)
-      lcd.drawLine(gx + 4, cy, gx + s - 4, cy)
-      -- The corner to go to.
-      local z = math.floor(s * (1 - TARGET) / 2) + r
-      lcd.color(colors.active)
-      lcd.drawRectangle(gx + 1, y0 + s - z - 1, z, z)
-      local fx, fy = reading(sticks[k].x), reading(sticks[k].y)
-      if fx and fy then
-        local px = cx + math.floor(fx * (s / 2 - r - 2))
-        local py = cy - math.floor(fy * (s / 2 - r - 2))
-        lcd.color((fx <= -TARGET and fy <= -TARGET) and colors.active or colors.text)
-        lcd.drawLine(cx, cy, px, py)
-        lcd.drawFilledCircle(px, py, r)
-      end
-      lcd.color(colors.muted)
-      lcd.drawText(gx + math.floor(s / 2), y0 + s + 4, stickNames[k], CENTERED)
+    local cx, cy = gx + math.floor(s / 2), y0 + math.floor(s / 2)
+    lcd.color(colors.surface)
+    lcd.drawRectangle(gx, y0, s, s)
+    lcd.drawLine(cx, y0 + 4, cx, y0 + s - 4)
+    lcd.drawLine(gx + 4, cy, gx + s - 4, cy)
+    -- The corner to go to.
+    local z = math.floor(s * (1 - TARGET) / 2) + r
+    lcd.color(colors.active)
+    lcd.drawRectangle(gx + 1, y0 + s - z - 1, z, z)
+    local fx, fy = reading(STEERING), reading(THROTTLE)
+    if fx and fy then
+      local px = cx + math.floor(fx * (s / 2 - r - 2))
+      local py = cy - math.floor(fy * (s / 2 - r - 2))
+      lcd.color((fx <= -TARGET and fy <= -TARGET) and colors.active or colors.text)
+      lcd.drawLine(cx, cy, px, py)
+      lcd.drawFilledCircle(px, py, r)
     end
+    lcd.color(colors.muted)
+    lcd.drawText(gx + math.floor(s / 2), y0 + s + 4, padName, CENTERED)
   end
 
   function self.build()
@@ -175,17 +162,24 @@ local function new(wiz)
       return nil
     end
     if screen == "check" then
-      scr:text(T.title, T.check .. " " .. string.format(T.order, controls.orderLabel(map)), T.reversed)
-      scr:draw(drawSticks, nil, true)
+      local body = T.check .. " " .. string.format(T.order, map[FUNCTIONS[STEERING].slot] + 1,
+        map[FUNCTIONS[THROTTLE].slot] + 1)
+      local buttons = {{text = T.wrong, press = startDetect}}
+      if not controls.isCarMap(map) then
+        body = body .. " " .. T.carHint
+        table.insert(buttons, 1, {text = T.carOrder, press = useCarOrder})
+      end
+      scr:text(T.title, body, T.reversed)
+      scr:draw(drawPad, nil, true)
       scr:live(drawBars, BARS_LINES)
-      -- Next when the bars follow the sticks; Detect when they don't.
-      return scr:row(nil, {{text = T.wrong, press = startDetect}})
+      -- Next when the bars follow the controls; Detect when they don't.
+      return scr:row(nil, buttons)
     end
-    local fn = FUNCTIONS[DETECT_ORDER[#found + 1]]
+    local fn = FUNCTIONS[#found + 1]
     scr:text(T.detectTitle, fn.move)
-    scr:draw(drawSticks, nil, true)
+    scr:draw(drawPad, nil, true)
     scr:live(drawBars, BARS_LINES)
-    -- Back cancels; the order is written once every stick has moved.
+    -- Back cancels; the order is written once both have moved.
     return scr:row(function() screen = "check"; wiz.rebuild() end,
       {{text = T.restart, primary = true, press = startDetect}}, false)
   end
@@ -205,12 +199,10 @@ local function new(wiz)
       local channel = controls.movedChannel(peaks, found)
       if channel >= 0 then
         found[#found + 1] = channel
-        -- The next stick starts from where everything is now.
+        -- The next control starts from where everything is now.
         for i = 1, #raw do baseline[i], peaks[i] = raw[i], 0 end
-        if #found == #DETECT_ORDER then
-          local byFunction = {}
-          for k, fnIndex in ipairs(DETECT_ORDER) do byFunction[fnIndex] = found[k] end
-          writeMap(controls.mapFromDetected(byFunction, #map))
+        if #found == #FUNCTIONS then
+          writeMap(controls.carMap(found[STEERING], found[THROTTLE]))
           screen = "check"
         end
         wiz.rebuild()
@@ -218,7 +210,7 @@ local function new(wiz)
       end
     end
     -- Redraw the bars when a reading moves.
-    for i = 1, 4 do
+    for i = 1, #FUNCTIONS do
       local f = reading(i)
       if f ~= lastShown[i] then
         lastShown[i] = f

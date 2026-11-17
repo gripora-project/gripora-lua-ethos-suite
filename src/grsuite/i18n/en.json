@@ -3562,12 +3562,6 @@
         }
       },
       "failsafe": {
-        "aux1": {
-          "english": "CH #5",
-          "max_length": 5,
-          "needs_translation": false,
-          "translation": "CH #5"
-        },
         "aux10": {
           "english": "CH #14",
           "max_length": 6,
@@ -3597,24 +3591,6 @@
           "max_length": 6,
           "needs_translation": false,
           "translation": "CH #18"
-        },
-        "aux2": {
-          "english": "CH #6",
-          "max_length": 5,
-          "needs_translation": false,
-          "translation": "CH #6"
-        },
-        "aux3": {
-          "english": "CH #7",
-          "max_length": 5,
-          "needs_translation": false,
-          "translation": "CH #7"
-        },
-        "aux4": {
-          "english": "CH #8",
-          "max_length": 5,
-          "needs_translation": false,
-          "translation": "CH #8"
         },
         "aux5": {
           "english": "CH #9",
@@ -3646,6 +3622,12 @@
           "needs_translation": false,
           "translation": "CH #13"
         },
+        "aux_fmt": {
+          "english": "AUX %d",
+          "max_length": 6,
+          "needs_translation": false,
+          "translation": "AUX %d"
+        },
         "collective": {
           "english": "Collective",
           "max_length": 10,
@@ -3664,29 +3646,17 @@
           "needs_translation": false,
           "translation": "Failsafe"
         },
-        "pitch": {
-          "english": "Pitch",
-          "max_length": 5,
+        "steering": {
+          "english": "Steering",
+          "max_length": 8,
           "needs_translation": false,
-          "translation": "Pitch"
-        },
-        "roll": {
-          "english": "Roll",
-          "max_length": 4,
-          "needs_translation": false,
-          "translation": "Roll"
+          "translation": "Steering"
         },
         "throttle": {
           "english": "Throttle",
           "max_length": 8,
           "needs_translation": false,
           "translation": "Throttle"
-        },
-        "yaw": {
-          "english": "Yaw",
-          "max_length": 3,
-          "needs_translation": false,
-          "translation": "Yaw"
         }
       },
       "failsafe_procedure": {
@@ -5112,17 +5082,17 @@
           "needs_translation": false,
           "translation": "RC Channel Roll"
         },
+        "input_rcch_steering": {
+          "english": "RC Channel Steering",
+          "max_length": 19,
+          "needs_translation": false,
+          "translation": "RC Channel Steering"
+        },
         "input_rcch_throttle": {
           "english": "RC Channel Throttle",
           "max_length": 19,
           "needs_translation": false,
           "translation": "RC Channel Throttle"
-        },
-        "input_rcch_yaw": {
-          "english": "RC Channel Yaw",
-          "max_length": 14,
-          "needs_translation": false,
-          "translation": "RC Channel Yaw"
         },
         "input_rccmd_pitch": {
           "english": "RC Command Pitch",
@@ -5148,6 +5118,12 @@
           "needs_translation": false,
           "translation": "RC Command Yaw"
         },
+        "input_role_aux_fmt": {
+          "english": "AUX %d",
+          "max_length": 6,
+          "needs_translation": false,
+          "translation": "AUX %d"
+        },
         "input_role_pitch": {
           "english": "Pitch",
           "max_length": 5,
@@ -5160,17 +5136,17 @@
           "needs_translation": false,
           "translation": "Roll"
         },
+        "input_role_steering": {
+          "english": "Steering",
+          "max_length": 8,
+          "needs_translation": false,
+          "translation": "Steering"
+        },
         "input_role_throttle": {
           "english": "Throttle",
           "max_length": 8,
           "needs_translation": false,
           "translation": "Throttle"
-        },
-        "input_role_yaw": {
-          "english": "Yaw",
-          "max_length": 3,
-          "needs_translation": false,
-          "translation": "Yaw"
         },
         "input_stab_pitch": {
           "english": "Stabilized Pitch",
@@ -7824,6 +7800,12 @@
           "needs_translation": false,
           "translation": "Roll"
         },
+        "axis_steering": {
+          "english": "Steering",
+          "max_length": 8,
+          "needs_translation": false,
+          "translation": "Steering"
+        },
         "axis_throttle": {
           "english": "Throttle",
           "max_length": 8,
@@ -9138,11 +9120,23 @@
           "needs_translation": false,
           "translation": "Disarm: the FC refused setup mode."
         },
-        "rx_check": {
-          "english": "Put both sticks in the bottom-left corner. Every bar should go to the left.",
-          "max_length": 75,
+        "rx_car_hint": {
+          "english": "Car radios send CH1 steering, CH2 throttle.",
+          "max_length": 43,
           "needs_translation": false,
-          "translation": "Put both sticks in the bottom-left corner. Every bar should go to the left."
+          "translation": "Car radios send CH1 steering, CH2 throttle."
+        },
+        "rx_car_order": {
+          "english": "Car order",
+          "max_length": 9,
+          "needs_translation": false,
+          "translation": "Car order"
+        },
+        "rx_check_car": {
+          "english": "Turn the wheel full left and push the trigger to full brake. Both bars should go left.",
+          "max_length": 86,
+          "needs_translation": false,
+          "translation": "Turn the wheel full left and push the trigger to full brake. Both bars should go left."
         },
         "rx_detect_title": {
           "english": "Find the channel order",
@@ -9156,35 +9150,23 @@
           "needs_translation": false,
           "translation": "All good"
         },
-        "rx_move_pitch": {
-          "english": "Move pitch (elevator) all the way, and leave the others still.",
-          "max_length": 62,
+        "rx_move_steering": {
+          "english": "Turn the steering wheel all the way, and leave the trigger still.",
+          "max_length": 65,
           "needs_translation": false,
-          "translation": "Move pitch (elevator) all the way, and leave the others still."
+          "translation": "Turn the steering wheel all the way, and leave the trigger still."
         },
-        "rx_move_roll": {
-          "english": "Move roll (aileron) all the way, and leave the others still.",
-          "max_length": 60,
+        "rx_move_trigger": {
+          "english": "Pull the throttle trigger all the way, and leave the wheel still.",
+          "max_length": 65,
           "needs_translation": false,
-          "translation": "Move roll (aileron) all the way, and leave the others still."
+          "translation": "Pull the throttle trigger all the way, and leave the wheel still."
         },
-        "rx_move_throttle": {
-          "english": "Move throttle all the way, and leave the others still.",
-          "max_length": 54,
+        "rx_order_car_fmt": {
+          "english": "Steering is CH%d, throttle CH%d.",
+          "max_length": 32,
           "needs_translation": false,
-          "translation": "Move throttle all the way, and leave the others still."
-        },
-        "rx_move_yaw": {
-          "english": "Move yaw (rudder) all the way, and leave the others still.",
-          "max_length": 58,
-          "needs_translation": false,
-          "translation": "Move yaw (rudder) all the way, and leave the others still."
-        },
-        "rx_order_fmt": {
-          "english": "Channel order: %s.",
-          "max_length": 18,
-          "needs_translation": false,
-          "translation": "Channel order: %s."
+          "translation": "Steering is CH%d, throttle CH%d."
         },
         "rx_restart": {
           "english": "Start again",

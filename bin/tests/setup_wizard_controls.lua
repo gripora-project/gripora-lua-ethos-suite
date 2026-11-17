@@ -26,12 +26,36 @@ local St = assert(loadfile(ROOT .. "lib/setup_wizard_styles.lua"))()
 local function list(t) return table.concat(t, ",") end
 local function range(r) return r.start .. "-" .. r["end"] end
 
+-- The car's channel order (Gripora's own: steering and throttle only, roll
+-- and pitch parked). Maps are roll, pitch, yaw (steering), throttle, aux 1-4.
+check("car order is the firmware's RT1234AE", list(C.CAR_MAP) == "6,7,0,1,2,3,4,5")
+check("carMap: CH1 steering, CH2 throttle", list(C.carMap(0, 1)) == list(C.CAR_MAP))
+check("carMap: CH2 steering, CH1 throttle", list(C.carMap(1, 0)) == "6,7,1,0,2,3,4,5")
+check("carMap: roll and pitch skip a high steering channel",
+  list(C.carMap(7, 2)) == "5,6,7,2,0,1,3,4")
+check("carMap: steering and throttle past CH8 leave aux on CH1-CH4",
+  list(C.carMap(9, 10)) == "6,7,9,10,0,1,2,3")
+do
+  local ok = true
+  for steering = 0, 9 do
+    for throttle = 0, 9 do
+      if steering ~= throttle then
+        local m = C.carMap(steering, throttle)
+        local seen = {}
+        for i = 1, 8 do
+          if m[i] == nil or seen[m[i]] then ok = false end
+          seen[m[i] or -1] = true
+        end
+        if m[1] > 7 or m[2] > 7 or m[3] ~= steering or m[4] ~= throttle then ok = false end
+      end
+    end
+  end
+  check("carMap: every pair gives 8 distinct channels, roll and pitch in CH1-CH8", ok)
+end
+check("isCarMap", C.isCarMap(C.carMap(0, 1)) and not C.isCarMap({0, 1, 3, 2, 4, 5, 6, 7})
+  and not C.isCarMap(nil))
+
 -- receiver.js
-check("orderLabel AETR", C.orderLabel({0, 1, 3, 2, 4, 5, 6, 7}) == "AETR1234")
-check("orderLabel TAER", C.orderLabel({1, 2, 3, 0, 4, 5, 6, 7}) == "TAER1234")
-check("mapFromDetected: TEAR on 0-3", list(C.mapFromDetected({2, 1, 3, 0}, 8)) == "2,1,3,0,4,5,6,7")
-check("mapFromDetected: sticks on 4-7, aux fills 0-3", list(C.mapFromDetected({4, 5, 6, 7}, 8)) == "4,5,6,7,0,1,2,3")
-check("orderLabel of a detected map", C.orderLabel(C.mapFromDetected({2, 1, 3, 0}, 8)) == "TEAR1234")
 check("movedChannel: nothing moved", C.movedChannel({0, 0, 0, 0}) == -1)
 check("movedChannel: not far enough yet", C.movedChannel({0, 200, 0, 0}) == -1)
 check("movedChannel: a clear winner", C.movedChannel({10, 450, 20, 0}) == 1)

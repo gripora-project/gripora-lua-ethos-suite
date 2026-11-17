@@ -26,22 +26,23 @@ local MSG_RELOAD_TITLE = "@i18n(reload)@"
 local MSG_RELOAD_BODY = "@i18n(app.msg_reload_settings)@"
 local MODE_SET = 2
 
--- Roll/Pitch/Yaw/Throttle (AETR), no Collective channel: gripora is
--- fixed-wing, not a 5-channel heli layout -- matches the precedent this
--- project already set once, pre-rewrite (see git history's "Remove
--- collective channel and dependancies (#6)"). One extra aux slot
--- (aux14) added at the end to keep this list's length matching
--- the first 18 channels, same fix that
--- commit made.
+-- The firmware's failsafe slots are its RC functions, not receiver channels:
+-- roll, pitch, yaw, throttle, aux 1-4 (rx.c getRxfailValue(), after the RX
+-- map), then CH #9 onwards. Gripora drives a car, so yaw is Steering and
+-- roll and pitch, unused and parked on spare channels, get no row (false):
+-- their settings are still read and, never being changed here, never
+-- written. Aux 1-4 are named, not numbered, since the RX map decides which
+-- receiver channel each is on (CH3-CH6 by default).
+local AUX_FMT = "@i18n(app.modules.failsafe.aux_fmt)@"
 local CHANNEL_LABELS = {
-  "@i18n(app.modules.failsafe.roll)@",
-  "@i18n(app.modules.failsafe.pitch)@",
-  "@i18n(app.modules.failsafe.yaw)@",
+  false,
+  false,
+  "@i18n(app.modules.failsafe.steering)@",
   "@i18n(app.modules.failsafe.throttle)@",
-  "@i18n(app.modules.failsafe.aux1)@",
-  "@i18n(app.modules.failsafe.aux2)@",
-  "@i18n(app.modules.failsafe.aux3)@",
-  "@i18n(app.modules.failsafe.aux4)@",
+  string.format(AUX_FMT, 1),
+  string.format(AUX_FMT, 2),
+  string.format(AUX_FMT, 3),
+  string.format(AUX_FMT, 4),
   "@i18n(app.modules.failsafe.aux5)@",
   "@i18n(app.modules.failsafe.aux6)@",
   "@i18n(app.modules.failsafe.aux7)@",
@@ -310,24 +311,26 @@ local function open(opts)
 
   local slotsHint = {0, 0}
   for i = 1, #CHANNEL_LABELS do
-    local line = form.addLine(CHANNEL_LABELS[i])
-    local slots = form.getFieldSlots(line, slotsHint)
-    local pair = {index = i}
-    pair.mode = form.addChoiceField(line, slots[1], MODE_OPTIONS,
-      function() return channels[i].mode end,
-      function(value)
-        markDirty()
-        channels[i].mode = value
-        refreshEnabled()
-      end)
-    pair.value = form.addNumberField(line, slots[2], 875, 2125,
-      function() return channels[i].value end,
-      function(value) markDirty(); channels[i].value = value end)
-    pair.value:suffix("us")
-    if pair.value.step then pair.value:step(5) end
-    pair.mode:enable(false)
-    pair.value:enable(false)
-    fields[#fields + 1] = pair
+    if CHANNEL_LABELS[i] then
+      local line = form.addLine(CHANNEL_LABELS[i])
+      local slots = form.getFieldSlots(line, slotsHint)
+      local pair = {index = i}
+      pair.mode = form.addChoiceField(line, slots[1], MODE_OPTIONS,
+        function() return channels[i].mode end,
+        function(value)
+          markDirty()
+          channels[i].mode = value
+          refreshEnabled()
+        end)
+      pair.value = form.addNumberField(line, slots[2], 875, 2125,
+        function() return channels[i].value end,
+        function(value) markDirty(); channels[i].value = value end)
+      pair.value:suffix("us")
+      if pair.value.step then pair.value:step(5) end
+      pair.mode:enable(false)
+      pair.value:enable(false)
+      fields[#fields + 1] = pair
+    end
   end
 
   loadData()

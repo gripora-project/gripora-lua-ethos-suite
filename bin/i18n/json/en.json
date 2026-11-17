@@ -3632,29 +3632,11 @@
         }
       },
       "failsafe": {
-        "aux1": {
-          "english": "CH #5",
-          "translation": "CH #5",
+        "aux_fmt": {
+          "english": "AUX %d",
+          "translation": "AUX %d",
           "needs_translation": false,
-          "max_length": 5
-        },
-        "aux2": {
-          "english": "CH #6",
-          "translation": "CH #6",
-          "needs_translation": false,
-          "max_length": 5
-        },
-        "aux3": {
-          "english": "CH #7",
-          "translation": "CH #7",
-          "needs_translation": false,
-          "max_length": 5
-        },
-        "aux4": {
-          "english": "CH #8",
-          "translation": "CH #8",
-          "needs_translation": false,
-          "max_length": 5
+          "max_length": 6
         },
         "aux5": {
           "english": "CH #9",
@@ -3734,29 +3716,17 @@
           "needs_translation": false,
           "max_length": 8
         },
-        "pitch": {
-          "english": "Pitch",
-          "translation": "Pitch",
+        "steering": {
+          "english": "Steering",
+          "translation": "Steering",
           "needs_translation": false,
-          "max_length": 5
-        },
-        "roll": {
-          "english": "Roll",
-          "translation": "Roll",
-          "needs_translation": false,
-          "max_length": 4
+          "max_length": 8
         },
         "throttle": {
           "english": "Throttle",
           "translation": "Throttle",
           "needs_translation": false,
           "max_length": 8
-        },
-        "yaw": {
-          "english": "Yaw",
-          "translation": "Yaw",
-          "needs_translation": false,
-          "max_length": 3
         }
       },
       "failsafe_procedure": {
@@ -7554,11 +7524,11 @@
           "needs_translation": false,
           "max_length": 5
         },
-        "input_role_yaw": {
-          "english": "Yaw",
-          "translation": "Yaw",
+        "input_role_steering": {
+          "english": "Steering",
+          "translation": "Steering",
           "needs_translation": false,
-          "max_length": 3
+          "max_length": 8
         },
         "input_role_throttle": {
           "english": "Throttle",
@@ -7566,17 +7536,23 @@
           "needs_translation": false,
           "max_length": 8
         },
+        "input_role_aux_fmt": {
+          "english": "AUX %d",
+          "translation": "AUX %d",
+          "needs_translation": false,
+          "max_length": 6
+        },
         "input_rcch_pitch": {
           "english": "RC Channel Pitch",
           "translation": "RC Channel Pitch",
           "needs_translation": false,
           "max_length": 16
         },
-        "input_rcch_yaw": {
-          "english": "RC Channel Yaw",
-          "translation": "RC Channel Yaw",
+        "input_rcch_steering": {
+          "english": "RC Channel Steering",
+          "translation": "RC Channel Steering",
           "needs_translation": false,
-          "max_length": 14
+          "max_length": 19
         },
         "input_rcch_throttle": {
           "english": "RC Channel Throttle",
@@ -8608,6 +8584,12 @@
           "needs_translation": false,
           "max_length": 3
         },
+        "axis_steering": {
+          "english": "Steering",
+          "translation": "Steering",
+          "needs_translation": false,
+          "max_length": 8
+        },
         "axis_throttle": {
           "english": "Throttle",
           "translation": "Throttle",
@@ -8794,17 +8776,29 @@
           "needs_translation": false,
           "max_length": 8
         },
-        "rx_check": {
-          "english": "Put both sticks in the bottom-left corner. Every bar should go to the left.",
-          "translation": "Put both sticks in the bottom-left corner. Every bar should go to the left.",
+        "rx_check_car": {
+          "english": "Turn the wheel full left and push the trigger to full brake. Both bars should go left.",
+          "translation": "Turn the wheel full left and push the trigger to full brake. Both bars should go left.",
           "needs_translation": false,
-          "max_length": 75
+          "max_length": 86
         },
-        "rx_order_fmt": {
-          "english": "Channel order: %s.",
-          "translation": "Channel order: %s.",
+        "rx_order_car_fmt": {
+          "english": "Steering is CH%d, throttle CH%d.",
+          "translation": "Steering is CH%d, throttle CH%d.",
           "needs_translation": false,
-          "max_length": 18
+          "max_length": 32
+        },
+        "rx_car_hint": {
+          "english": "Car radios send CH1 steering, CH2 throttle.",
+          "translation": "Car radios send CH1 steering, CH2 throttle.",
+          "needs_translation": false,
+          "max_length": 43
+        },
+        "rx_car_order": {
+          "english": "Car order",
+          "translation": "Car order",
+          "needs_translation": false,
+          "max_length": 9
         },
         "rx_reversed": {
           "english": "A bar going right is reversed: reverse that channel on your radio, not here.",
@@ -8830,29 +8824,17 @@
           "needs_translation": false,
           "max_length": 22
         },
-        "rx_move_roll": {
-          "english": "Move roll (aileron) all the way, and leave the others still.",
-          "translation": "Move roll (aileron) all the way, and leave the others still.",
+        "rx_move_steering": {
+          "english": "Turn the steering wheel all the way, and leave the trigger still.",
+          "translation": "Turn the steering wheel all the way, and leave the trigger still.",
           "needs_translation": false,
-          "max_length": 60
+          "max_length": 65
         },
-        "rx_move_pitch": {
-          "english": "Move pitch (elevator) all the way, and leave the others still.",
-          "translation": "Move pitch (elevator) all the way, and leave the others still.",
+        "rx_move_trigger": {
+          "english": "Pull the throttle trigger all the way, and leave the wheel still.",
+          "translation": "Pull the throttle trigger all the way, and leave the wheel still.",
           "needs_translation": false,
-          "max_length": 62
-        },
-        "rx_move_yaw": {
-          "english": "Move yaw (rudder) all the way, and leave the others still.",
-          "translation": "Move yaw (rudder) all the way, and leave the others still.",
-          "needs_translation": false,
-          "max_length": 58
-        },
-        "rx_move_throttle": {
-          "english": "Move throttle all the way, and leave the others still.",
-          "translation": "Move throttle all the way, and leave the others still.",
-          "needs_translation": false,
-          "max_length": 54
+          "max_length": 65
         },
         "rx_restart": {
           "english": "Start again",

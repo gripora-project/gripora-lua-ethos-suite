@@ -3,7 +3,8 @@
 -- gain step's adjustment ranges.
 --
 -- A port of gripora-configurator src/tabs/setup_wizard/receiver.js,
--- modeRanges.js and trimGain.js. Keep them in step: the cases in
+-- modeRanges.js and trimGain.js, except the channel order, which is the
+-- car's (steering and throttle only; see below). Keep them in step: the cases in
 -- bin/tests/setup_wizard_controls.lua are the configurator's own, from
 -- scripts/tests/setup-wizard-receiver.test.mjs,
 -- setup-wizard-trim-gain.test.mjs and setup-wizard-surfaces.test.mjs.
@@ -23,14 +24,21 @@ local M = {}
 local function round(x) return floor(x + 0.5) end
 
 ---------------------------------------------------------------------------
--- Receiver: channel order (receiver.js)
+-- Receiver: channel order
 --
 -- map[function + 1] = receiver channel, functions in the order roll, pitch,
--- yaw, throttle, aux 1-4 (firmware rxConfig()->rcmap).
+-- yaw, throttle, aux 1-4 (firmware rxConfig()->rcmap, MSP_RX_MAP).
+--
+-- Gripora drives a car: steering (the yaw slot) and throttle are the only
+-- controls. Roll and pitch keep their slots, since the wire layout is the
+-- firmware's, but are parked on two of CH1-CH8 that nothing else uses,
+-- CH7 and CH8 when those are free. The firmware's default is "RT1234AE":
+-- CH1 steering, CH2 throttle, CH3-CH6 aux 1-4, roll and pitch on CH7/CH8,
+-- the order car radios send.
 ---------------------------------------------------------------------------
 
--- Letters for roll, pitch, yaw, throttle, as in "AETR".
-local LETTERS = {"A", "E", "R", "T"}
+local MAPPABLE = 8
+M.CAR_MAP = {6, 7, 0, 1, 2, 3, 4, 5}
 
 local function indexOf(list, value)
   for i = 1, #list do
@@ -39,32 +47,23 @@ local function indexOf(list, value)
   return -1
 end
 
--- The order as the receiver sends it, e.g. {0, 1, 3, 2, ...} -> "AETR1234".
-function M.orderLabel(map)
-  local out = {}
-  for channel = 0, #map - 1 do
-    local fn = indexOf(map, channel)
-    if fn < 0 then
-      out[#out + 1] = "-"
-    elseif fn < 4 then
-      out[#out + 1] = LETTERS[fn + 1]
-    else
-      out[#out + 1] = tostring(fn - 3)
-    end
+-- A full map from the channels found for steering and throttle: aux 1-4
+-- take the lowest of CH1-CH8 left over, roll and pitch the highest two.
+function M.carMap(steering, throttle)
+  local free = {}
+  for channel = 0, MAPPABLE - 1 do
+    if channel ~= steering and channel ~= throttle then free[#free + 1] = channel end
   end
-  return table.concat(out)
+  local map = {free[#free - 1], free[#free], steering, throttle}
+  for i = 1, 4 do map[4 + i] = free[i] end
+  return map
 end
 
--- A full map from the channels found for roll, pitch, yaw and throttle (in
--- that order); the aux functions take the remaining channels in order.
-function M.mapFromDetected(found, length)
-  local map = {}
-  for i = 1, #found do map[i] = found[i] end
-  for channel = 0, length - 1 do
-    if indexOf(found, channel) < 0 then map[#map + 1] = channel end
+function M.isCarMap(map)
+  for i = 1, MAPPABLE do
+    if not map or map[i] ~= M.CAR_MAP[i] then return false end
   end
-  while #map > length do map[#map] = nil end
-  return map
+  return true
 end
 
 -- Minimum movement (us) that counts as "this stick moved", and how much

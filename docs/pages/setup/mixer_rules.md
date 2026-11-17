@@ -21,7 +21,7 @@ Requires a running background task and a flight controller connection.
 | Setting | What it does |
 | --- | --- |
 | Operation | None marks an unused rule; Set, Add and Multiply select how the rule combines with its output. |
-| Input | Select a stabilized axis, RC command or receiver channel. Logical receiver-axis labels include the physical channel when the channel map is available. |
+| Input | Select a stabilized axis, RC command or receiver channel. Steering, Throttle and AUX 1–4 are listed by the receiver channel the channel map puts them on, for example *CH #1 (Steering)*, or by name when the map can't be read. Roll and pitch, which a car doesn't use, are listed only when a rule already reads one. |
 | Output | Destination output for the rule: None, Servo 1–24 or Motor 1–4. Servo N is the servo of that number on the Servos page, on a PWM output, a bus channel or both. A servo with a name shows it, for example *Servo 1 (L AIL)*. |
 | Offset | Rule offset, −2500 to 2500. |
 | Weight / Weight (-) | Separate weights for positive and negative input, each −10,000 to 10,000 in the editor's raw scale. |
