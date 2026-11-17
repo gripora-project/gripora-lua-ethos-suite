@@ -472,11 +472,12 @@ end
 -- The FC's answer loses its second continuation frame on the link: start,
 -- sequence 1, then sequence 3. The queue sees the break on the tick that reads
 -- the out-of-sequence frame and resends on the next tick, without waiting for
--- the retry window -- on firmware at MSP API 22.12 or later, which answers a
--- replacement request with its own start frame (gripora-firmware #173).
--- 22.15 also offers version 3 of the framing; 22.11 has neither.
-local API_WITH_REPLACEMENT_START = {22, 15}
-local API_4_6 = {22, 11}
+-- the retry window -- on firmware at MSP API 33.0 or later, which answers a
+-- replacement request with its own start frame (gripora-firmware #173) and
+-- offers version 3 of the framing. Firmware from before 33.0 (22.x) is
+-- refused by the session, and the queue keeps the plain behaviour for it.
+local API_WITH_REPLACEMENT_START = {33, 0}
+local API_OLDER = {22, 16}
 
 local function brokenReply(cmd)
   local frames = replyFrames(cmd, 12, { {1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12} })
@@ -544,12 +545,12 @@ do
     "frames=" .. framesForCommand(rig.transport.sent, msg.command))
 end
 
--- Firmware below API 22.12 (before snapshot 0.0.30) answers a replacement request without a start
--- frame, so an early resend there only spends an attempt. The queue waits for
+-- Firmware below API 33.0 is not known to answer a replacement request with a start
+-- frame, so an early resend there could only spend an attempt. The queue waits for
 -- the retry window, as it did before; so does a queue that has not been told
 -- the API version yet, and one told nil on a disconnect.
 for _, case in ipairs({
-  { label = "API 22.11", api = API_4_6 },
+  { label = "API 22.16", api = API_OLDER },
   { label = "an unknown API version", api = nil },
   { label = "a disconnect", api = API_WITH_REPLACEMENT_START, disconnect = true },
 }) do
@@ -839,7 +840,7 @@ do
 end
 
 -- One frame of a long reply is lost on the link. The rest of that reply keeps
--- arriving and is discarded. On API 22.12 the queue resends on the tick after
+-- arriving and is discarded. On API 33.0 the queue resends on the tick after
 -- it sees the break, while that tail is still arriving: the firmware answers a
 -- request that replaces a reply in progress with its own start frame
 -- (gripora-firmware #173), so there is nothing to wait for. It used to
@@ -887,7 +888,7 @@ do
 end
 
 -- ---------------------------------------------------------------------------
--- Framing: version 2 to start, version 3 from API 22.15, back on a refusal
+-- Framing: version 2 to start, version 3 from API 33.0, back on a refusal
 -- ---------------------------------------------------------------------------
 
 -- Reply frames as telemetry/msp_shared.c's sendMspReply() writes version 3: a
@@ -931,10 +932,10 @@ local function queueReplies(rig, frames)
   for _, f in ipairs(frames) do rig.transport.replies[#rig.transport.replies + 1] = f end
 end
 
--- Before the API version is known, and below API 22.15, requests go out as
+-- Before the API version is known, and below API 33.0, requests go out as
 -- MSPv2: version bits 2 and a flags byte.
-for _, case in ipairs({ { label = "an unknown API version", api = nil }, { label = "API 22.11", api = API_4_6 },
-    { label = "API 22.12 (resend on, no version 3 yet)", api = {22, 12} } }) do
+for _, case in ipairs({ { label = "an unknown API version", api = nil }, { label = "API 22.16", api = API_OLDER },
+    { label = "Rotorflight's API 12.10", api = {12, 10} } }) do
   local rig = newRig({ api = case.api })
   rig.queue:add(newMessage(0x1E))
   rig.tick()
@@ -944,14 +945,14 @@ for _, case in ipairs({ { label = "an unknown API version", api = nil }, { label
     string.format("bytes=%02X %02X %02X %02X %02X %02X", b[1] or 0, b[2] or 0, b[3] or 0, b[4] or 0, b[5] or 0, b[6] or 0))
 end
 
--- From API 22.15 a request goes out in version 3: command and an 8-bit length
+-- From API 33.0 a request goes out in version 3: command and an 8-bit length
 -- right after the status byte, so the first frame has room for payload.
 do
   local rig = newRig({ api = API_WITH_REPLACEMENT_START })
   rig.queue:add(newMessage(0x1E, { payload = { 0xAA, 0xBB, 0xCC } }))
   rig.tick()
   local b = rig.transport.sent[1].bytes
-  check("from API 22.15, a request goes out in version 3 with payload in its start frame",
+  check("from API 33.0, a request goes out in version 3 with payload in its start frame",
     b[1] & 0x70 == 0x70 and b[2] == 0x1E and b[3] == 0 and b[4] == 3 and b[5] == 0xAA and b[6] == 0xBB,
     string.format("bytes=%02X %02X %02X %02X %02X %02X", b[1], b[2], b[3], b[4], b[5], b[6]))
 end

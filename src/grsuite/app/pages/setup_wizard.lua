@@ -20,7 +20,7 @@
 -- telemetry included, is here.
 --
 -- Safety, as in the configurator:
---   * The wizard needs timed overrides (API 22.14). Everything it holds -- the
+--   * The wizard needs timed overrides (MSP API 33.0). Everything it holds -- the
 --     setup state, forced modes, mixer and servo overrides, servo probes --
 --     is sent with a timeout and re-sent by lib/override_keepalive.lua, so a
 --     radio that is switched off or a link that drops lets the flight

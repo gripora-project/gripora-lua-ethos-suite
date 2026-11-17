@@ -1,4 +1,4 @@
--- MSP2_WING_SERVO_NAMES (cmd 0x5F3A, read) and MSP2_WING_SET_SERVO_NAME
+-- MSP2_GRIPORA_SERVO_NAMES (cmd 0x5F3A, read) and MSP2_GRIPORA_SET_SERVO_NAME
 -- (cmd 0x5F3B, write): a short name per servo ("L AIL", "ELEV"), for
 -- reference only. Nothing in flight reads it.
 --

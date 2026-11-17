@@ -1,6 +1,6 @@
 -- Controls -> GPS Navigation page.
 --
--- Edits MSP2_WING_GPS_NAV_CONFIG: tuning for the fixed-wing RTH/Loiter nav
+-- Edits MSP2_GRIPORA_GPS_NAV_CONFIG: tuning for the fixed-wing RTH/Loiter nav
 -- controller, used by BOXRTH/BOXLOITER and the Failsafe Procedure page's
 -- GPS Rescue option. Same flat-record shape as failsafe_procedure.lua (see
 -- that file's own header comment for why this differs from

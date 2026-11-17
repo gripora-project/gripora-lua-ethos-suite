@@ -311,7 +311,11 @@ end
 
 -- Opening ---------------------------------------------------------------------
 
-local function openPage(apiMinor, stepKey)
+-- api is {major, minor}.
+local CURRENT = {33, 0}
+local OLDER = {22, 16}
+
+local function openPage(api, stepKey)
   fields, dialogs, sent, headers = {}, {}, {}, {}
   answeredUpTo = 0
   heldMessages = {}
@@ -332,16 +336,16 @@ local function openPage(apiMinor, stepKey)
     setCleanupHandler = function(fn) ctx.cleanup = fn end,
   })
   -- keepalive.lua subscribes when it is first required, by the page.
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = apiMinor})
+  session({connected = true, isArmed = false, apiVersionMajor = api[1], apiVersionMinor = api[2]})
   for _ = 1, 4 do
     answerAll()
     if ctx.wakeup then ctx.wakeup() end
   end
 end
 
--- 22.14, default glider ------------------------------------------------------
+-- 33.0, default glider -------------------------------------------------------
 
-openPage(14)
+openPage(CURRENT)
 
 local modeWrites = writesOf(0x5F1B)
 check("opening holds the setup state, nothing forced, 10 s timeout",
@@ -443,7 +447,7 @@ check("one surface wrong on its own axis: its servo is reversed",
 
 -- Arming lets go of everything
 before = #sent
-session({connected = true, isArmed = true, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = true, isArmed = true, apiVersionMajor = 33, apiVersionMinor = 0})
 check("arming releases the held axes", lastMixer(before + 1, 2) and lastMixer(before + 1, 2).value == 2501)
 tick()
 check("arming says why", (function()
@@ -453,7 +457,7 @@ check("the answers are greyed out while armed", not button(T("dir_like")).enable
 before = #sent
 tick(1)
 check("nothing moves while armed", #writesOf(191, before + 1) == 0)
-session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
 tick()
 tick(1)
 check("disarming starts the check moving again", #mixerWrites(before + 1, 3) >= 1)
@@ -486,7 +490,7 @@ check("nothing is held after leaving", not requireModule("lib/override_keepalive
 
 -- Discard writes back what was loaded ----------------------------------------
 
-openPage(14)
+openPage(CURRENT)
 press(T("dir_start"))
 press(T("dir_like"))
 press(T("dir_unlike"))
@@ -518,7 +522,7 @@ do
   end
   replies[172] = pool
 end
-openPage(14)
+openPage(CURRENT)
 press(T("dir_start"))
 check("a flying wing starts on pitch", shows("dir_check_pitch"))
 press(T("dir_like"))
@@ -571,7 +575,7 @@ end
 local function s16bytes(v) if v < 0 then v = v + 65536 end return v % 256, math.floor(v / 256) end
 
 -- Sensors: calibrate, auto orientation, auto level, then save and restart.
-openPage(14, "sensors")
+openPage(CURRENT, "sensors")
 settle()
 check("sensors: opens on its intro", shows("sen_intro"))
 check("sensors: the board has an accelerometer (sensor_status bit 0)", not shows("sen_no_acc"))
@@ -635,9 +639,9 @@ tick(3)
 check("sensors: the bar fills while the FC restarts",
   restartDialog and (restartDialog.values[#restartDialog.values] or 0) >= 10,
   restartDialog and table.concat(restartDialog.values, ","))
-session({connected = false, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
 tick()
-session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14, handshake = {apiVersion = true}})
+session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0, handshake = {apiVersion = true}})
 before = #sent
 settle(6)
 check("sensors: after the restart the wizard reloads and reopens the step",
@@ -650,7 +654,7 @@ replies[0x5F00], replies[0x5F05] = nil, nil
 do
   local raw = {1500, 1500, 1500, 1000, 1000, 1000, 1000, 1000}
   replies[114] = function() return u16list(raw) end
-  openPage(14, "receiver")
+  openPage(CURRENT, "receiver")
   settle()
   check("receiver: the check screen", shows("rx_check_car"))
   check("receiver: the car order needs no change", not shows("rx_car_hint"))
@@ -680,7 +684,7 @@ do
 end
 
 -- Airframe: a flying wing replaces the mix.
-openPage(14, "airframe")
+openPage(CURRENT, "airframe")
 settle()
 press(T("air_change"))
 do
@@ -731,7 +735,7 @@ do
 end
 
 -- Servo type: digital sets the one PWM rate, then save and restart.
-openPage(14, "servotype")
+openPage(CURRENT, "servotype")
 settle()
 check("servo type: analog and digital are offered",
   button(T("st_analog")) ~= nil and button(T("st_digital")) ~= nil)
@@ -756,7 +760,7 @@ do
   for _, b in ipairs({string.byte("F7C5", 1, -1)}) do info[#info + 1] = b end
   replies[4] = info
 end
-openPage(14, "busoutput")
+openPage(CURRENT, "busoutput")
 settle()
 check("servo bus: opens on the port question", shows("bus_title") and button(T("bus_none")) ~= nil)
 check("servo bus: the ports carry the board's connector names", button("S.BUS") ~= nil and button("TELEM") ~= nil)
@@ -821,7 +825,7 @@ do
     return n
   end
   local function toSignal()
-    openPage(14, "busoutput")
+    openPage(CURRENT, "busoutput")
     settle()
     press("UART1")
     press(T("btn_next"))
@@ -952,16 +956,16 @@ do
   headers[#headers].opts.onBack()
   tick()
   running()
-  session({connected = true, isArmed = true, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = true, isArmed = true, apiVersionMajor = 33, apiVersionMinor = 0})
   check("servo bus: arming stops a running trial", stopped())
   tick()
   check("servo bus: and Detect wiring is off while armed", not button(T("esc_detect")).enabled)
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
   running()
-  session({connected = false, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   check("servo bus: a lost link stops a running trial", stopped())
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
   running()
   headers[#headers].opts.onBack()
@@ -994,9 +998,9 @@ do
   press(T("btn_save_restart"))
   tick()
   tick()
-  session({connected = false, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14, handshake = {apiVersion = true}})
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0, handshake = {apiVersion = true}})
   settle(6)
   check("servo bus: after that restart the step reopens on the signal screen, still with Use the other pin",
     #writesOf(68, before + 1) == 1 and shows("bus_signal_title") and button(T("bus_other_pin")) ~= nil
@@ -1041,7 +1045,7 @@ do
   local packets = 10
   -- One device: physical ID 5, on F.Bus, not forwarded, packet count (U32), no name, no app IDs.
   replies[0x5F07] = function() return {1, 5, 0, 0, packets % 256, packets // 256, 0, 0, 0, 0} end
-  openPage(14, "busoutput")
+  openPage(CURRENT, "busoutput")
   settle()
   press("UART1")
   press(T("btn_next"))
@@ -1076,7 +1080,7 @@ do
 
   -- The serial ports answer before the wiring: no port can be chosen yet.
   held[0x5F09] = true
-  openPage(14, "busoutput")
+  openPage(CURRENT, "busoutput")
   settle()
   check("servo bus: no port is offered before the wiring has been read",
     button("S.BUS") == nil and button(T("bus_none")) == nil and #heldMessages == 1)
@@ -1097,7 +1101,7 @@ do
 
   -- The same for the connector names: without them the SBUS connector is not known.
   held[4] = true
-  openPage(14, "busoutput")
+  openPage(CURRENT, "busoutput")
   settle()
   check("servo bus: no port is offered before the board has been read",
     button("UART1") == nil and button("S.BUS") == nil and button(T("bus_none")) == nil)
@@ -1106,7 +1110,7 @@ do
   check("servo bus: then the ports carry the connector names", button("S.BUS") ~= nil and button("UART1") == nil)
   -- A wiring read that fails still lets the step go on, with the pin left alone.
   held[0x5F09] = true
-  openPage(14, "busoutput")
+  openPage(CURRENT, "busoutput")
   settle()
   do
     local m = heldMessages[1]
@@ -1131,7 +1135,7 @@ do
       return out
     end
   end
-  openPage(14, "busoutput")
+  openPage(CURRENT, "busoutput")
   settle()
   press("S.BUS")
   check("servo bus: a new port asks for Save and restart", button(T("btn_save_restart")) ~= nil)
@@ -1171,7 +1175,7 @@ do
 end
 
 -- Motor: the protocol, and a timed spin.
-openPage(14, "motor")
+openPage(CURRENT, "motor")
 settle()
 local function protocolY() local b = button(T("mot_pwm")); return b and b.rect.y end
 local function otherPicker()
@@ -1230,7 +1234,7 @@ do
   check("motor: the Other picker comes after the quick picks, before the row", order)
 end
 -- Other: DShot600 is still there for a pilot who wants it.
-openPage(14, "motor")
+openPage(CURRENT, "motor")
 settle()
 before = #sent
 otherPicker().set(7)
@@ -1255,7 +1259,7 @@ local function motorReply(bidir, protocol)
 end
 check("motor: no RPM note while DShot600 is set", not shows("mot_dshot150_rpm"))
 motorReply(1, 0)
-openPage(14, "motor")
+openPage(CURRENT, "motor")
 settle()
 before = #sent
 press(T("mot_dshot150"))
@@ -1265,7 +1269,7 @@ check("motor: choosing DShot150 turns bidirectional DShot off in the same write"
   bidirOff[1] and bytes(bidirOff[1].payload))
 check("motor: after choosing DShot150 both the restart and the RPM notes show",
   shows("mot_changed") and shows("mot_dshot150_rpm"))
-openPage(14, "motor")
+openPage(CURRENT, "motor")
 settle()
 before = #sent
 press(T("mot_dshot300"))
@@ -1275,7 +1279,7 @@ check("motor: DShot300 leaves bidirectional DShot as it was",
   bidirKept[1] and bytes(bidirKept[1].payload))
 check("motor: no RPM note after choosing DShot300", not shows("mot_dshot150_rpm"))
 motorReply(0, 5)
-openPage(14, "motor")
+openPage(CURRENT, "motor")
 settle()
 check("motor: with DShot150 set, the step says RPM needs DShot300 or telemetry",
   shows("mot_dshot150_rpm") and not shows("mot_changed"))
@@ -1309,7 +1313,7 @@ do
   end
   local function last(values) return values and values[#values] end
   local function toProp()
-    openPage(14, "motor")
+    openPage(CURRENT, "motor")
     settle()
     press(T("mot_test"))
   end
@@ -1393,18 +1397,18 @@ do
   tick()
   check("motor: Save in the header writes zero", droppedToZero() and shows("mot_cal_stopped"))
   startFull()
-  session({connected = true, isArmed = true, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = true, isArmed = true, apiVersionMajor = 33, apiVersionMinor = 0})
   check("motor: arming writes zero", droppedToZero())
   tick()
   before = #sent
   tick(1)
   check("motor: and nothing is sent while armed", #writesOf(195, before + 1) == 0 and shows("mot_cal_stopped"))
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
   startFull()
-  session({connected = false, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   check("motor: a lost link writes zero", droppedToZero())
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
   startFull()
   headers[#headers].opts.onBack()
@@ -1450,10 +1454,10 @@ do
   check("motor: Stop ends it early", last(w[1]) == 0 and all(w[0], 0) and button(T("mot_spin_fmt")) ~= nil)
   press(T("mot_spin_fmt"))
   before = #sent
-  session({connected = true, isArmed = true, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = true, isArmed = true, apiVersionMajor = 33, apiVersionMinor = 0})
   w = overrides(before + 1)
   check("motor: arming stops a spin, with zero on every motor", last(w[1]) == 0 and last(w[0]) == 0)
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
   press(T("btn_back"))
   check("motor: Back from the spin on PWM is the calibration", shows("mot_cal_title"))
@@ -1516,7 +1520,7 @@ do
 
   -- A new protocol is not checked before the restart, also after the step
   -- is closed and opened again.
-  openPage(14, "motor")
+  openPage(CURRENT, "motor")
   settle()
   press(T("mot_dshot300"))
   check("motor: a new protocol asks for Save and restart, with no Check motor",
@@ -1528,9 +1532,9 @@ do
   press(T("btn_save_restart"))
   tick()
   tick()
-  session({connected = false, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14, handshake = {apiVersion = true}})
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0, handshake = {apiVersion = true}})
   settle(6)
   check("motor: after the restart Check motor is back",
     #writesOf(68, before + 1) == 1 and button(T("mot_test")) ~= nil and button(T("btn_save_restart")) == nil
@@ -1568,7 +1572,7 @@ do
   end
 
   sixPorts(0)
-  openPage(14, "esctelemetry")
+  openPage(CURRENT, "esctelemetry")
   settle()
   check("esc telemetry: opens on the protocol question, Not used and a drop-down",
     shows("esc_title") and button(T("esc_not_used")) ~= nil and #choiceFields() == 1
@@ -1622,9 +1626,9 @@ do
   tick()
   tick()
   check("esc telemetry: saves and restarts", #writesOf(250, before + 1) == 1 and #writesOf(68, before + 1) == 1)
-  session({connected = false, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+  session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
-  session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14, handshake = {apiVersion = true}})
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0, handshake = {apiVersion = true}})
   settle(6)
   check("esc telemetry: after the restart the step reopens on the wiring screen",
     shows("esc_wiring_title") and button(T("esc_detect")) ~= nil and button(T("esc_detect")).enabled
@@ -1676,7 +1680,7 @@ do
   check("esc telemetry: no polling once the trial has ended", #writesOf(0x5F14, before + 1) == 0)
 
   -- The wiring already set answers: nothing to write.
-  openPage(14, "esctelemetry")
+  openPage(CURRENT, "esctelemetry")
   settle()
   check("esc telemetry: with telemetry set up the drop-down shows the protocol", choiceFields()[1].get() == 2)
   press(T("btn_next"))
@@ -1786,7 +1790,7 @@ do
       end
     end
     masks({})   -- the protocol is set, with no port yet
-    openPage(14, "esctelemetry")
+    openPage(CURRENT, "esctelemetry")
     settle()
     press(T("btn_next"))
     press("UART2")
@@ -1827,7 +1831,7 @@ do
     return out
   end
   held[32] = true
-  openPage(14, "esctelemetry")
+  openPage(CURRENT, "esctelemetry")
   settle()
   choiceFields()[1].set(3)   -- a change before the battery has answered
   tick()
@@ -1847,7 +1851,7 @@ do
       and #batteryWrites[1].payload == 81,
     batteryWrites[1] and (batteryWrites[1].payload[4] .. "," .. batteryWrites[1].payload[5]))
   -- A change with no battery change leaves the battery alone on Discard.
-  openPage(14, "esctelemetry")
+  openPage(CURRENT, "esctelemetry")
   settle()
   choiceFields()[1].set(3)
   tick()
@@ -1858,7 +1862,7 @@ do
 
   -- F.BUS telemetry is set up elsewhere.
   replies[123] = {13, 0, 200, 0, 0, 15, 0, 0, 0, 0}
-  openPage(14, "esctelemetry")
+  openPage(CURRENT, "esctelemetry")
   settle()
   check("esc telemetry: F.BUS telemetry is left alone, with Next only",
     shows("esc_elsewhere_fmt") and #choiceFields() == 0 and button(T("esc_not_used")) == nil
@@ -1867,7 +1871,7 @@ do
 
   -- Castle Link reads telemetry on the throttle wire.
   motorReply(0, requireModule("lib/msp_motor_config.lua").CASTLE_PROTOCOL)
-  openPage(14, "esctelemetry")
+  openPage(CURRENT, "esctelemetry")
   settle()
   check("esc telemetry: with Castle Link it says the throttle wire carries it, with Next only",
     shows("esc_castle") and #choiceFields() == 0 and button(T("esc_not_used")) == nil
@@ -1881,7 +1885,7 @@ do
     out[28] = 0   -- motor_count
     return out
   end
-  openPage(14, "esctelemetry")
+  openPage(CURRENT, "esctelemetry")
   settle()
   check("esc telemetry: a model with no motor is told so, with Next only",
     shows("esc_no_motor") and #choiceFields() == 0 and button(T("esc_not_used")) == nil
@@ -1890,7 +1894,7 @@ do
 end
 
 -- Centre: every surface held at its centre; nudging writes the Mid.
-openPage(14, "centre")
+openPage(CURRENT, "centre")
 settle()
 check("center: the encoder goes Back, the nudges and Identify, then Next", inScreenOrder())
 local held = {}
@@ -1975,25 +1979,25 @@ settle()
 
 press(T("cen_identify"))
 before = #sent
-session({connected = true, isArmed = true, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = true, isArmed = true, apiVersionMajor = 33, apiVersionMinor = 0})
 tick()
 check("centre: arming releases Identify and disables its button",
   lastServoValue(0, before + 1) == 2001 and not button(T("cen_identify")).enabled)
 before = #sent
 tick(4)
 check("centre: Identify sends no movement while armed", #writesOf(193, before + 1) == 0)
-session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
 settle()
 check("centre: disarming holds center without resuming Identify", lastServoValue(0) == 0)
 press(T("cen_identify"))
 before = #sent
-session({connected = false, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
 tick()
 check("centre: disconnecting releases Identify", lastServoValue(0, before + 1) == 2001)
 before = #sent
 tick(4)
 check("centre: Identify sends no movement while disconnected", #writesOf(193, before + 1) == 0)
-session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
 settle()
 press(T("cen_identify"))
 before = #sent
@@ -2001,7 +2005,7 @@ ctx.cleanup()
 check("centre: closing releases the identifying servo", lastServoValue(0, before + 1) == 2001)
 
 -- Limits: one screen per side, Min then Max for each servo, one counter.
-openPage(14, "limits")
+openPage(CURRENT, "limits")
 settle()
 check("limits: the intro pictures the method", shows("lim_how_bind") and shows("lim_how_back"))
 before = #sent
@@ -2054,7 +2058,7 @@ check("limits: Back returns to servo 1's Max", shows("lim_todo_max")
   and probe[#probe].payload[1] == 0)
 
 -- Next skips a side without changing its limit.
-openPage(14, "limits")
+openPage(CURRENT, "limits")
 settle()
 press(T("btn_start"))
 before = #sent
@@ -2075,7 +2079,7 @@ end
 check("limits: after the last side, the step is done", shows("lim_done"))
 
 -- Throws: PASSTHROUGH forced, Throw stepped.
-openPage(14, "throws")
+openPage(CURRENT, "throws")
 settle()
 before = #sent
 press(T("btn_start"))
@@ -2087,7 +2091,7 @@ local throw = writesOf(171, before + 1)
 check("throws: +5% raises roll's throw to 105%", #throw == 1 and throw[1].payload[1] == 1 and s16(throw[1].payload, 2) == 1050)
 
 -- Travel and Gyro.
-openPage(14, "travel")
+openPage(CURRENT, "travel")
 settle()
 check("travel: every surface inside its limits", shows("trv_ok"))
 before = #sent
@@ -2096,13 +2100,13 @@ check("travel: polls the live servo outputs for the gauges", #writesOf(103, befo
 check("the saved servo trims were read with the servo configs", #writesOf(233) >= 1)
 forced = writesOf(0x5F1B)
 check("travel: forces PASSTHROUGH", #forced >= 1 and bytes(forced[#forced].payload) == "16,39,1,12")
-session({connected = false, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
 settle()
 check("travel: without the link, says PASSTHROUGH is off", shows("thr_no_passthrough"))
-session({connected = true, isArmed = false, apiVersionMajor = 22, apiVersionMinor = 14})
+session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
 settle()
 check("travel: back on the link, PASSTHROUGH again", shows("trv_ok") and not shows("thr_no_passthrough"))
-openPage(14, "gyro")
+openPage(CURRENT, "gyro")
 settle()
 before = #sent
 press(T("btn_start"))
@@ -2122,7 +2126,7 @@ do
   replies[52] = pool
   local rcValues = {1500, 1500, 1500, 1000, 1000, 1000, 1000, 1000}
   replies[105] = function() return u16list(rcValues) end
-  openPage(14, "trimgain")
+  openPage(CURRENT, "trimgain")
   settle()
   press(T("btn_start"))
   press(T("tg_trim_auto"))
@@ -2144,7 +2148,7 @@ end
 do
   local rcValues = {1500, 1500, 1500, 1000, 1000, 1000, 1000, 1000}
   replies[105] = function() return u16list(rcValues) end
-  openPage(14, "modes")
+  openPage(CURRENT, "modes")
   settle()
   press(T("btn_start"))
   check("modes: ARM first", shows("mod_help_arm"))
@@ -2160,14 +2164,14 @@ do
 end
 
 -- Flying style and Finish.
-openPage(14, "style")
+openPage(CURRENT, "style")
 settle()
 check("style: the encoder goes through the styles, then Back and Next", inScreenOrder())
 before = #sent
 press(T("sty_3d"))
 local rcw, pidw = writesOf(204, before + 1), writesOf(95, before + 1)
 check("style: 3D writes 500 deg/s roll and the PID profile", #rcw == 1 and rcw[1].payload[1] == 100 and #pidw == 1)
-openPage(14, "finish")
+openPage(CURRENT, "finish")
 settle()
 check("finish: the summary", shows("fin_intro"))
 press(T("btn_next"))
@@ -2176,7 +2180,7 @@ press(T("fin_button"))
 check("finish: Save and finish leaves", ctx.back == 1)
 
 -- The step list, and a step that needs surfaces on a model without any.
-openPage(14, "direction")
+openPage(CURRENT, "direction")
 settle()
 headers[#headers].opts.onTool()
 tick()
@@ -2186,7 +2190,7 @@ do
   local empty = {}
   for _ = 1, 32 * 14 do empty[#empty + 1] = 0 end
   replies[172] = empty
-  openPage(14, "centre")
+  openPage(CURRENT, "centre")
   settle()
   check("no surfaces: the step points to Airframe", button(T("go_airframe")) ~= nil)
   press(T("go_airframe"))
@@ -2220,7 +2224,7 @@ local FORWARD = {[T("btn_next")] = true, [T("dir_save_next")] = true, [T("fin_bu
   [T("btn_save_restart")] = true}
 local badFooter, skips = {}, {}
 for i, key in ipairs(STEP_KEYS) do
-  openPage(14, key)
+  openPage(CURRENT, key)
   settle()
   local row = footer()
   local backOk = (i == 1) == (row[1].text ~= T("btn_back"))
@@ -2240,7 +2244,7 @@ check("every step's row has Back on the left and the way forward on the right", 
 check("no Skip or Steps buttons: Next moves on, the step list jumps", #skips == 0, table.concat(skips, ", "))
 
 -- Back and a plain Next are small chevron buttons, clear of the screen's own.
-openPage(14, "centre")
+openPage(CURRENT, "centre")
 settle()
 do
   local row = footer()
@@ -2253,25 +2257,25 @@ do
     firstOwn.rect.x - (back.rect.x + back.rect.w) >= 16
     and nextB.rect.x - (lastOwn.rect.x + lastOwn.rect.w) >= 16)
 end
-openPage(14, "servotype")
+openPage(CURRENT, "servotype")
 settle()
 press(T("st_digital"))
 check("a way forward that saves or restarts keeps its words",
   footer()[#footer()].text == T("btn_save_restart") and footer()[#footer()].icon == nil)
 
-openPage(14, "sensors")
+openPage(CURRENT, "sensors")
 settle()
 check("no Back on the first step", footer()[1].text ~= T("btn_back"))
 check("Next on an untouched step says Next", footer()[#footer()].text == T("btn_next") and footer()[#footer()].enabled)
 
-openPage(14, "receiver")
+openPage(CURRENT, "receiver")
 settle()
 footer()[1].press()
 tick()
 check("Back from a step's first screen opens the step before",
   headers[#headers].title == T("name") .. " / 1. " .. T("step_sensors"), headers[#headers].title)
 
-openPage(14, "finish")
+openPage(CURRENT, "finish")
 settle()
 press(T("btn_next"))
 check("the last screen's way forward is Save and finish", footer()[#footer()].text == T("fin_button"))
@@ -2285,16 +2289,16 @@ do
   package.loaded["grsuite.test.loaded_first"] = nil
 end
 
--- Older firmware: explain and stop -------------------------------------------
+-- Older firmware (before 33.0): explain and stop ------------------------------
 
-openPage(13)
-check("22.13: no setup state requested", #writesOf(0x5F1B) == 0)
-check("22.13: no override sent", #writesOf(191) == 0 and #writesOf(196) == 0)
+openPage(OLDER)
+check("22.16: no setup state requested", #writesOf(0x5F1B) == 0)
+check("22.16: no override sent", #writesOf(191) == 0 and #writesOf(196) == 0)
 local explained = false
 for _, f in ipairs(fields) do
   if f.kind == "static" and f.text and f.text:find("needs_firmware", 1, true) then explained = true end
 end
-check("22.13: the page says why", explained)
+check("22.16: the page says why", explained)
 
 print(string.format("%d checks, %d failed", checks, failures))
 os.exit(failures == 0 and 0 or 1)

@@ -1,5 +1,5 @@
 -- Schema + message-builders for gripora-firmware's own Throttle Range
--- Governor -- MSP2_WING_GOVERNOR_CONFIG / MSP2_WING_SET_GOVERNOR_CONFIG
+-- Governor -- MSP2_GRIPORA_GOVERNOR_CONFIG / MSP2_GRIPORA_SET_GOVERNOR_CONFIG
 -- (cmd 0x5F01/0x5F02, i.e. 24321/24322 -- see msp_protocol.h). Not the
 -- pre-rewrite suite's heli engine-RPM governor (MSP_GOVERNOR_CONFIG is
 -- gone from gripora-firmware entirely, see lib/msp_pid_profile.lua's

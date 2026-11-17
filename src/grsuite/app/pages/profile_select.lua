@@ -129,7 +129,7 @@ local function open(opts)
       original.rate = current.rate
 
       -- Thrust Vector's active profile index isn't part of MSP_STATUS -- it
-      -- leads the MSP2_WING_TV_PID_CONFIG read reply instead (see
+      -- leads the MSP2_GRIPORA_TV_PID_CONFIG read reply instead (see
       -- lib/msp_tv_pid.lua). Fetched as a second step rather than blocking
       -- the PID/rate pickers on it.
       bus.publish("msp.request", tvPidMsp.buildReadMessage(function(tvData)

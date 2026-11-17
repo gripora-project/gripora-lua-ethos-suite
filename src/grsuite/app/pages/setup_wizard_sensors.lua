@@ -8,14 +8,14 @@
 --   intro   the tail-wheel note; Start, or Next to leave the step as it is
 --   acc     calibrate the accelerometer (MSP_ACC_CALIBRATION, then wait for
 --           the FC to clear ARMING_DISABLED_CALIBRATING, lib/acc_calibration_wait.lua)
---   align   MSP2_WING_BOARD_AUTO_ALIGN: flat, Start, lift the tail 20 deg; the
+--   align   MSP2_GRIPORA_BOARD_AUTO_ALIGN: flat, Start, lift the tail 20 deg; the
 --           result is written as the board alignment. A side view of the
 --           plane (app/plane3d.lua) shows the tail lift.
 --   check   the live attitude (MSP_ATTITUDE) on the 3D plane, seen from
 --           behind: tilting the model must move the picture the same way.
 --           The firmware applies an auto-align result at once, so this
 --           shows the new orientation without a restart.
---   level   MSP2_WING_BOARD_MOUNT_TRIM_AUTO: hold the flying attitude; the
+--   level   MSP2_GRIPORA_BOARD_MOUNT_TRIM_AUTO: hold the flying attitude; the
 --           result is written as the mount trim
 --   done    board alignment only applies after a restart, so Save and
 --           restart when either changed

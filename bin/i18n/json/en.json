@@ -8135,8 +8135,8 @@
           "max_length": 83
         },
         "needs_firmware": {
-          "english": "The Setup Wizard needs flight controller firmware with MSP API 22.14 or newer, which can hold the surfaces safely. Update the firmware, or use the Configurator.",
-          "translation": "The Setup Wizard needs flight controller firmware with MSP API 22.14 or newer, which can hold the surfaces safely. Update the firmware, or use the Configurator.",
+          "english": "The Setup Wizard needs flight controller firmware with MSP API 33.0 or newer, which can hold the surfaces safely. Update the firmware, or use the Configurator.",
+          "translation": "The Setup Wizard needs flight controller firmware with MSP API 33.0 or newer, which can hold the surfaces safely. Update the firmware, or use the Configurator.",
           "needs_translation": false,
           "max_length": 160
         },

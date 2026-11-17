@@ -1,4 +1,4 @@
--- MSP2_WING_SELECT_TV_PROFILE / MSP2_WING_COPY_TV_PID_PROFILE helpers
+-- MSP2_GRIPORA_SELECT_TV_PROFILE / MSP2_GRIPORA_COPY_TV_PID_PROFILE helpers
 -- (cmd 0x5F10 / 0x5F11, both write-only).
 --
 -- Thrust Vector profile switching is independent of PID/rate profile

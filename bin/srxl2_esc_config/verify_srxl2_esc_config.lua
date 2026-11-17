@@ -12,9 +12,9 @@
 --     decode/encode path runs on a workstation through the real message
 --     builders.
 --   * The wire sizes are transcribed from the firmware handler
---     (gripora-firmware PR #257, msp.c): MSP2_WING_SRXL2_ESC_CONFIG (0x5F35)
+--     (gripora-firmware PR #257, msp.c): MSP2_GRIPORA_SRXL2_ESC_CONFIG (0x5F35)
 --     replies U8 version (1), U16 throttle_rate_hz, U8 telem_interval_frames,
---     U8 motor2_channel = 5 bytes; MSP2_WING_SET_SRXL2_ESC_CONFIG (0x5F36) takes
+--     U8 motor2_channel = 5 bytes; MSP2_GRIPORA_SET_SRXL2_ESC_CONFIG (0x5F36) takes
 --     the same fields without the version byte, 4 bytes.
 --   * The page saves by writing back what it read, so a reply in a layout this
 --     suite does not know must be refused, not decoded into plausible numbers
@@ -94,7 +94,7 @@ local REPLY = {1, 0x4D, 0x01, 9, 4}
 -- ---------------------------------------------------------------------------
 print("case 1: the sizes and commands match the firmware handler")
 
-check("read is MSP2_WING_SRXL2_ESC_CONFIG (0x5F35)", codec.READ_COMMAND == 0x5F35, codec.READ_COMMAND)
+check("read is MSP2_GRIPORA_SRXL2_ESC_CONFIG (0x5F35)", codec.READ_COMMAND == 0x5F35, codec.READ_COMMAND)
 check("PAYLOAD_VERSION is 1", codec.PAYLOAD_VERSION == 1, codec.PAYLOAD_VERSION)
 check("REPLY_LENGTH is 5", codec.REPLY_LENGTH == 5, codec.REPLY_LENGTH)
 local sim = codec.buildReadMessage(function() end, function() end).simulatorResponse
@@ -114,7 +114,7 @@ if data then
   check("motor2_channel", data.motor2_channel == 4, data.motor2_channel)
   local msg = codec.buildWriteMessage(data, function() end, function() end)
   local payload = msg.payload
-  check("write uses MSP2_WING_SET_SRXL2_ESC_CONFIG (0x5F36)", msg.command == 0x5F36, msg.command)
+  check("write uses MSP2_GRIPORA_SET_SRXL2_ESC_CONFIG (0x5F36)", msg.command == 0x5F36, msg.command)
   check("encode gives exactly 4 bytes", #payload == 4, #payload)
   local same = #payload == 4
   for i = 1, 4 do same = same and payload[i] == REPLY[i + 1] end

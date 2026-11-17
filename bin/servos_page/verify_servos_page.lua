@@ -12,9 +12,9 @@
 --     servos in use and no longer "PWM outputs + bus channels"), capped at the
 --     firmware's 24, and nothing else. The page does not offer the PWM update
 --     rate, and reads the status and the servo names to build the list.
---   * Servo names (MSP2_WING_SERVO_NAMES): a tile shows the name, the editor's
+--   * Servo names (MSP2_GRIPORA_SERVO_NAMES): a tile shows the name, the editor's
 --     Name field is written with Save, ahead of the config write, as
---     MSP2_WING_SET_SERVO_NAME (0x5F3B). Firmware without names refuses the
+--     MSP2_GRIPORA_SET_SERVO_NAME (0x5F3B). Firmware without names refuses the
 --     read: no names, no Name field, no name write.
 --   * A save from a tile: one MSP_SET_SERVO_CONFIGURATION (212) carrying the
 --     tile's own index and the seven-field record, 15 bytes. There is one index
@@ -334,7 +334,7 @@ do
   -- An Ethos text field reads its value once, when built: it must already be the name.
   check("the Name field shows the stored name from the start", shownAtBuild == "L AIL", tostring(shownAtBuild))
   check("the editor has a Name field", #textFields == 1, "text fields: " .. #textFields)
-  check("Save writes the edited name with MSP2_WING_SET_SERVO_NAME", write ~= nil, why)
+  check("Save writes the edited name with MSP2_GRIPORA_SET_SERVO_NAME", write ~= nil, why)
   check("the name write carries the servo and the cleaned name",
     write ~= nil and bytes(write.payload) == "0,69,76,69,86,65,84,79,82",
     write and bytes(write.payload))

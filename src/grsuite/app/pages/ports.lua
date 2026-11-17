@@ -59,8 +59,8 @@ local PORT_FUNCTIONS = {
   -- Receivers: primary, then the backups in the order they take over
   {id = 64, excl = 64, name = "@i18n(app.modules.ports.function_rx_serial)@", type = PORT_TYPE_AUTO},
   {id = 8388608, excl = 8388608, name = "@i18n(app.modules.ports.function_rx_input_backup)@", type = PORT_TYPE_AUTO},
-  -- FUNCTION_RX_INPUT_BACKUP2 (firmware serial.h): the second backup receiver, MSP API 22.15 dev builds onwards.
-  {id = 16777216, excl = 16777216, name = "@i18n(app.modules.ports.function_rx_input_backup2)@", type = PORT_TYPE_AUTO, minApiMinor = 15},
+  -- FUNCTION_RX_INPUT_BACKUP2 (firmware serial.h): the second backup receiver.
+  {id = 16777216, excl = 16777216, name = "@i18n(app.modules.ports.function_rx_input_backup2)@", type = PORT_TYPE_AUTO},
   -- Telemetry to the radio
   {id = 32, excl = 4668, name = "@i18n(app.modules.ports.function_telem_smartport)@", type = PORT_TYPE_TELEM},
   {id = 4096, excl = 4668, name = "@i18n(app.modules.ports.function_telem_ibus)@", type = PORT_TYPE_TELEM},
@@ -75,9 +75,8 @@ local PORT_FUNCTIONS = {
   {id = 262144, excl = 262144, name = "@i18n(app.modules.ports.function_sbus_out)@", type = PORT_TYPE_AUTO},
   {id = 524288, excl = 524288, name = "@i18n(app.modules.ports.function_fbus_out)@", type = PORT_TYPE_AUTO},
   {id = 1048576, excl = 1048576, name = "@i18n(app.modules.ports.function_sport_input)@", type = PORT_TYPE_AUTO},
-  -- FUNCTION_CRSF_SENSORS (firmware serial.h, added by rotorflight-firmware #497). MSP API 12.10 was
-  -- already set before it, so a 12.10 board built earlier lacks it too; this gate only excludes 12.09 (#2497).
-  {id = 4194304, excl = 4194304, name = "@i18n(app.modules.ports.function_crsf_sensors)@", type = PORT_TYPE_AUTO, minApiMinor = 10},
+  -- FUNCTION_CRSF_SENSORS (firmware serial.h, added by rotorflight-firmware #497).
+  {id = 4194304, excl = 4194304, name = "@i18n(app.modules.ports.function_crsf_sensors)@", type = PORT_TYPE_AUTO},
 }
 
 local BAUD_OPTIONS = {
@@ -210,10 +209,6 @@ local function otherPortsExcl(portIndex, ports)
   return excl
 end
 
--- The firmware's minor API version, from the session snapshot. Read by the function list, which
--- sits at module level, so it lives here rather than inside open() (#2497).
-local apiVersionMinor = nil
-
 local function buildFunctionChoiceTable(portIndex, ports)
   local port = ports[portIndex]
   if not port then return {} end
@@ -221,14 +216,11 @@ local function buildFunctionChoiceTable(portIndex, ports)
   local excl = otherPortsExcl(portIndex, ports)
   local tableData = {}
   local seen = {}
+  -- Every function in the list is in every firmware this suite supports (MSP API 33.0 and
+  -- later), so none is left out for the firmware version.
   for i = 1, #PORT_FUNCTIONS do
     local def = PORT_FUNCTIONS[i]
-    -- A function the connected firmware does not have is not offered. A port that already carries
-    -- it keeps it, so the row still shows what the board has. Before the handshake the minor
-    -- version is unknown, and such an entry is left out, as on the telemetry page (#2497).
-    local known = def.minApiMinor == nil or def.id == port.function_mask
-      or (apiVersionMinor or 0) >= def.minApiMinor
-    if known and (def.id == port.function_mask or (not def.hide and (def.id == 0 or not maskHasAny(excl, def.id)))) then
+    if def.id == port.function_mask or (not def.hide and (def.id == 0 or not maskHasAny(excl, def.id))) then
       tableData[#tableData + 1] = {def.name, def.id}
       seen[def.id] = true
     end
@@ -252,7 +244,6 @@ local function openProgress(title, message)
 end
 
 local function open(opts)
-  apiVersionMinor = nil -- a new visit starts with the handshake's version, not the last one
   local disposed = false
   local loaded = false
   local busy = false
@@ -263,9 +254,6 @@ local function open(opts)
   local saveError = nil
   local saveNotice = nil
   local needsRender = false
-  -- The API version this page instance last rendered for. Kept per page: a stale subscriber can
-  -- already have stored the shared apiVersionMinor before this page's handler runs.
-  local lastApiMinor = nil
   local isArmed = nil
   local activeDialog = nil
   local confirmDialog = nil
@@ -698,14 +686,6 @@ local function open(opts)
   sessionHandler = function(update)
     if disposed then return end
     isArmed = update and update.isArmed
-    -- The function choices depend on the minor version, so a change rebuilds the rows. A
-    -- load that finished before the handshake would otherwise keep the list built without it.
-    local minor = update and update.apiVersionMinor
-    apiVersionMinor = minor
-    if minor ~= lastApiMinor then
-      lastApiMinor = minor
-      needsRender = true
-    end
   end
   bus.subscribe("session.update", sessionHandler)
 

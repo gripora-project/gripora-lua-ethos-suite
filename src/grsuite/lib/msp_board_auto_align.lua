@@ -1,5 +1,5 @@
 -- Codec/message-builders for gripora-firmware's board auto-align
--- helper: MSP2_WING_BOARD_AUTO_ALIGN (cmd 0x5F00 / 24320).
+-- helper: MSP2_GRIPORA_BOARD_AUTO_ALIGN (cmd 0x5F00 / 24320).
 --
 -- Wire shape verified against gripora-firmware src/main/msp/msp.c:
 -- optional request payload action U8 (1 starts auto-align), reply status

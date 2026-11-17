@@ -9,11 +9,13 @@
 -- The major number identifies the firmware *family* this MSP dialect
 -- belongs to (Rotorflight, Gripora, Betaflight, iNav, ... each stakes
 -- out its own), not a generic "how new" number -- talking to the wrong
--- family entirely (e.g. this suite's 22.x against a Rotorflight FC's 12.x)
+-- family entirely (e.g. this suite's 33.x against a Rotorflight FC's 12.x)
 -- is a hard mismatch, not a "just needs an update" case. The minor number
--- is the real floor *within* that family. See tasks/session.lua's
--- runHandshake() for where this gets read and tasks/msp/queue.lua's
--- isSim branch for why the simulator override below only ever matters
+-- is the real floor *within* that family. Gripora's own family is 33: it
+-- reported WingFlight's 22.x before it had an MSP protocol of its own, so a
+-- 22.x FC is old firmware that needs an update (see classifyUnsupported()).
+-- See tasks/session.lua's runHandshake() for where this gets read and
+-- tasks/msp/queue.lua's isSim branch for why the simulator override below only ever matters
 -- there -- real hardware ignores simulatorResponse entirely.
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
@@ -21,18 +23,19 @@ local mspcodec = requireModule("lib/mspcodec.lua")
 
 local READ_COMMAND = 1
 
--- Gripora 22.16 is required for the servo messages: it made a servo index
--- the same in every one of them, dropped the per-servo rate from the servo
--- record and changed what MSP_STATUS's servo count means, so older firmware
--- would be misread and miswritten (lib/msp_servo_config.lua).
-local EXPECTED_API_MAJOR = 22
-local MIN_API_MINOR = 16
+-- Gripora MSP API 33.0: the first version that is Gripora's own (WingFlight
+-- stays on 22.x), with every MSP2_GRIPORA_* message. Older firmware is
+-- refused.
+local EXPECTED_API_MAJOR = 33
+local MIN_API_MINOR = 0
 
 -- Concrete versions offered by the developer "simulated API version"
 -- picker (see app/pages/developer_settings.lua) -- add new entries here as
 -- Gripora ships new MSP API versions; nothing else needs to change,
 -- the simulator byte-triplet is derived from the string itself below.
-local SIMULATABLE_VERSIONS = {"22.09", "22.10", "22.11", "22.12", "22.13", "22.14", "22.15", "22.16"}
+-- 22.16 is the last version before 33.0, there to show the "firmware too
+-- old" path. The last entry is the default.
+local SIMULATABLE_VERSIONS = {"22.16", "33.00"}
 
 -- "Invalid" simulates talking to a *different firmware family* entirely
 -- (major 12 -- Rotorflight's own, per that project's own
@@ -51,6 +54,13 @@ local INVALID_SIM_RESPONSE = {0, 12, 9}
 local KNOWN_FAMILY_NAMES = {
   [12] = "Rotorflight",
   [1] = "Betaflight",
+}
+
+-- Majors this family used before EXPECTED_API_MAJOR: Gripora firmware from
+-- before MSP API 33.0 reported WingFlight's 22.x. Such an FC is classified
+-- "unsupported" (update the firmware), not "invalid".
+local OLDER_API_MAJORS = {
+  [22] = true,
 }
 
 local msp_api_version = {
@@ -75,20 +85,21 @@ end
 -- product, not just an old version of this one -- with familyName filled
 -- in when that other major is a recognized family (nil otherwise);
 -- "unsupported" when major matches but minor is below this rebuild's own
--- floor -- same family, just needs a firmware update, so no familyName
+-- floor, or major is one this family used before (OLDER_API_MAJORS) --
+-- same family, just needs a firmware update, so no familyName
 -- (nothing to name, it's already this one). Returns nil when
 -- isSupported() would also return nil (still unread) or true (supported --
 -- nothing to classify).
 function msp_api_version.classifyUnsupported(major, minor)
   if msp_api_version.isSupported(major, minor) ~= false then return nil end
-  if major ~= EXPECTED_API_MAJOR then
+  if major ~= EXPECTED_API_MAJOR and not OLDER_API_MAJORS[major] then
     return "invalid", KNOWN_FAMILY_NAMES[major]
   end
   return "unsupported", nil
 end
 
 -- Builds the {mspProtocolVersion, major, minor} simulator fixture for a
--- developer-selected version string (e.g. "22.05", from
+-- developer-selected version string (e.g. "33.00", from
 -- SIMULATABLE_VERSIONS) or "invalid"/nil for the cross-family fixture.
 function msp_api_version.simResponseForVersion(versionString)
   if not versionString or versionString == "invalid" then

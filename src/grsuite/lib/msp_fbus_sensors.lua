@@ -1,4 +1,4 @@
--- Message-builder for MSP2_WING_FBUS_SENSORS (cmd 0x5F07, read only): the
+-- Message-builder for MSP2_GRIPORA_FBUS_SENSORS (cmd 0x5F07, read only): the
 -- devices the flight controller's F.Bus master (or S.Port master) has heard
 -- from. The Setup Wizard's Servo bus step only needs how many answer on
 -- F.Bus, which proves the bus wiring, so decode() counts them, keeps each

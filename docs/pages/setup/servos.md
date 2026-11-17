@@ -21,7 +21,7 @@ PWM and BUS pages any more.
 *Configuration* → *Setup* → *Servos*
 
 Requires a running background task and a flight controller connection. The flight
-controller firmware must support MSP API 22.16 or newer; the suite refuses older
+controller firmware must support MSP API 33.0 or newer; the suite refuses older
 firmware when it connects.
 
 ## The list

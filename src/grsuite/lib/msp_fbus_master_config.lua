@@ -1,5 +1,5 @@
--- Schema + message-builders for MSP2_WING_FBUS_MASTER_CONFIG /
--- MSP2_WING_SET_FBUS_MASTER_CONFIG (cmd 0x5F09 read / 0x5F0A write).
+-- Schema + message-builders for MSP2_GRIPORA_FBUS_MASTER_CONFIG /
+-- MSP2_GRIPORA_SET_FBUS_MASTER_CONFIG (cmd 0x5F09 read / 0x5F0A write).
 --
 -- The F.Bus master is the flight controller's F.Bus output: the bus that
 -- F.Bus servos and sensors plug into. The read reply is a payload version

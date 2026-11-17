@@ -1,8 +1,8 @@
 -- Run from the repository root with Lua 5.3+: lua bin/tests/mode_override.lua
--- Checks the timed bench overrides of gripora-firmware API 22.14:
+-- Checks the timed bench overrides of gripora-firmware (MSP API 33.0):
 -- lib/msp_mode_override.lua and lib/msp_servo_override.lua against the
 -- firmware's wire format (src/main/msp/msp.c), and lib/override_keepalive.lua
--- re-sending held overrides until they are released, only on 22.14+ and only
+-- re-sending held overrides until they are released, only on 33.x and only
 -- while connected.
 
 local ROOT = "src/grsuite/"
@@ -58,8 +58,11 @@ local function lastOf(command)
     if sent[i].command == command then return sent[i] end
   end
 end
-local function session(minor, connected)
-  sessionHandler({connected = connected ~= false, apiVersionMajor = 22, apiVersionMinor = minor})
+-- api is {major, minor}.
+local CURRENT = {33, 0}
+local OLDER = {22, 16}
+local function session(api, connected)
+  sessionHandler({connected = connected ~= false, apiVersionMajor = api[1], apiVersionMinor = api[2]})
 end
 
 -- Wire format
@@ -81,22 +84,22 @@ check("servo write: untimed is unchanged", bytes(msg.payload) == "2,0,0", bytes(
 msg = servoOverride.buildWriteAllMessage(0, nil, nil, 10000)
 check("servo write all: optional trailing timeout", bytes(msg.payload) == "0,0,16,39", bytes(msg.payload))
 
--- Older firmware: untimed, no keepalive, no forced modes
-session(13)
+-- Older firmware (before 33.0): untimed, no keepalive, no forced modes
+session(OLDER)
 sent = {}
 servoOverride.holdAll(servoOverride.OVERRIDE_CENTER)
-check("22.13: servo override sent untimed", #sent == 1 and bytes(sent[1].payload) == "0,0")
-check("22.13: modes can't be forced", modeOverride.hold({modeOverride.BOX_PASSTHROUGH}) == false and #sent == 1)
+check("22.16: servo override sent untimed", #sent == 1 and bytes(sent[1].payload) == "0,0")
+check("22.16: modes can't be forced", modeOverride.hold({modeOverride.BOX_PASSTHROUGH}) == false and #sent == 1)
 clock = 110
 keepalive.tick(clock)
-check("22.13: nothing re-sent", #sent == 1)
+check("22.16: nothing re-sent", #sent == 1)
 servoOverride.releaseAll()
 
--- 22.14: held overrides are re-sent until released
-session(14)
+-- 33.0: held overrides are re-sent until released
+session(CURRENT)
 sent = {}
 local refused
-check("22.14: mode hold accepted", modeOverride.hold({modeOverride.BOX_PASSTHROUGH}, function(r) refused = r end))
+check("33.0: mode hold accepted", modeOverride.hold({modeOverride.BOX_PASSTHROUGH}, function(r) refused = r end))
 check("mode hold sends at once", #sent == 1 and bytes(sent[1].payload) == "16,39,1,12")
 servoOverride.hold(3, servoOverride.OVERRIDE_CENTER)
 check("servo hold sends timed", #sent == 2 and bytes(sent[2].payload) == "3,0,0,16,39", bytes(sent[2].payload))
@@ -108,11 +111,11 @@ clock = 113
 keepalive.tick(clock)
 check("both refreshed at the interval", #sent == 4)
 
-session(14, false)
+session(CURRENT, false)
 clock = 120
 keepalive.tick(clock)
 check("nothing sent while disconnected", #sent == 4)
-session(14)
+session(CURRENT)
 
 lastOf(modeOverride.WRITE_COMMAND).errorHandler("max_retries")
 check("a link error keeps the holds", modeOverride.isHeld() and refused == nil)
@@ -147,20 +150,20 @@ check("mixer write: negative value, trailing timeout", bytes(p) == "2,106,255,16
 p = mixerOverride.encode(13, mixerOverride.OVERRIDE_OFF)
 check("mixer write: untimed OFF", bytes(p) == "13,197,9", bytes(p))
 
-session(13)
+session(OLDER)
 sent = {}
 mixerOverride.hold(1, 250)
-check("22.13: mixer override sent untimed", #sent == 1 and bytes(sent[1].payload) == "1,250,0", bytes(sent[1].payload))
+check("22.16: mixer override sent untimed", #sent == 1 and bytes(sent[1].payload) == "1,250,0", bytes(sent[1].payload))
 clock = 400
 keepalive.tick(clock)
-check("22.13: mixer override not re-sent", #sent == 1)
+check("22.16: mixer override not re-sent", #sent == 1)
 mixerOverride.release(1)
 
-session(14)
+session(CURRENT)
 sent = {}
 mixerOverride.hold(1, 250)
 mixerOverride.hold(3, 0)
-check("22.14: mixer holds sent timed", #sent == 2 and bytes(sent[1].payload) == "1,250,0,16,39")
+check("33.0: mixer holds sent timed", #sent == 2 and bytes(sent[1].payload) == "1,250,0,16,39")
 mixerOverride.hold(1, -250)
 check("re-holding an input replaces its value", bytes(last().payload) == "1,6,255,16,39", bytes(last().payload))
 clock = 410

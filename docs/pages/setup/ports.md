@@ -42,9 +42,10 @@ Ports tab, in the same groups and with the same "Group: Item" labels:
 | ESC links | ESC: Telemetry, ESC: SRXL2 |
 | Buses the flight controller hosts | Bus: S.BUS Output, Bus: F.BUS Master, Bus: S.PORT Master, Bus: CRSF Sensors |
 
-A function that another port already holds is greyed out. *Receiver: Backup 2*
-(the second backup receiver, PR #277) needs MSP API 22.15 or later;
-*Bus: CRSF Sensors* needs 22.10 or later. The backup receivers take over when
+A function that another port already holds is greyed out. Every function is in
+every firmware the suite supports (MSP API 33.0 and later), *Receiver: Backup 2*
+(the second backup receiver, PR #277) and *Bus: CRSF Sensors* included, so the
+list does not depend on the firmware version. The backup receivers take over when
 the primary receiver's signal is lost, backup 1 first; see the *Rx Backup*
 diagnostics page.
 

@@ -36,7 +36,7 @@ full-stick rate. When it engages, the target starts at the model's current
 attitude and moves toward the stick angle at that rate, so the model levels
 smoothly instead of snapping.
 
-Damping needs firmware with MSP API 22.13 or later; the suite requires it.
+Every firmware the suite supports (MSP API 33.0 and later) has Damping.
 
 ## Source
 

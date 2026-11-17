@@ -37,7 +37,7 @@ only the bars.
 *System* → *Tools* → *Setup Wizard*
 
 Requires a running background task and a flight controller connection. The
-flight controller firmware must support MSP API 22.16 or newer, as the whole
+flight controller firmware must support MSP API 33.0 or newer, as the whole
 suite does; it refuses older firmware when it connects.
 
 The wizard works on every servo in use, up to 24, whether it is on a PWM output,

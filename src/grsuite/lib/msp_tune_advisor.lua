@@ -1,6 +1,6 @@
 -- Schema + message-builders for gripora-firmware's tune advisor
--- statistics: MSP2_WING_TUNE_ADVISOR (cmd 0x5F18, read) and
--- MSP2_WING_TUNE_ADVISOR_CLEAR (cmd 0x5F19, write, empty payload). Both
+-- statistics: MSP2_GRIPORA_TUNE_ADVISOR (cmd 0x5F18, read) and
+-- MSP2_GRIPORA_TUNE_ADVISOR_CLEAR (cmd 0x5F19, write, empty payload). Both
 -- are new messages with no MSP API version change: an FC without them
 -- answers with an error, which the page reports as "needs newer firmware".
 --
@@ -8,7 +8,7 @@
 -- 2 yaw). The reply is 48 bytes: one CRSF frame, and 11 S.Port/FBUS frames.
 --
 -- Wire layout verified against gripora-firmware's own serializer
--- (src/main/msp/msp.c, MSP2_WING_TUNE_ADVISOR case), payload version 2:
+-- (src/main/msp/msp.c, MSP2_GRIPORA_TUNE_ADVISOR case), payload version 2:
 --   U8 version, U8 flags (bits 0-1 axis, bit 2 collecting), U16 seconds of
 --   usable flight, then:
 --     U32 P | F << 10 | B << 20, U8 iterm_relax, U8 rc_rate (the tune measured)
@@ -68,7 +68,7 @@ local SIM_AXES = {
 }
 
 -- Payload versions this codec reads: reply length by version. Version 2
--- (firmware msp.c, MSP2_WING_TUNE_ADVISOR) writes its one-byte values as
+-- (firmware msp.c, MSP2_GRIPORA_TUNE_ADVISOR) writes its one-byte values as
 -- value x scale.
 local PAYLOAD_VERSION = 2
 local REPLY_LENGTHS = {[1] = 65, [2] = 48}

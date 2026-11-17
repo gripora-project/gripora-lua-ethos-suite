@@ -13,7 +13,7 @@
 -- the other fields are locked, matching the original suite's safety shape
 -- without its global session table.
 --
--- Servo names (MSP2_WING_SERVO_NAMES, firmware #286): a tile shows the
+-- Servo names (MSP2_GRIPORA_SERVO_NAMES, firmware #286): a tile shows the
 -- servo's name, and the editor has a Name field, written with the page's Save
 -- ahead of the config and the EEPROM write. On firmware without names the
 -- read is refused, and the page shows no names and no Name field.

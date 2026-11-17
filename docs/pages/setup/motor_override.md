@@ -45,7 +45,7 @@ about a second after the wheel is let go, which reads as an intermittent fault.
 
 This is **not** the timed override of `lib/override_keepalive.lua`. That path
 exists for servo, mixer and mode overrides, which carry their own timeout in the
-payload from firmware API 22.14 on a 10-second window refreshed every 3 seconds.
+payload (every firmware the suite supports, MSP API 33.0 and later) on a 10-second window refreshed every 3 seconds.
 `MSP_SET_MOTOR_OVERRIDE` carries no timeout field at all — the firmware supplies
 its own one-second one — so a 3-second refresh would let the motor lapse between
 sends.

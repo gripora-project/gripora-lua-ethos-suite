@@ -1,4 +1,4 @@
--- Message-builders for MSP2_WING_FBUS_MASTER_TRIAL (cmd 0x5F37): the flight
+-- Message-builders for MSP2_GRIPORA_FBUS_MASTER_TRIAL (cmd 0x5F37): the flight
 -- controller's F.Bus output wiring detection.
 --
 -- The flight controller reopens the F.Bus port with each combination of pin

@@ -113,7 +113,7 @@ check("withName adds the name", names.withName("Servo 1", {[0] = "L AIL"}, 0) ==
 check("withName leaves an unnamed servo", names.withName("Servo 2", {[0] = "L AIL", [1] = ""}, 1) == "Servo 2")
 check("withName without names", names.withName("Servo 1", nil, 0) == "Servo 1")
 
--- Wire format (firmware msp.c, MSP2_WING_SERVO_NAMES / SET_SERVO_NAME)
+-- Wire format (firmware msp.c, MSP2_GRIPORA_SERVO_NAMES / SET_SERVO_NAME)
 check("clean trims, drops non-printables, caps at 8",
   codec.clean("  Elevator!xyz") == "Elevator" and codec.clean("L\1 AIL ") == "L AIL"
   and codec.clean(nil) == "" and codec.clean("ABCDEFG HIJ") == "ABCDEFG", codec.clean("ABCDEFG HIJ"))

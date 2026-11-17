@@ -1,4 +1,4 @@
--- MSP2_WING_GPS_NAV_CONFIG helper (cmd 0x5F16 read / 0x5F17 write).
+-- MSP2_GRIPORA_GPS_NAV_CONFIG helper (cmd 0x5F16 read / 0x5F17 write).
 --
 -- gpsNavConfig_t (PG_GPS_NAV) -- tuning for the fixed-wing RTH/Loiter nav
 -- controller (gps_nav.c), used by BOXRTH/BOXLOITER and, since

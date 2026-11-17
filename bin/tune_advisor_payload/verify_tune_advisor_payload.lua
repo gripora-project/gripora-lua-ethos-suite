@@ -8,7 +8,7 @@
 -- its read builder returns, so the reply goes through processReply exactly as the
 -- transport hands it over. The replies are the simulator's own 48-byte reply (payload
 -- version 2), replies packed here with string.pack from the firmware's layouts (msp.c,
--- MSP2_WING_TUNE_ADVISOR: version 2, and the 65-byte version 1 of snapshots 0.0.32 to
+-- MSP2_GRIPORA_TUNE_ADVISOR: version 2, and the 65-byte version 1 of snapshots 0.0.32 to
 -- 0.0.38) so the codec is checked against the firmware's byte order and not against
 -- itself, and variants of them.
 --
@@ -97,7 +97,7 @@ end
 
 local function near(x, y) return x ~= nil and math.abs(x - y) < 1e-9 end
 
--- The firmware's layouts, field by field (msp.c, MSP2_WING_TUNE_ADVISOR)
+-- The firmware's layouts, field by field (msp.c, MSP2_GRIPORA_TUNE_ADVISOR)
 local LAYOUT_V2 = "<" ..
   "B B H" ..          -- version, flags (bits 0-1 axis, bit 2 collecting), seconds
   "I4 B B" ..         -- P | F << 10 | B << 20, iterm relax, rc rate

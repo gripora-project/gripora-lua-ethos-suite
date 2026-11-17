@@ -1,6 +1,6 @@
 -- Schema + message-builders for gripora-firmware's temporary mode
--- override: MSP2_WING_MODE_OVERRIDE (cmd 0x5F1A, read) and
--- MSP2_WING_SET_MODE_OVERRIDE (cmd 0x5F1B, write), both new in MSP API
+-- override: MSP2_GRIPORA_MODE_OVERRIDE (cmd 0x5F1A, read) and
+-- MSP2_GRIPORA_SET_MODE_OVERRIDE (cmd 0x5F1B, write), both new in MSP API
 -- 22.14. An FC without them answers with an MSP error (errorHandler reason
 -- true), which means "needs newer firmware".
 --
@@ -13,7 +13,7 @@
 -- or a link that drops lets it lapse.
 --
 -- Wire layout verified against gripora-firmware's own serializer
--- (src/main/msp/msp.c, MSP2_WING_MODE_OVERRIDE / MSP2_WING_SET_MODE_OVERRIDE):
+-- (src/main/msp/msp.c, MSP2_GRIPORA_MODE_OVERRIDE / MSP2_GRIPORA_SET_MODE_OVERRIDE):
 --   write: U16 timeout ms (FC clamps to 500-30000), U8 count,
 --          count x U8 permanent box id. Replaces the whole override.
 --          Timeout 0 clears it; count 0 holds the setup state (a setup tool
@@ -104,7 +104,8 @@ end
 --   modeOverride.hold({modeOverride.BOX_PASSTHROUGH}, onRefused)
 --   modeOverride.release()                                   -- page closes (always)
 --
--- Returns false without sending on firmware older than API 22.14. Re-sent
+-- Returns false without sending until lib/override_keepalive.lua knows the
+-- firmware is MSP API 33.x (before the handshake, or on older firmware). Re-sent
 -- by lib/override_keepalive.lua until release(). onRefused(reason) runs once
 -- if the FC refuses (reason true: armed, or a mode it won't force); the hold
 -- then stops. Link errors are left to the next refresh.

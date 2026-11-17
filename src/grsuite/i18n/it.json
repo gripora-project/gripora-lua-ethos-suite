@@ -10584,11 +10584,11 @@
           "translation": "Setup Wizard"
         },
         "needs_firmware": {
-          "english": "The Setup Wizard needs flight controller firmware with MSP API 22.14 or newer, which can hold the surfaces safely. Update the firmware, or use the Configurator.",
+          "english": "The Setup Wizard needs flight controller firmware with MSP API 33.0 or newer, which can hold the surfaces safely. Update the firmware, or use the Configurator.",
           "max_length": 160,
           "needs_translation": true,
           "reverse_text": false,
-          "translation": "The Setup Wizard needs flight controller firmware with MSP API 22.14 or newer, which can hold the surfaces safely. Update the firmware, or use the Configurator."
+          "translation": "The Setup Wizard needs flight controller firmware with MSP API 33.0 or newer, which can hold the surfaces safely. Update the firmware, or use the Configurator."
         },
         "no_surfaces": {
           "english": "No control surfaces are mixed yet. Set up the mix in Mixer Rules or with the Configurator's Setup Wizard, then come back.",

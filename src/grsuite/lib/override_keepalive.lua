@@ -1,6 +1,6 @@
--- Keeps timed bench overrides alive (gripora-firmware API 22.14+).
+-- Keeps timed bench overrides alive.
 --
--- From API 22.14 the FC drops a servo, mixer or mode override that carries a
+-- The FC drops a servo, mixer or mode override that carries a
 -- timeout unless it is re-sent within that time, so a radio that is switched
 -- off or a link that drops while a page holds a servo cannot leave it held.
 -- A page sets an override here instead of sending it once; tick(), run from
@@ -8,8 +8,10 @@
 -- regardless of which page is open, and clear() stops it (the page still
 -- sends the OFF value itself).
 --
--- Against older firmware supported() is false and callers send their
--- overrides untimed, as before.
+-- Every firmware the suite supports (MSP API 33.0 and later,
+-- lib/msp_api_version.lua) has timed overrides. supported() is false only
+-- until that is known (before the handshake, or on firmware the suite
+-- refuses); callers then send their overrides untimed.
 --
 -- Self-caches via package.loaded (same mechanism lib/bus.lua uses).
 if package.loaded["grsuite.lib.override_keepalive"] then
@@ -19,8 +21,9 @@ end
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local bus = requireModule("lib/bus.lua")
 
-local MIN_API_MAJOR = 22
-local MIN_API_MINOR = 14
+-- lib/msp_api_version.lua's EXPECTED_API_MAJOR: every minor of it has timed
+-- overrides.
+local API_MAJOR = 33
 -- Telemetry links are slow and lossy: a 10 s timeout refreshed every 3 s
 -- survives two lost refreshes (each also retried by the queue).
 local TIMEOUT_MS = 10000
@@ -40,7 +43,7 @@ bus.subscribe("session.update", function(snapshot)
 end)
 
 function keepalive.supported()
-  return apiMajor == MIN_API_MAJOR and (apiMinor or 0) >= MIN_API_MINOR
+  return apiMajor == API_MAJOR and apiMinor ~= nil
 end
 
 -- build() returns a fresh MSP message carrying TIMEOUT_MS; it is sent now

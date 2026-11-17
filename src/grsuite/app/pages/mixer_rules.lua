@@ -219,7 +219,7 @@ local INPUT_OPTIONS = buildInputOptions(nil)
 -- Matches gripora-configurator's Mixer.js outputOrder()/outputLabel() and
 -- firmware flight/mixer.h.
 --
--- A servo with a name (MSP2_WING_SERVO_NAMES, read by open() below) shows it:
+-- A servo with a name (MSP2_GRIPORA_SERVO_NAMES, read by open() below) shows it:
 -- "Servo 1 (L AIL)", as the Configurator does.
 -- Inlined rather than taken from lib/servo_names.lua, which would load the
 -- setup wizard's surface code onto this page for one line.

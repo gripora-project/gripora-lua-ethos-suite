@@ -1,13 +1,13 @@
--- MSP2_WING_SRXL2_ESC_CONFIG helper (0x5F35 read / 0x5F36 write): the SRXL2 ESC
+-- MSP2_GRIPORA_SRXL2_ESC_CONFIG helper (0x5F35 read / 0x5F36 write): the SRXL2 ESC
 -- bus settings, firmware pg/srxl2_esc.h. The read reply starts with a payload
 -- version byte; the write takes the same fields without it. A changed setting
 -- takes effect at the next boot, so the page reboots after saving.
 --
--- Read reply (gripora-firmware msp.c, MSP2_WING_SRXL2_ESC_CONFIG), payload
+-- Read reply (gripora-firmware msp.c, MSP2_GRIPORA_SRXL2_ESC_CONFIG), payload
 -- version 1:
 --   U8 version, U16 throttle_rate_hz, U8 telem_interval_frames,
 --   U8 motor2_channel                                         = 5 bytes
--- The write (MSP2_WING_SET_SRXL2_ESC_CONFIG) is the same four field bytes
+-- The write (MSP2_GRIPORA_SET_SRXL2_ESC_CONFIG) is the same four field bytes
 -- without the version.
 
 if package.loaded["grsuite.lib.msp_srxl2_esc_config"] then

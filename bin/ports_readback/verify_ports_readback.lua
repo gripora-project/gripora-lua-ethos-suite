@@ -306,27 +306,20 @@ local function anyFunctionListHas(id)
   return false
 end
 
-print("function list by firmware")
-openAndLoad(0, 9)
-check("on a 12.09 board CRSF sensors is not offered", not anyFunctionListHas(CRSF_SENSORS))
-openAndLoad(0, 10)
-check("on a 12.10 board CRSF sensors is offered", anyFunctionListHas(CRSF_SENSORS))
-openAndLoad(0, nil)
-check("before the handshake CRSF sensors is not offered", not anyFunctionListHas(CRSF_SENSORS))
-openAndLoad(CRSF_SENSORS, 9)
-check("a port that already carries CRSF sensors keeps it on a 12.09 board",
-  anyFunctionListHas(CRSF_SENSORS))
+-- Every function is in every firmware the suite supports (MSP API 33.0 and later), so the
+-- list does not depend on the API version, nor wait for the handshake.
+local RX_INPUT_BACKUP2 = 16777216
 
-print("function list after the handshake")
+print("function list")
+openAndLoad(0, 0)
+check("CRSF sensors is offered", anyFunctionListHas(CRSF_SENSORS))
+check("the second backup receiver is offered", anyFunctionListHas(RX_INPUT_BACKUP2))
 openAndLoad(0, nil)
-choiceCalls = {}
-require("grsuite.lib.bus").publish("session.update", {isArmed = false, apiVersionMinor = 10})
-if wakeupHandler then wakeupHandler() end
-check("a handshake that lands after the load rebuilds the list with CRSF sensors",
-  anyFunctionListHas(CRSF_SENSORS))
+check("before the handshake CRSF sensors is offered", anyFunctionListHas(CRSF_SENSORS))
+check("before the handshake the second backup receiver is offered", anyFunctionListHas(RX_INPUT_BACKUP2))
 
 print("rate field")
-openAndLoad(0, 10)
+openAndLoad(0, 0)
 local oneEntry = 0
 for _, call in ipairs(choiceCalls) do
   if call.items and #call.items == 1 then oneEntry = oneEntry + 1 end

@@ -3,7 +3,7 @@
 -- The radio's copy of gripora-configurator's StepLimits.svelte, as one
 -- screen per side of each surface (servo 1 Min, servo 1 Max, servo 2 Min, ...)
 -- with one counter over all of them, so there is no step inside the step.
--- The servo is held by a probe (MSP2_WING_SET_SERVO_PROBE,
+-- The servo is held by a probe (MSP2_GRIPORA_SET_SERVO_PROBE,
 -- lib/msp_servo_probe.lua) at Mid + an offset that ignores the stored
 -- Min/Max, so the stored limits are never widened while exploring. Step it
 -- until the surface binds, back off one step, and Set: the offset is written

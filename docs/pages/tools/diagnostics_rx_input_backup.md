@@ -39,7 +39,7 @@ There is nothing to change here. The lines shown:
 
 ## Notes
 
-- Values come from `MSP2_WING_RX_INPUT_BACKUP_STATUS` (`lib/msp_rx_input_backup_status.lua`),
+- Values come from `MSP2_GRIPORA_RX_INPUT_BACKUP_STATUS` (`lib/msp_rx_input_backup_status.lua`),
   payload versions 1 to 4. Firmware older than payload version 4 reports one
   backup only; the second backup's lines then read *Not configured*.
 - Telemetry travels over the primary receiver, so while the primary link is

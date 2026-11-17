@@ -253,7 +253,7 @@ rebranded; the car conversion is still to come. Status:
   (`app/pages/rates.lua`/`lib/rate_curve_scale.lua`'s `DEFAULT_RAW`).
   See `HANDOVER.md`'s "Done" list for what each actually covers.
 - **Still to port**: Throttle Range Governor
-  (`MSP2_WING_GOVERNOR_CONFIG`) -- see HANDOVER.md for current priority
+  (`MSP2_GRIPORA_GOVERNOR_CONFIG`) -- see HANDOVER.md for current priority
   order.
 - **Setup Wizard** (`app/pages/setup_wizard.lua` and one
   `app/pages/setup_wizard_<step>.lua` per step) is the radio's copy of

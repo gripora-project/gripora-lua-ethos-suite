@@ -32,14 +32,14 @@ Requires a running background task and a flight controller connection. Lit only 
 - Save is refused while the model is armed.
 - The throttle rate is not shown. The firmware derives it from the motor PWM rate;
   the page writes back the value it read unchanged.
-- Firmware without MSP2_WING_SRXL2_ESC_CONFIG refuses the read, and the page shows a
+- Firmware without MSP2_GRIPORA_SRXL2_ESC_CONFIG refuses the read, and the page shows a
   failed load. A reply of another payload version or length is refused the same way,
   rather than decoded and written back on the next save.
 
 ## Source
 
 [Page implementation](../../../src/grsuite/app/pages/esc_motors_srxl2.lua), codec
-`lib/msp_srxl2_esc_config.lua` (MSP2_WING_SRXL2_ESC_CONFIG / MSP2_WING_SET_SRXL2_ESC_CONFIG,
+`lib/msp_srxl2_esc_config.lua` (MSP2_GRIPORA_SRXL2_ESC_CONFIG / MSP2_GRIPORA_SET_SRXL2_ESC_CONFIG,
 gripora-firmware PR #257), PR #279. Menu conditions come from `app/tool.lua`.
 
 *Documented against GRSuite Ethos 2.3.1.*

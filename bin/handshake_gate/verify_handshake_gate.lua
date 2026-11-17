@@ -23,7 +23,7 @@
 --     thing under test: the real lib/msp_handshake.lua, lib/msp_battery.lua,
 --     lib/msp_api_version.lua, ... are loaded, so the command ids the spy sees
 --     are the ones production would send, and the verdict is produced by the
---     real isSupported() -- major 22 / minor >= 13.
+--     real isSupported() -- major 33 / minor >= 0.
 --   * The MSP queue is a spy that records every message session.lua hands it.
 --     A reply is delivered by calling that message's own processReply, which is
 --     exactly what the real queue does once a matching reply arrives.
@@ -267,7 +267,7 @@ end
 
 local SUPPORTED = { 0, API_MAJOR, API_MIN_MINOR }        -- this suite's family, at the floor
 local WRONG_FAMILY = { 0, 12, 9 }                        -- Rotorflight's epoch
-local TOO_OLD = { 0, API_MAJOR, API_MIN_MINOR - 4 }      -- same family, below the floor
+local TOO_OLD = { 0, 22, 16 }                           -- Gripora before MSP API 33.0
 
 -- ---------------------------------------------------------------------------
 -- 1. Before the verdict, the only handshake read on the queue is API_VERSION.
@@ -347,7 +347,7 @@ do
 end
 
 -- ---------------------------------------------------------------------------
--- 4. Same-family / too-old (minor below the floor) is also a hard stop.
+-- 4. Same-family / too-old (Gripora firmware from before MSP API 33.0) is also a hard stop.
 -- ---------------------------------------------------------------------------
 do
   local rig = newRig({ telemetryActive = true })

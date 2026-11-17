@@ -1,6 +1,6 @@
 -- Codec/message-builders for gripora-firmware's fine board mount trim:
--- MSP2_WING_BOARD_MOUNT_TRIM / MSP2_WING_SET_BOARD_MOUNT_TRIM
--- (cmd 0x5F03/0x5F04) and MSP2_WING_BOARD_MOUNT_TRIM_AUTO (0x5F05).
+-- MSP2_GRIPORA_BOARD_MOUNT_TRIM / MSP2_GRIPORA_SET_BOARD_MOUNT_TRIM
+-- (cmd 0x5F03/0x5F04) and MSP2_GRIPORA_BOARD_MOUNT_TRIM_AUTO (0x5F05).
 --
 -- Wire shape verified against gripora-firmware src/main/msp/msp.c:
 -- config read/write is roll/pitch/yaw S16 decidegrees; auto command takes

@@ -1,5 +1,5 @@
 -- Setup -> ESC & Motors -> SRXL2 ESC page: the SRXL2 ESC bus settings
--- (MSP2_WING_SRXL2_ESC_CONFIG). Firmware without the message refuses the read,
+-- (MSP2_GRIPORA_SRXL2_ESC_CONFIG). Firmware without the message refuses the read,
 -- which the runtime shows as a failed load.
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()

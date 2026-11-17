@@ -1,8 +1,8 @@
 -- Setup -> Governor page.
 --
 -- Gripora's fixed-wing Throttle Range Governor, not Rotorflight's
--- removed heli governor. Edits MSP2_WING_GOVERNOR_CONFIG /
--- MSP2_WING_SET_GOVERNOR_CONFIG via lib/msp_governor_config.lua.
+-- removed heli governor. Edits MSP2_GRIPORA_GOVERNOR_CONFIG /
+-- MSP2_GRIPORA_SET_GOVERNOR_CONFIG via lib/msp_governor_config.lua.
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local pageRuntime = requireModule("app/page_runtime.lua")

@@ -155,23 +155,27 @@ end
 -- API versions differ.
 --
 -- Resending on a broken reply needs the firmware to answer a request that
--- replaces a reply in progress with a reply of its own, START frame first:
--- gripora-firmware #173, MSP API 22.12 (snapshot 0.0.30). Below that the
--- resend's answer comes without a START frame and is discarded, so the queue
--- waits for retryDelay of silence instead.
+-- replaces a reply in progress with a reply of its own, START frame first
+-- (gripora-firmware #173). Without it the resend's answer comes without a
+-- START frame and is discarded, so the queue waits for retryDelay of silence
+-- instead.
 --
--- Version 3 of the framing (tasks/msp/common.lua) is offered from API 22.15.
--- Snapshot 0.0.38 already reports 22.15 without having it
--- (gripora-firmware #251 came in 0.0.39); it refuses version 3 once, and
--- the link falls back to version 2 for its lifetime.
+-- Version 3 of the framing (tasks/msp/common.lua) needs gripora-firmware
+-- #251. If the firmware refuses version 3, the link falls back to version 2
+-- for its lifetime.
+--
+-- Both are in every Gripora firmware the suite supports (MSP API 33.0 and
+-- later); an older or foreign firmware is refused by tasks/session.lua and
+-- keeps the plain behaviour.
 local function apiAtLeast(major, minor, wantMajor, wantMinor)
   return major ~= nil and minor ~= nil
     and (major > wantMajor or (major == wantMajor and minor >= wantMinor))
 end
 
 function Queue:setFirmwareApi(major, minor)
-  self.resendOnBreak = apiAtLeast(major, minor, 22, 12)
-  self.common.setFraming(apiAtLeast(major, minor, 22, 15) and 3 or 2)
+  local current = apiAtLeast(major, minor, 33, 0)
+  self.resendOnBreak = current
+  self.common.setFraming(current and 3 or 2)
 end
 
 function Queue:isProcessed()

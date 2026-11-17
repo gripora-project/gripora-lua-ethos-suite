@@ -1,4 +1,4 @@
--- Schema + message-builders for the MSP2_WING_TV_PID_CONFIG / SET command
+-- Schema + message-builders for the MSP2_GRIPORA_TV_PID_CONFIG / SET command
 -- pair (cmd 0x5F0B read / 0x5F0C write) -- the independent Thrust Vector PID
 -- loop's config (FEATURE_THRUST_VECTOR), a completely separate MSP command
 -- from MSP_PID_PROFILE/MSP_PID_TUNING (lib/msp_pid_profile.lua/
@@ -19,8 +19,8 @@
 -- convention as MSP_PID_PROFILE/MSP_SET_PID_PROFILE.
 --
 -- Field order/types verified against gripora-firmware's actual wire
--- serializer (src/main/msp/msp.c, MSP2_WING_TV_PID_CONFIG/
--- MSP2_WING_SET_TV_PID_CONFIG cases) and its backing struct (pg/tv_pid.h's
+-- serializer (src/main/msp/msp.c, MSP2_GRIPORA_TV_PID_CONFIG/
+-- MSP2_GRIPORA_SET_TV_PID_CONFIG cases) and its backing struct (pg/tv_pid.h's
 -- tvPidProfile_t) -- there is no rotorflight equivalent to cross-check
 -- against, unlike lib/msp_pid_profile.lua's history, since Thrust Vector is
 -- gripora-native.

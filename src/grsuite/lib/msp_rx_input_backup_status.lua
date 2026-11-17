@@ -1,9 +1,9 @@
 -- Schema + message-builder for gripora-firmware's read-only backup-RX
--- diagnostics -- MSP2_WING_RX_INPUT_BACKUP_STATUS (cmd 0x5F0D / 24333
+-- diagnostics -- MSP2_GRIPORA_RX_INPUT_BACKUP_STATUS (cmd 0x5F0D / 24333
 -- decimal -- see msp_protocol.h). Read-only: there is no SET_ variant.
 --
 -- Wire layout verified directly against gripora-firmware's own
--- serializer (src/main/msp/msp.c, MSP2_WING_RX_INPUT_BACKUP_STATUS case):
+-- serializer (src/main/msp/msp.c, MSP2_GRIPORA_RX_INPUT_BACKUP_STATUS case):
 -- U8 payload version -> U8 enabled (backup 1's port is assigned)
 -- -> [version >= 3 only] U8 mainLinkUp (the main RX is receiving)
 -- -> [version >= 2 only] U8 provider (0 = SBUS) -> U8 linkUp (backup 1 has

@@ -1,4 +1,4 @@
--- Message-builders for MSP2_WING_ESC_SENSOR_TRIAL (cmd 0x5F14): the flight
+-- Message-builders for MSP2_GRIPORA_ESC_SENSOR_TRIAL (cmd 0x5F14): the flight
 -- controller's ESC telemetry wiring detection.
 --
 -- The flight controller tries the half duplex and pin swap combinations on

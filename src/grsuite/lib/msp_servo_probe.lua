@@ -1,4 +1,4 @@
--- MSP2_WING_SET_SERVO_PROBE (cmd 0x5F1C, write, API 22.14): holds one
+-- MSP2_GRIPORA_SET_SERVO_PROBE (cmd 0x5F1C, write, API 22.14): holds one
 -- servo at its Mid plus an offset in us, ignoring its Min/Max, so the Setup
 -- Wizard's Limits step can look for where a surface binds without widening
 -- the stored limits.

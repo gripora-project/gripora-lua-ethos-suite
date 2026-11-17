@@ -98,7 +98,7 @@ do
   check("cleared", masksOf(ports) == "0," .. SERIAL_RX .. ",0" and #changed == 1, masksOf(ports))
 end
 
-print("MSP2_WING_FBUS_MASTER_CONFIG: the port wiring is read and written only when sent")
+print("MSP2_GRIPORA_FBUS_MASTER_CONFIG: the port wiring is read and written only when sent")
 do
   assert(loadfile(ROOT .. "lib/require.lua"))()
   package.loaded["grsuite.lib.mspcodec"] = assert(loadfile(ROOT .. "lib/mspcodec.lua"))()
@@ -115,7 +115,7 @@ do
   check("version 1 writes eight bytes", #C.encode(v1) == 8, #C.encode(v1))
 end
 
-print("MSP2_WING_FBUS_MASTER_TRIAL: the request is one action byte, the reply eight bytes")
+print("MSP2_GRIPORA_FBUS_MASTER_TRIAL: the request is one action byte, the reply eight bytes")
 do
   local C = assert(loadfile(ROOT .. "lib/msp_fbus_master_trial.lua"))()
 
@@ -153,7 +153,7 @@ do
   check("every simulator reply decodes", err ~= "simulator")
 end
 
-print("MSP2_WING_FBUS_SENSORS: each F.Bus device's packet count, and which answered since the read before")
+print("MSP2_GRIPORA_FBUS_SENSORS: each F.Bus device's packet count, and which answered since the read before")
 do
   local C = assert(loadfile(ROOT .. "lib/msp_fbus_sensors.lua"))()
   -- Two devices: ID 5 on F.Bus with 300 packets, named "AB", one app ID; ID 7 on S.Port with 9.
