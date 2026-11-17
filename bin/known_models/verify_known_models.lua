@@ -311,7 +311,7 @@ local function partLibrary(mut)
   -- 1. A name goes through lib/ini.lua, which reads "007", "0x10", "1e3" back as numbers and
   --    "true" as a boolean. It has to come back as what was written.
   local cases = {
-    { "Gripora Wing 1", "Gripora Wing 1" },
+    { "Gripora Car 1", "Gripora Car 1" },
     { "007", "007" },
     { "0x10", "0x10" },
     { "1e3", "1e3" },

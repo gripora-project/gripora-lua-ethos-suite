@@ -14,8 +14,7 @@ fixed-wing aircraft.
 
 **[User guide](https://doc.gripora.org/ethos-suite/)** ·
 **[Installing](https://doc.gripora.org/ethos-suite/installing/)** ·
-**[Releases](https://github.com/gripora-project/gripora-lua-ethos-suite/releases)** ·
-**[Discord](https://discord.gg/aEyyAJTXRw)**
+**[Releases](https://github.com/gripora-project/gripora-lua-ethos-suite/releases)**
 
 | | |
 | --- | --- |
@@ -97,7 +96,6 @@ dashboard themes, translations and a [reference for every page](docs/pages/READM
 Gripora is a community project. You can help by:
 
 - testing new versions and [reporting bugs](https://github.com/gripora-project/gripora-lua-ethos-suite/issues)
-- helping other pilots on [Discord](https://discord.gg/aEyyAJTXRw)
 - translating the suite, or keeping a translation up to date
 - fixing bugs and adding features
 
