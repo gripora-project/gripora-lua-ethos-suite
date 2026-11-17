@@ -2,7 +2,7 @@
 --
 -- Stateless renderer for app/pages/alignment.lua. It keeps the original
 -- module's important behavior: live attitude text, configured offset text,
--- nose-direction cue, and a 3D aircraft (app/plane3d.lua, shared with the
+-- nose-direction cue, and a 3D car (app/plane3d.lua, shared with the
 -- Setup Wizard) whose orientation follows MSP_ATTITUDE plus any *unsaved*
 -- edits to the board offset fields (see state.baseline in
 -- app/pages/alignment.lua -- the offsets already saved on the FC are

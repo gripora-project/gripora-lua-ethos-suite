@@ -1,6 +1,13 @@
--- The 3D plane: a low-poly aircraft drawn at a given attitude inside a box.
--- Used by the Alignment page (app/alignment_visual.lua) and the Setup
--- Wizard (its Sensors step, and app/setup_wizard_art.lua's pictures).
+-- The 3D model: a low-poly car (the default) or aircraft drawn at a given
+-- attitude inside a box. Used by the Alignment page (app/alignment_visual.lua)
+-- and the Setup Wizard (its Sensors step, and app/setup_wizard_art.lua's
+-- pictures, which still draw aircraft layouts).
+--
+-- The car is the Configurator's preview car (gripora-configurator
+-- src/js/car_model.js) in low poly: orange body, dark cabin, four six-sided
+-- wheels with grey hubs, a rear wing, headlights and red tail lights. Its
+-- numbers are that file's, in the same glTF-style axes (x = width, y = up,
+-- z = aft, nose at -z). spec.car = true selects it; it has no surfaces.
 --
 --   plane3d.setup(spec)        -- which airframe (default: the Extra below)
 --   plane3d.pose(arrows)       -- light up and deflect control surfaces
@@ -22,8 +29,8 @@
 -- reference yaw first. draw() sizes the model so it fits the box in any
 -- attitude (at zoom 1) and clips to the box.
 --
--- The default airframe is the Configurator's model (gripora-configurator
--- resources/models/model.gltf, an Extra-style aerobatic plane): red body,
+-- The aircraft is the old WingFlight Configurator model (an Extra-style
+-- aerobatic plane): body,
 -- dark ailerons/elevator/rudder, white spinner and landing gear, a canopy
 -- and a two-blade prop. setup() builds other layouts from the same parts:
 --
@@ -123,6 +130,8 @@ end
 local MODEL_SCALE = 0.70
 local ORIGIN_Y = 0.10
 local ORIGIN_Z = 1.00
+-- The origin in use: the aircraft's above, or the car's centre (0, 0, 0).
+local originY, originZ = ORIGIN_Y, ORIGIN_Z
 
 local MAT_BODY = 1
 local MAT_SURFACE = 2
@@ -130,6 +139,8 @@ local MAT_WHITE = 3
 local MAT_CANOPY = 4
 local MAT_PROP = 5
 local MAT_ACTIVE = 6
+local MAT_TYRE = 7
+local MAT_TAIL = 8
 
 -- How far pose() swings a surface with an arrow.
 local DEFLECT_R = rad(28)
@@ -154,9 +165,9 @@ local MODEL_RADIUS = 1
 
 local function vtx(gx, gy, gz)
   vertexCount = vertexCount + 1
-  MX[vertexCount] = -(gz - ORIGIN_Z) * MODEL_SCALE
+  MX[vertexCount] = -(gz - originZ) * MODEL_SCALE
   MY[vertexCount] = gx * MODEL_SCALE
-  MZ[vertexCount] = (gy - ORIGIN_Y) * MODEL_SCALE
+  MZ[vertexCount] = (gy - originY) * MODEL_SCALE
   return vertexCount
 end
 
@@ -186,9 +197,9 @@ end
 -- next to this face; the winding is flipped if needed so the normal points
 -- away from it, which is all the back-face test needs.
 local function solid(a, b, c, d, mat, rx, ry, rz)
-  local ix = -(rz - ORIGIN_Z) * MODEL_SCALE
+  local ix = -(rz - originZ) * MODEL_SCALE
   local iy = rx * MODEL_SCALE
-  local iz = (ry - ORIGIN_Y) * MODEL_SCALE
+  local iz = (ry - originY) * MODEL_SCALE
   local ux, uy, uz = MX[b] - MX[a], MY[b] - MY[a], MZ[b] - MZ[a]
   local vx, vy, vz = MX[c] - MX[a], MY[c] - MY[a], MZ[c] - MZ[a]
   local nx, ny, nz = uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx
@@ -350,8 +361,76 @@ local function fin(baseY, baseLE, topY, topLE, hingeZ, teTop, teBottom, bottomY,
   if rudder then surface("fin", 1, h1, h2, t2, t1) else plate(h1, h2, t2, t1, MAT_BODY) end
 end
 
-local DEFAULT_SPEC = {tail = "conventional", wing = "straight", outer = {0.30, 1.0},
-  fin = true, rudder = true, gear = true}
+---------------------------------------------------------------------------
+-- The car (spec.car). Parts are prisms: a side profile of {z, y} points
+-- (convex, in order around it) pushed out across the car's width.
+---------------------------------------------------------------------------
+
+-- A closed prism: the profile at x = cx - hw and x = cx + hw, its sides in
+-- mat and its two end caps in capMat.
+local function prism(profile, cx, hw, mat, capMat)
+  local n = #profile
+  local left, right = {}, {}
+  local cz, cy = 0, 0
+  for i = 1, n do
+    local p = profile[i]
+    left[i] = vtx(cx + hw, p[2], p[1])
+    right[i] = vtx(cx - hw, p[2], p[1])
+    cz, cy = cz + p[1], cy + p[2]
+  end
+  cz, cy = cz / n, cy / n
+  for i = 1, n do
+    local j = (i % n) + 1
+    solid(left[i], left[j], right[j], right[i], mat, cx, cy, cz)
+  end
+  for i = 2, n - 1 do
+    solid(left[1], left[i], left[i + 1], nil, capMat, cx, cy, cz)
+    solid(right[1], right[i], right[i + 1], nil, capMat, cx, cy, cz)
+  end
+end
+
+local CAR_BODY = {{-3.05, -0.33}, {-3.05, 0.00}, {-2.20, 0.28}, {2.40, 0.38}, {3.00, 0.32}, {3.00, -0.33}}
+local CAR_CABIN = {{-1.10, 0.30}, {-0.15, 0.92}, {1.25, 0.92}, {2.05, 0.36}}
+local CAR_WHEELS = {{1.50, -1.95}, {-1.50, -1.95}, {1.50, 2.00}, {-1.50, 2.00}}
+
+local function carWheel(k)
+  local w = CAR_WHEELS[k]
+  local hex = {}
+  for i = 1, 6 do
+    local a = (i - 1) * math.pi / 3
+    hex[i] = {w[2] + 0.62 * cos(a), -0.32 + 0.62 * sin(a)}
+  end
+  prism(hex, w[1], 0.28, MAT_TYRE, MAT_PROP)
+end
+
+local CAR_STAGES = {
+  function()
+    originY, originZ = 0, 0
+    prism(CAR_BODY, 0, 1.42, MAT_BODY, MAT_BODY)
+  end,
+  function()
+    prism(CAR_CABIN, 0, 1.12, MAT_CANOPY, MAT_CANOPY)
+    -- Chassis plate under the body
+    prism({{-3.0, -0.51}, {-3.0, -0.33}, {3.0, -0.33}, {3.0, -0.51}}, 0, 1.35, MAT_SURFACE, MAT_SURFACE)
+  end,
+  function() carWheel(1) carWheel(2) end,
+  function() carWheel(3) carWheel(4) end,
+  function()
+    -- Rear wing on two struts
+    plate(vtx(-1.35, 0.90, 2.45), vtx(1.35, 0.90, 2.45), vtx(1.35, 0.90, 3.05), vtx(-1.35, 0.90, 3.05), MAT_SURFACE)
+    for _, x in ipairs({-0.75, 0.75}) do
+      plate(vtx(x, 0.37, 2.61), vtx(x, 0.88, 2.61), vtx(x, 0.88, 2.89), vtx(x, 0.37, 2.89), MAT_SURFACE)
+    end
+    -- Headlights and tail lights, so the heading reads at a glance
+    for _, s in ipairs({-1, 1}) do
+      plate(vtx(0.62 * s, -0.05, -3.07), vtx(1.18 * s, -0.05, -3.07), vtx(1.18 * s, 0.09, -3.07), vtx(0.62 * s, 0.09, -3.07), MAT_WHITE)
+      plate(vtx(0.62 * s, 0.14, 3.02), vtx(1.18 * s, 0.14, 3.02), vtx(1.18 * s, 0.26, 3.02), vtx(0.62 * s, 0.26, 3.02), MAT_TAIL)
+    end
+  end,
+  function() end,
+}
+
+local DEFAULT_SPEC = {car = true}
 
 local function specTail(spec) return spec.tail or "conventional" end
 local function specPlanform(spec) return WINGS[spec.wing or "straight"] or WINGS.straight end
@@ -366,17 +445,31 @@ local oldVertices, oldFaces = 0, 0
 
 local STAGES = {
   function(spec)
+    if spec.car then
+      oldVertices, oldFaces = vertexCount, faceCount
+      vertexCount, faceCount, surfaceCount = 0, 0, 0
+      return CAR_STAGES[1](spec)
+    end
+    originY, originZ = ORIGIN_Y, ORIGIN_Z
     oldVertices, oldFaces = vertexCount, faceCount
     vertexCount, faceCount, surfaceCount = 0, 0, 0
     fuselage(specTail(spec) == "none" and POD or BODY)
   end,
   function(spec)
+    if spec.car then return CAR_STAGES[2](spec) end
     if specTail(spec) == "none" then canopy(0.46, 1.45) else canopy(0.62, 1.75) end
     nose()
   end,
-  function(spec) wing(specPlanform(spec), spec.outer, spec.inner, 1) end,
-  function(spec) wing(specPlanform(spec), spec.outer, spec.inner, 2) end,
   function(spec)
+    if spec.car then return CAR_STAGES[3](spec) end
+    wing(specPlanform(spec), spec.outer, spec.inner, 1)
+  end,
+  function(spec)
+    if spec.car then return CAR_STAGES[4](spec) end
+    wing(specPlanform(spec), spec.outer, spec.inner, 2)
+  end,
+  function(spec)
+    if spec.car then return CAR_STAGES[5](spec) end
     local tail = specTail(spec)
     local planform = specPlanform(spec)
     for side = 1, 2 do
@@ -406,6 +499,7 @@ local STAGES = {
     end
   end,
   function(spec)
+    if spec.car then return CAR_STAGES[6](spec) end
     if not spec.gear then return end
     for side = 1, 2 do
       -- A leg out of the belly and a spatted wheel.
@@ -511,21 +605,26 @@ local DIFFUSE = 0.65
 local SHADE_LEVELS = 8
 
 local BASE_COLORS = {
+  -- Body in Gripora orange; the car's cabin glass is MAT_CANOPY, its hubs MAT_PROP.
   dark = {
-    [MAT_BODY] = {210, 40, 45},
+    [MAT_BODY] = {255, 95, 31},
     [MAT_SURFACE] = {78, 80, 88},
     [MAT_WHITE] = {235, 235, 230},
-    [MAT_CANOPY] = {95, 125, 160},
+    [MAT_CANOPY] = {70, 85, 105},
     [MAT_PROP] = {160, 160, 165},
-    [MAT_ACTIVE] = {255, 165, 30},
+    [MAT_ACTIVE] = {255, 205, 60},
+    [MAT_TYRE] = {48, 48, 54},
+    [MAT_TAIL] = {225, 40, 30},
   },
   light = {
-    [MAT_BODY] = {200, 30, 35},
+    [MAT_BODY] = {240, 85, 20},
     [MAT_SURFACE] = {45, 45, 52},
     [MAT_WHITE] = {215, 215, 210},
-    [MAT_CANOPY] = {55, 75, 100},
+    [MAT_CANOPY] = {45, 55, 70},
     [MAT_PROP] = {120, 120, 125},
-    [MAT_ACTIVE] = {255, 150, 0},
+    [MAT_ACTIVE] = {255, 190, 0},
+    [MAT_TYRE] = {30, 30, 34},
+    [MAT_TAIL] = {200, 30, 25},
   },
 }
 
@@ -774,7 +873,7 @@ function plane3d.setup(spec)
   currentSpec = spec
   if c and c.tail == spec.tail and c.wing == spec.wing and sameSpan(c.outer, spec.outer)
       and sameSpan(c.inner, spec.inner) and c.fin == spec.fin and c.rudder == spec.rudder
-      and c.winglets == spec.winglets and c.gear == spec.gear then
+      and c.winglets == spec.winglets and c.gear == spec.gear and c.car == spec.car then
     return
   end
   buildSpec, buildStage, ready, prepStage = spec, 1, false, 0
