@@ -24,7 +24,7 @@ showed the lazy version *grew* retained RAM over a session more than just
 paying the eager cost once at startup does. Don't reintroduce a lazy
 proxy/deferred-registration layer for these three subsystems without new
 on-device evidence — this isn't a style choice, it's a reverted experiment.
-This is also directly noted in `AGENTS.md` Section 11 (Wingflight Migration
+This is also directly noted in `AGENTS.md` Section 11 (Gripora Migration
 Notes): the pre-rewrite `lib/features.lua` "Feature Flags" RAM system (a
 toggle to skip registering widgets) was deliberately not ported for the
 same reason.
@@ -72,13 +72,13 @@ The idiom, verbatim, matching `lib/bus.lua`'s own (the pattern's origin
 point in this codebase):
 
 ```lua
-if package.loaded["wfsuite.lib.my_module"] then
-  return package.loaded["wfsuite.lib.my_module"]
+if package.loaded["grsuite.lib.my_module"] then
+  return package.loaded["grsuite.lib.my_module"]
 end
 
 -- ... module body ...
 
-package.loaded["wfsuite.lib.my_module"] = my_module
+package.loaded["grsuite.lib.my_module"] = my_module
 return my_module
 ```
 
@@ -261,7 +261,7 @@ linearly with the number of page visits, which is the exact thing §8's
 pooling exists to prevent.
 
 Upstream measured this by replaying every page's real field inventory
-(rotorflight's page set, not wingflight's) through `app/field_layout.lua`
+(rotorflight's page set, not gripora's) through `app/field_layout.lua`
 on Lua 5.4, opening each page, building every field and releasing the
 runtime:
 
@@ -272,7 +272,7 @@ runtime:
 | 5 | 195 | 975 |
 | 20 | 195 | 3900 |
 
-The shape carries over even though wingflight's numbers differ: the pool is
+The shape carries over even though gripora's numbers differ: the pool is
 *bounded by construction*, not merely slow to grow. It is keyed by field
 shape, and every field shape in the app is a literal in some page's source,
 so it saturates on the first tour and never grows again.
@@ -407,7 +407,7 @@ The same change in rotorflight-lua-ethos-suite (#2421) measured **−60.4 kB**
 of resting Lua heap on an X18RS, connected with the tool closed. The saving
 is in the **resting** state, not the peak: with the tool open the modules
 are loaded either way, so a pilot who keeps the tool open gets nothing back.
-Wingflight had already deferred most of this subtree before that port; the
+Gripora had already deferred most of this subtree before that port; the
 port added the `close()` nil-checks and the `menu_container.lua` change.
 
 Two harnesses pin it, both run in the PR workflow:
@@ -649,7 +649,7 @@ page, and after every cycle counts:
 
 - the tables and strings actually **reachable from `_G` and `package.loaded`**
   — the sharp check, an exact integer;
-- live bus subscribers, `wfsuite.*` entries in `package.loaded`, the
+- live bus subscribers, `grsuite.*` entries in `package.loaded`, the
   `field_layout` pool size, the form-widget count, and the post-collect heap as
   a coarse backstop.
 

@@ -7,7 +7,7 @@
 -- the same inputs and expected values. Lists are 1-based here; the channel
 -- numbers in them are the same 0-based ones.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)

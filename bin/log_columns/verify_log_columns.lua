@@ -9,7 +9,7 @@
 --     lua5.4 bin/log_columns/verify_log_columns.lua
 --     lua5.4 bin/log_columns/verify_log_columns.lua --self-test
 --
--- What it drives: the real src/wfsuite/lib/log_columns.lua, the pure reader that
+-- What it drives: the real src/grsuite/lib/log_columns.lua, the pure reader that
 -- app/pages/logs.lua calls. The page wiring itself is not driven here: the page needs
 -- the full UI. The check is that the page passes the header map and the row count
 -- through unchanged, which is a code reading, not a run.
@@ -26,7 +26,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local MODULE = ROOT .. "/src/wfsuite/lib/log_columns.lua"
+local MODULE = ROOT .. "/src/grsuite/lib/log_columns.lua"
 
 local checks, failures = 0, 0
 local function check(label, ok, detail)
@@ -167,7 +167,7 @@ for _, a in ipairs(arg or {}) do
   if a == "--self-test" then selfTest = true end
 end
 
-print("module: src/wfsuite/lib/log_columns.lua")
+print("module: src/grsuite/lib/log_columns.lua")
 runChecks(dofile(MODULE))
 
 if selfTest then

@@ -7,7 +7,7 @@
 --   * The real app/page_runtime.lua: Back on a dirty page asks first. Discard leaves, Stay keeps
 --     the page, Save saves and keeps it. A clean page, a live-write page and a page that has not
 --     loaded leave at once. While armed the question offers Discard and Stay only.
---   * The real src/wfsuite/app/pages/power_alerts.lua, a page that keeps its own state: the same
+--   * The real src/grsuite/app/pages/power_alerts.lua, a page that keeps its own state: the same
 --     question through its own Back. The header, the form and the model preferences are stand-ins.
 --
 -- Against unpatched master Back leaves at once, so the dirty-page checks fail.
@@ -19,7 +19,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -36,7 +36,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -46,7 +46,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -232,12 +232,12 @@ end
 -- ---------------------------------------------------------------------------
 
 local headerOpts
-package.loaded["wfsuite.app.header"] = {build = function(_, opts)
+package.loaded["grsuite.app.header"] = {build = function(_, opts)
   headerOpts = opts
   return {setSaveEnabled = noop, setReloadEnabled = noop, focusSave = noop, focusReload = noop, focusMenu = noop}
 end}
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return false end}
-package.loaded["wfsuite.lib.model_preferences"] = {
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return false end}
+package.loaded["grsuite.lib.model_preferences"] = {
   load = function() return {}, "model.ini" end,
   powerAlerts = function() return {flighttime = 300, alert_type = 0, becalertvalue = 6.5, rxalertvalue = 7.5} end,
   setPowerAlerts = function(prefs) return prefs end,
@@ -275,12 +275,12 @@ do
   local sent = {}
   local sub = bus.subscribe("msp.request", function(m) sent[#sent + 1] = m end)
   local wakeupHandler = nil
-  package.loaded["wfsuite.lib.msp_board_info"] = {
+  package.loaded["grsuite.lib.msp_board_info"] = {
     buildReadMessage = function(onOk)
       return {processReply = function(self, data) onOk(data or self) end}
     end,
   }
-  package.loaded["wfsuite.lib.msp_serial_config"] = {
+  package.loaded["grsuite.lib.msp_serial_config"] = {
     buildReadMessage = function(onOk)
       return {processReply = function(self, data) onOk(data or self) end}
     end,
@@ -288,12 +288,12 @@ do
       return {processReply = function(self, data) onOk(data or self) end}
     end,
   }
-  package.loaded["wfsuite.lib.msp_eeprom"] = {
+  package.loaded["grsuite.lib.msp_eeprom"] = {
     buildWriteMessage = function(onOk)
       return {processReply = function(_) onOk() end}
     end,
   }
-  package.loaded["wfsuite.lib.msp_reboot"] = {
+  package.loaded["grsuite.lib.msp_reboot"] = {
     buildWriteMessage = function() return {} end,
   }
 

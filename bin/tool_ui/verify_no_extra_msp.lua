@@ -9,7 +9,7 @@
 -- counts every "msp.request" at bus.publish while driving the real tool.
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/tool.lua, including its real guards. Only the
+--   * The real src/grsuite/app/tool.lua, including its real guards. Only the
 --     Ethos widgets, the background task and the link are stubbed. The last two
 --     have to report "running" and "connected", because the guards only request
 --     then (their canRequest in tool.lua) -- without them the run passes on
@@ -39,7 +39,7 @@ local function scriptDir()
   return (path:match("^(.*)[/\\][^/\\]*$")) or "."
 end
 
-local SUITE = (scriptDir() .. "/../../src/wfsuite"):gsub("\\", "/")
+local SUITE = (scriptDir() .. "/../../src/grsuite"):gsub("\\", "/")
 local SUITE_PREFIX = SUITE .. "/"
 
 local checks, failures = 0, 0

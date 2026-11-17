@@ -1,7 +1,7 @@
 *~
 **/.DS_Store
 *.orig.png
-src/wfsuite.zip
+src/grsuite.zip
 /build/
 /bin/sound-generator/soundpack/user/*.wav
 *subprocess_conout.cpython-312.*
@@ -12,13 +12,13 @@ deploy.json
 *.pyc
 .claude/*
 !.claude/settings.json
-bin/updater/src/wfsuite_updater_work
+bin/updater/src/grsuite_updater_work
 bin/updater/src/build
 bin/updater/src/build_embed
 bin/updater/src/dist_embed
 bin/updater/src/build
-/bin/updater/src/wfsuite_updater_work
-/bin/updater/wfsuite_updater_work
+/bin/updater/src/grsuite_updater_work
+/bin/updater/grsuite_updater_work
 .vscode/settings.json
 bin/package/rotorflight-lua-ethos-suite-local-test-en.zip
 .vscode/logs/

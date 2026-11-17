@@ -42,6 +42,6 @@ See [Failsafe Stage 2](failsafe_procedure.md) for selection of GPS Rescue.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/gps_nav_config.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/gps_nav_config.lua). Menu conditions come from `app/tool.lua`.
 
-*Reviewed against WFSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*
+*Reviewed against GRSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*

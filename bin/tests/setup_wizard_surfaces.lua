@@ -6,7 +6,7 @@
 -- shows up here. The style and mode-range cases of that file come with the
 -- steps that use them.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)

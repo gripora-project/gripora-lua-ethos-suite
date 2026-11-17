@@ -26,7 +26,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 RESOLVER = REPO / ".vscode" / "scripts" / "resolve_i18n_tags.py"
 SRC_ROOT = REPO / "src"
-LOCALE_DIR = SRC_ROOT / "wfsuite" / "i18n"
+LOCALE_DIR = SRC_ROOT / "grsuite" / "i18n"
 
 
 def load_resolver():
@@ -81,7 +81,7 @@ def main():
         for key, uses in sorted(missing.items()):
             for rel, lineno in uses:
                 print(f"  {rel}:{lineno}: {key}")
-        print("[i18n] Add them to bin/i18n/json/en.json and regenerate src/wfsuite/i18n/ (see AGENTS.md section 7).")
+        print("[i18n] Add them to bin/i18n/json/en.json and regenerate src/grsuite/i18n/ (see AGENTS.md section 7).")
     else:
         print(f"[i18n] OK: every @i18n tag in src/ resolves against {args.lang}.json")
 

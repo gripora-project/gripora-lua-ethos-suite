@@ -14,7 +14,7 @@
       "args": [
         "${workspaceFolder}/.vscode/scripts/deploy.py",
         "--lang",
-        "${config:wfsuite.deploy.language}",
+        "${config:grsuite.deploy.language}",
         "--step",
         "i18n",
         "--step",
@@ -24,7 +24,7 @@
       ],
       "options": {
         "env": {
-          "WFSUITE_LANG": "${config:wfsuite.deploy.language}"
+          "GRSUITE_LANG": "${config:grsuite.deploy.language}"
         }
       },
       "problemMatcher": [],
@@ -35,7 +35,7 @@
       }
     },
     {
-      "label": "WFSuite: Set Deployment Language",
+      "label": "GRSuite: Set Deployment Language",
       "type": "shell",
       "command": "node",
       "args": [
@@ -58,7 +58,7 @@
         "${workspaceFolder}/.vscode/scripts/deploy.py",
         "--radio",
         "--lang",
-        "${config:wfsuite.deploy.language}",
+        "${config:grsuite.deploy.language}",
         "--step",
         "i18n",
         "--step",
@@ -89,7 +89,7 @@
         "fast",
         "--radio",
         "--lang",
-        "${config:wfsuite.deploy.language}",
+        "${config:grsuite.deploy.language}",
         "--step",
         "i18n",
         "--step",
@@ -117,7 +117,7 @@
         "--radio",
         "--radio-debug",
         "--lang",
-        "${config:wfsuite.deploy.language}",
+        "${config:grsuite.deploy.language}",
         "--step",
         "i18n",
         "--step",
@@ -147,7 +147,7 @@
         "--radio",
         "--radio-debug",
         "--lang",
-        "${config:wfsuite.deploy.language}",
+        "${config:grsuite.deploy.language}",
         "--step",
         "i18n",
         "--step",
@@ -175,7 +175,7 @@
         "--radio",
         "--connect-only",
         "--lang",
-        "${config:wfsuite.deploy.language}",
+        "${config:grsuite.deploy.language}",
         "--step",
         "i18n",
         "--step",
@@ -369,7 +369,7 @@
       }
     },
     {
-      "label": "Run WFSuite Sensor Tool",
+      "label": "Run GRSuite Sensor Tool",
       "type": "process",
       "command": "${workspaceFolder}/bin/sensors/sensors.exe",
       "osx": {
@@ -377,7 +377,7 @@
       },
       "options": {
         "env": {
-          "WFSUITE_LANG": "${config:wfsuite.deploy.language}"
+          "GRSUITE_LANG": "${config:grsuite.deploy.language}"
         },
         "cwd": "${workspaceFolder}/bin/sensors"
       },

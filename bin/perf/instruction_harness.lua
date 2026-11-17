@@ -8,7 +8,7 @@
 -- desktop Lua 5.4 against stubbed Ethos APIs and counts VM instructions with
 -- a count hook -- the same unit the limit is expressed in.
 --
--- Only instructions executed by functions defined under src/wfsuite/ are
+-- Only instructions executed by functions defined under src/grsuite/ are
 -- counted. The stubs here stand in for Ethos C functions, which cost the radio
 -- one call instruction (already counted at the call site), so their own Lua
 -- bodies must not inflate the figures.
@@ -28,13 +28,13 @@ local function scriptDir()
   return (path:match("^(.*)[/\\][^/\\]*$")) or "."
 end
 
--- The suite resolves every path relative to src/wfsuite.
-local ROOT = (scriptDir() .. "/../../src/wfsuite"):gsub("\\", "/")
+-- The suite resolves every path relative to src/grsuite.
+local ROOT = (scriptDir() .. "/../../src/grsuite"):gsub("\\", "/")
 H.ROOT = ROOT
 
 local function rooted(path)
   if type(path) ~= "string" then return path end
-  local rest = path:match("^SCRIPTS:/wfsuite/(.*)$")
+  local rest = path:match("^SCRIPTS:/grsuite/(.*)$")
   if rest then return ROOT .. "/" .. rest end
   if not path:match("^%a:") and path:sub(1, 1) ~= "/" then return ROOT .. "/" .. path end
   return path
@@ -50,7 +50,7 @@ local isSuite = setmetatable({}, {__mode = "k"})
 local getinfo = debug.getinfo
 
 local function suiteKey(info)
-  return info.short_src:gsub("^.*src/wfsuite/", "") .. ":" .. info.linedefined
+  return info.short_src:gsub("^.*src/grsuite/", "") .. ":" .. info.linedefined
 end
 
 -- Optional emulation of the limit itself, for checking what the suite does
@@ -67,7 +67,7 @@ local function hook()
   local f = getinfo(2, "f").func
   local suite = isSuite[f]
   if suite == nil then
-    suite = getinfo(f, "S").source:find("/src/wfsuite/", 1, true) ~= nil
+    suite = getinfo(f, "S").source:find("/src/grsuite/", 1, true) ~= nil
     isSuite[f] = suite
   end
   if not suite then return end
@@ -287,10 +287,10 @@ loadfile = function(path, ...)
   return timed
 end
 
--- Settings come from H.settings instead of SCRIPTS:/wfsuite.user.
+-- Settings come from H.settings instead of SCRIPTS:/grsuite.user.
 H.settings = {}
 local ini = assert(loadfile("lib/ini.lua"))()
-package.loaded["wfsuite.lib.ini"] = ini
+package.loaded["grsuite.lib.ini"] = ini
 ini.load_ini_file = function() return H.settings end
 ini.save_ini_file = function() return true end
 

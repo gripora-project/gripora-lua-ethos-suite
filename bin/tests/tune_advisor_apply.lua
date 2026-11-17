@@ -10,7 +10,7 @@
 -- that each stage is shown.
 -- i18n tags are left unresolved: messages are matched by their key.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -70,14 +70,14 @@ local cache = {
       focusReload = function() end}
   end},
 }
-package.loaded["wfsuite.lib.require"] = function(path)
+package.loaded["grsuite.lib.require"] = function(path)
   if cache[path] == nil then
     local result = assert(loadfile(ROOT .. path))()
     cache[path] = result == nil and true or result
   end
   return cache[path]
 end
-local requireModule = package.loaded["wfsuite.lib.require"]
+local requireModule = package.loaded["grsuite.lib.require"]
 
 local tuneAdvisor = requireModule("lib/msp_tune_advisor.lua")
 local tuneHistory = requireModule("lib/tune_history.lua")

@@ -102,7 +102,7 @@
       "preLaunchTask": "ethos.OpenTelemetry"
     },
     {
-      "name": "Run WFSuite Sensor Tool",
+      "name": "Run GRSuite Sensor Tool",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/.vscode/scripts/dummy.py",
@@ -110,7 +110,7 @@
       "subProcess": false,
       "justMyCode": true,
       "stopOnEntry": false,
-      "postDebugTask": "Run WFSuite Sensor Tool"
+      "postDebugTask": "Run GRSuite Sensor Tool"
     },
     {
       "name": "ActiveLook Preview",

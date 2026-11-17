@@ -5,7 +5,7 @@
 --     lua5.4 bin/model_prefs_save/verify_model_prefs_save.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/pages/power_alerts.lua, stats.lua and
+--   * The real src/grsuite/app/pages/power_alerts.lua, stats.lua and
 --     power_smartfuel.lua, and the real app/page_runtime.lua, with the real bus
 --     and the real app/settings_save.lua helper. The UI (form, header), the
 --     model-preferences codec and the MSP-side modules are stubs.
@@ -33,7 +33,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -50,7 +50,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -60,7 +60,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -122,14 +122,14 @@ local function newHeaderHandle()
     setReloadEnabled = noop,
   })
 end
-package.loaded["wfsuite.app.header"] = {
+package.loaded["grsuite.app.header"] = {
   build = function(_, opts)
     headerOpts = opts
     headerHandle = newHeaderHandle()
     return headerHandle
   end,
 }
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return false end}
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return false end}
 
 -- The save switch: each scenario sets saveResult before pressing Save.
 local prefsStore = {saveCalls = 0, saveResult = true}
@@ -146,19 +146,19 @@ function mp.save()
   prefsStore.saveCalls = prefsStore.saveCalls + 1
   return prefsStore.saveResult
 end
-package.loaded["wfsuite.lib.model_preferences"] = mp
+package.loaded["grsuite.lib.model_preferences"] = mp
 
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   load = function() return {} end,
   saveConfirmEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.memstats"] = {print = noop}
-package.loaded["wfsuite.lib.debug_log"] = {print = noop, msp = noop, mspEnabled = function() return false end}
-package.loaded["wfsuite.lib.msp_eeprom"] = permissive()
-package.loaded["wfsuite.lib.msp_reboot"] = permissive()
-package.loaded["wfsuite.app.progress_dialog"] = permissive()
-package.loaded["wfsuite.app.field_layout"] = permissive()
-package.loaded["wfsuite.lib.msp_smartfuel_config"] = {MODE_CHOICES = {}}
+package.loaded["grsuite.lib.memstats"] = {print = noop}
+package.loaded["grsuite.lib.debug_log"] = {print = noop, msp = noop, mspEnabled = function() return false end}
+package.loaded["grsuite.lib.msp_eeprom"] = permissive()
+package.loaded["grsuite.lib.msp_reboot"] = permissive()
+package.loaded["grsuite.app.progress_dialog"] = permissive()
+package.loaded["grsuite.app.field_layout"] = permissive()
+package.loaded["grsuite.lib.msp_smartfuel_config"] = {MODE_CHOICES = {}}
 
 local bus = requireModule("lib/bus.lua")
 
@@ -274,7 +274,7 @@ headerOpts.onBack()
 -- The page hands its config to page_runtime; the test keeps it to call
 -- beforeSave the way performSave does.
 local capturedConfig = nil
-package.loaded["wfsuite.app.page_runtime"] = {
+package.loaded["grsuite.app.page_runtime"] = {
   new = function(config)
     capturedConfig = config
     return permissive({data = {}, cleanData = {}, loaded = true, activeDialog = false, disposed = false})
@@ -313,7 +313,7 @@ check("an accepted model-type save publishes the model-type update once",
 -- ---------------------------------------------------------------------------
 
 -- The real page_runtime, unstubbed. Only the header is a stand-in above.
-package.loaded["wfsuite.app.page_runtime"] = nil
+package.loaded["grsuite.app.page_runtime"] = nil
 local pageRuntime = requireModule("app/page_runtime.lua")
 
 print("page_runtime: performSave")

@@ -4,7 +4,7 @@
 -- writes back MSP_GPS_RESCUE with only byte 21 changed, and that the page still
 -- works (row disabled, no rescue write) when the FC does not report the field.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -50,7 +50,7 @@ local stubs = {
   end},
 }
 local cache = {}
-package.loaded["wfsuite.lib.require"] = function(path)
+package.loaded["grsuite.lib.require"] = function(path)
   if stubs[path] then return stubs[path] end
   if cache[path] == nil then
     local result = assert(loadfile(ROOT .. path))()
@@ -100,7 +100,7 @@ end
 -- lib/msp_gps_rescue.lua
 -- ---------------------------------------------------------------------------
 
-local codec = package.loaded["wfsuite.lib.require"]("lib/msp_gps_rescue.lua")
+local codec = package.loaded["grsuite.lib.require"]("lib/msp_gps_rescue.lua")
 
 check("decode: a reply without the field is nil", codec.decode(rescueReply(0, 21)) == nil)
 do

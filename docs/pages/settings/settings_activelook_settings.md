@@ -23,7 +23,7 @@ Available without a flight controller connection; the background task must be ru
 
 | Setting | What it does |
 | --- | --- |
-| Wingflight ActiveLook | TODO: explain behaviour, displayed units, range and conditions. |
+| Gripora ActiveLook | TODO: explain behaviour, displayed units, range and conditions. |
 | Hide Display | TODO: explain behaviour, displayed units, range and conditions. |
 | Offset X | TODO: explain behaviour, displayed units, range and conditions. |
 | Offset Y | TODO: explain behaviour, displayed units, range and conditions. |
@@ -36,6 +36,6 @@ firmware defaults; wire values may need scaling before display.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/settings_activelook_settings.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/settings_activelook_settings.lua). Menu conditions come from `app/tool.lua`.
 
-*Scaffolded against WFSuite Ethos 2.3.1; content awaiting review.*
+*Scaffolded against GRSuite Ethos 2.3.1; content awaiting review.*

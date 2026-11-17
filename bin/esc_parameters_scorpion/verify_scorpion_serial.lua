@@ -69,7 +69,7 @@
 --   gates pass for the wrong reason.
 --
 --   It clears package.loaded before the sabotage load: the codec self-caches under
---   wfsuite.lib.msp_esc_parameters_scorpion, and pass 1 has already filled that key,
+--   grsuite.lib.msp_esc_parameters_scorpion, and pass 1 has already filled that key,
 --   so loading the staged file returns the REAL module and a working cut looks
 --   broken. This is the third harness in two days to fall into that, after the
 --   XDFly bias harness and the YGE serial one.
@@ -86,7 +86,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 
 local SELF_TEST = arg[1] == "--self-test"
@@ -277,7 +277,7 @@ _G.form = {
   openProgressDialog = function() return dialogStub() end,
 }
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   publish = function(topic, message)
@@ -293,19 +293,19 @@ package.loaded["wfsuite.lib.bus"] = {
   end,
 }
 
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   open = function() return dialogStub() end,
   SPEED = { DEFAULT = 1, SLOW = 2, VSLOW = 3 },
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return false end,
   reloadConfirmEnabled = function() return true end,
   developerModeEnabled = function() return false end,
@@ -313,10 +313,10 @@ package.loaded["wfsuite.lib.settings_store"] = {
   save = function() end,
   DEFAULTS = { general = {}, developer = {} },
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { command = 250, isWrite = true } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
 
 local requireModule = assert(realLoadfile(PREFIX .. "lib/require.lua"))()
 
@@ -407,12 +407,12 @@ local function freshOpts()
 end
 
 local function resetModules()
-  package.loaded["wfsuite.app.pages.esc_forward_vendor"] = nil
-  package.loaded["wfsuite.app.esc_error"] = nil
-  package.loaded["wfsuite.app.close_key"] = nil
-  package.loaded["wfsuite.lib.msp_4wif_esc_fwd_prog"] = nil
-  package.loaded["wfsuite.app.pages.esc_forward_scorpion"] = nil
-  package.loaded["wfsuite.lib.msp_esc_parameters_scorpion"] = nil
+  package.loaded["grsuite.app.pages.esc_forward_vendor"] = nil
+  package.loaded["grsuite.app.esc_error"] = nil
+  package.loaded["grsuite.app.close_key"] = nil
+  package.loaded["grsuite.lib.msp_4wif_esc_fwd_prog"] = nil
+  package.loaded["grsuite.app.pages.esc_forward_scorpion"] = nil
+  package.loaded["grsuite.lib.msp_esc_parameters_scorpion"] = nil
 end
 
 local function pokeU16(buf, at, value)
@@ -902,7 +902,7 @@ if SELF_TEST then
   -- The feature must actually be GONE, so a cut that removed the wrong thing cannot
   -- masquerade as the pre-fix module.
   do
-    package.loaded["wfsuite.lib.msp_esc_parameters_scorpion"] = nil
+    package.loaded["grsuite.lib.msp_esc_parameters_scorpion"] = nil
     local pre = assert(realLoadfile(file))()
     local problems = {}
     local summary = tostring(pre.summaryFor({ escinfo_1 = 0, firmware_version = 7 }))

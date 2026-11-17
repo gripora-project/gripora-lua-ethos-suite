@@ -151,14 +151,14 @@ do.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/setup_wizard.lua) and one
+[Page implementation](../../../src/grsuite/app/pages/setup_wizard.lua) and one
 `app/pages/setup_wizard_<step>.lua` per step. The screens are built by
-[app/setup_wizard_ui.lua](../../../src/wfsuite/app/setup_wizard_ui.lua) and the
-pictures drawn by [app/setup_wizard_art.lua](../../../src/wfsuite/app/setup_wizard_art.lua).
+[app/setup_wizard_ui.lua](../../../src/grsuite/app/setup_wizard_ui.lua) and the
+pictures drawn by [app/setup_wizard_art.lua](../../../src/grsuite/app/setup_wizard_art.lua).
 The rules are ports of the Configurator's: `lib/setup_wizard_surfaces.lua`
 (`surfaces.js`), `lib/setup_wizard_controls.lua` (`receiver.js`, `modeRanges.js`,
 `trimGain.js`), `lib/setup_wizard_styles.lua` (`styles.js`), `lib/setup_wizard_bus.lua` (`busOutput.js`) and
 `lib/setup_wizard_mix.lua` (`Mixer.buildWizardRules()`). Menu conditions come from
 `app/tool.lua`.
 
-*Documented against WFSuite Ethos 2.3.1.*
+*Documented against GRSuite Ethos 2.3.1.*

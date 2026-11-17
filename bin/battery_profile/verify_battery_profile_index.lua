@@ -48,7 +48,7 @@ local function scriptDir()
 end
 
 local ROOT = (scriptDir() .. "/../.."):gsub("\\", "/")
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local failures = 0
 local checks = 0
@@ -295,8 +295,8 @@ print("module bookkeeping:")
 
 if checkLoaded() then
   check("loading twice returns the same table",
-    package.loaded["wfsuite.lib.battery_profile_index"] == batteryProfileIndex,
-    "package.loaded holds " .. tostring(package.loaded["wfsuite.lib.battery_profile_index"]))
+    package.loaded["grsuite.lib.battery_profile_index"] == batteryProfileIndex,
+    "package.loaded holds " .. tostring(package.loaded["grsuite.lib.battery_profile_index"]))
 
   check("the module publishes itself under its own key",
     batteryProfileIndex ~= nil
@@ -317,10 +317,10 @@ print("")
 print("no call site kept a base-accepting helper of its own:")
 
 local CALL_SITES = {
-  "src/wfsuite/tasks/session.lua",
-  "src/wfsuite/tasks/audio_events.lua",
-  "src/wfsuite/widgets/dashboard.lua",
-  "src/wfsuite/app/pages/power_battery.lua",
+  "src/grsuite/tasks/session.lua",
+  "src/grsuite/tasks/audio_events.lua",
+  "src/grsuite/widgets/dashboard.lua",
+  "src/grsuite/app/pages/power_battery.lua",
 }
 
 local survivors = {}
@@ -345,7 +345,7 @@ check("normalizeBatteryProfile is gone from all four",
 -- power_battery.lua had the same helper under a different name. The shared
 -- module kept that local alias on purpose, so the alias is fine; a second
 -- `function` definition behind it is not.
-local powerBattery = readFile(ROOT .. "/src/wfsuite/app/pages/power_battery.lua")
+local powerBattery = readFile(ROOT .. "/src/grsuite/app/pages/power_battery.lua")
 if powerBattery then
   check("power_battery.lua takes normalizeProfile from the module, not its own body",
     not powerBattery:find("local function normalizeProfile", 1, true),

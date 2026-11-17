@@ -33,7 +33,7 @@ drive the frame's two digital channels. Tap a tile to edit that servo.
 
 A servo with a name shows it on its tile instead of **SERVO N** (servos 1–16 keep
 their number on the icon; from servo 17 the number goes in front of the name). Names
-need firmware with servo names (wingflight-firmware #286); on older firmware the
+need firmware with servo names (gripora-firmware #286); on older firmware the
 tiles show only numbers and the editor has no Name field.
 
 The Tool button in the header switches servo override on for every servo: all of them
@@ -88,7 +88,7 @@ Servos tab.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/servos.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/servos.lua). Menu conditions come from `app/tool.lua`.
 
-*Reviewed against WFSuite Ethos 2.3.1 page and shared-runtime source and the
-wingflight-firmware MSP API 22.16 servo messages; not radio-tested.*
+*Reviewed against GRSuite Ethos 2.3.1 page and shared-runtime source and the
+gripora-firmware MSP API 22.16 servo messages; not radio-tested.*

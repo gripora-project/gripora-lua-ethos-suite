@@ -29,7 +29,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -46,7 +46,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -56,7 +56,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -99,7 +99,7 @@ end
 
 local lastHeaderOpts = nil
 local toolFocused = false
-package.loaded["wfsuite.app.header"] = {
+package.loaded["grsuite.app.header"] = {
   build = function(_, opts)
     lastHeaderOpts = opts
     local h = anything()
@@ -107,18 +107,18 @@ package.loaded["wfsuite.app.header"] = {
     return h
   end,
 }
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return true end}
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return true end}
+package.loaded["grsuite.app.progress_dialog"] = {
   SPEED = {DEFAULT = 1},
   open = function() return {value = function() end, close = function() end} end,
 }
-package.loaded["wfsuite.app.tile_grid"] = {
+package.loaded["grsuite.app.tile_grid"] = {
   metrics = function() return 3, 120, 90, 4, 0 end,
   fitLabel = function(text) return text end,
 }
-package.loaded["wfsuite.lib.memstats"] = {print = function() end}
-package.loaded["wfsuite.lib.debug_log"] = anything()
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.memstats"] = {print = function() end}
+package.loaded["grsuite.lib.debug_log"] = anything()
+package.loaded["grsuite.lib.settings_store"] = {
   load = function() return {} end,
   saveConfirmEnabled = function() return false end,
   clone = function(t) return t end,
@@ -126,7 +126,7 @@ package.loaded["wfsuite.lib.settings_store"] = {
 }
 
 -- Status (servo count) and servo config: real modules, read builders replaced.
-package.loaded["wfsuite.lib.msp_status"] = {
+package.loaded["grsuite.lib.msp_status"] = {
   buildReadMessage = function(onData, onError)
     return {kind = "statusRead", onData = onData, onError = onError}
   end,

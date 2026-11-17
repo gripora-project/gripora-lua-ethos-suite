@@ -5,7 +5,7 @@
 --     lua5.4 bin/settings_save/verify_settings_save.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/pages/settings_general.lua, with the real bus and the
+--   * The real src/grsuite/app/pages/settings_general.lua, with the real bus and the
 --     real app/settings_save.lua helper. The store and the header are stubs: the
 --     store's save() returns the value the scenario asks for, and the header's
 --     onSave is pressed the way the pilot presses Save.
@@ -29,7 +29,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -46,7 +46,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -56,7 +56,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -113,8 +113,8 @@ local headerOpts = nil
 local saveEnabledCalls = {}
 local headerHandle = anything()
 headerHandle.setSaveEnabled = function(v) saveEnabledCalls[#saveEnabledCalls + 1] = v end
-package.loaded["wfsuite.app.header"] = {build = function(_, opts) headerOpts = opts; return headerHandle end}
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return true end}
+package.loaded["grsuite.app.header"] = {build = function(_, opts) headerOpts = opts; return headerHandle end}
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return true end}
 
 local function deepcopy(v)
   if type(v) ~= "table" then return v end
@@ -134,7 +134,7 @@ local function deepsame(a, b)
 end
 store.same = deepsame
 store.save = function() store.saveCalls = store.saveCalls + 1; return store.saveResult end
-package.loaded["wfsuite.lib.settings_store"] = store
+package.loaded["grsuite.lib.settings_store"] = store
 
 local bus = requireModule("lib/bus.lua")
 local published = 0
@@ -206,7 +206,7 @@ prefsStore.load = function() return {general = {flightcount = 3}, dashboard = {}
 prefsStore.stats = function(p) return {flightcount = p.general.flightcount or 0} end
 prefsStore.setStats = function(p, s) p.general = p.general or {}; p.general.flightcount = s.flightcount; return p end
 prefsStore.save = function() prefsStore.saveCalls = prefsStore.saveCalls + 1; return prefsStore.saveResult end
-package.loaded["wfsuite.lib.model_preferences"] = prefsStore
+package.loaded["grsuite.lib.model_preferences"] = prefsStore
 
 local statsPage = requireModule("app/pages/stats.lua")
 local statsPublished = 0

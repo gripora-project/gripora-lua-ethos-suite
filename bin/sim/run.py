@@ -65,12 +65,12 @@ def deployed_target():
     name = f'{settings["ethos.board"]}_{settings["ethos.protocol"]}'
     release = settings.get('ethos.release') or settings.get('ethos.version')
     radio = os.path.join(REPO, settings.get('ethos.simulatorsFolder', 'simulators'), f'{name}@{release}')
-    if not os.path.isfile(os.path.join(radio, 'scripts', 'wfsuite', 'main.lua')):
+    if not os.path.isfile(os.path.join(radio, 'scripts', 'grsuite', 'main.lua')):
         sys.exit(f'Nothing deployed in {radio}: run .vscode/scripts/deploy.py first (AGENTS.md section 12)')
     simulator = os.path.join(extension_cache(), f'{name}.js')
     if not os.path.isfile(simulator):
         sys.exit(f'No {simulator}: run "Ethos: Start" once in VS Code, or use --simulator')
-    copy = os.path.join(tempfile.mkdtemp(prefix='wfsuite-sim-'), name)
+    copy = os.path.join(tempfile.mkdtemp(prefix='grsuite-sim-'), name)
     shutil.copytree(radio, copy)
     return simulator, copy
 

@@ -1,4 +1,4 @@
-name: Create wfsuite-lua-ethos ZIP on PR
+name: Create grsuite-lua-ethos ZIP on PR
 
 on:
   pull_request:
@@ -133,32 +133,32 @@ jobs:
           PR_NUMBER='${{ github.event.pull_request.number }}'
           echo "GIT_VER=PR-${PR_NUMBER}" >> $GITHUB_ENV
 
-      - name: Create wingflight-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}.zip
+      - name: Create gripora-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}.zip
         run: |
           python bin/package/build_package.py \
             --lang '${{ matrix.lang }}' \
             --artifact-version '${{ env.GIT_VER }}' \
-            --artifact-name 'wingflight-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}.zip' \
+            --artifact-name 'gripora-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}.zip' \
             --output-dir .
 
       - name: Validate ETHOS package manifest
         run: |
           python bin/package/validate_ethos_manifest_zip.py \
-            'wingflight-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}.zip'
+            'gripora-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}.zip'
 
       - name: Upload per-locale ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: wingflight-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}
-          path: wingflight-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}.zip
+          name: gripora-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}
+          path: gripora-lua-ethos-suite-${{ env.GIT_VER }}-${{ matrix.lang }}.zip
           if-no-files-found: error
 
   # tasks/elrs_sensors.lua's parseFrame() stops at the first appId it has no
   # decoder for and cannot skip it -- the pair's byte width lives only in
-  # src/wfsuite/lib/elrs_sensor_table.lua. So one appId the table is missing
+  # src/grsuite/lib/elrs_sensor_table.lua. So one appId the table is missing
   # silently costs every sensor packed after it in the same frame, and the
   # symptom looks like a dead sensor. The table is compared against
-  # wingflight-firmware's TLM_SENSOR(...) list, read at a pinned commit so a
+  # gripora-firmware's TLM_SENSOR(...) list, read at a pinned commit so a
   # firmware that adds an appId shows up here as a deliberate change.
   sensor-table-completeness:
     name: Sensor table completeness

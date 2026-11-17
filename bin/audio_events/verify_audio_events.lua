@@ -44,7 +44,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 
@@ -310,7 +310,7 @@ local function newStore()
   headerOpts, headerHandle = nil, nil
 end
 
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   load = function()
     local t = deepCopy(snapshot)
     loadedSnapshots[#loadedSnapshots + 1] = t
@@ -327,14 +327,14 @@ package.loaded["wfsuite.lib.settings_store"] = {
     return true
   end,
 }
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() return function() end end,
   unsubscribe = function() end,
   publish = function(topic, message)
     if topic == "settings.update" then published[#published + 1] = message end
   end,
 }
-package.loaded["wfsuite.app.header"] = headerStub()
+package.loaded["grsuite.app.header"] = headerStub()
 
 -- ── helpers ────────────────────────────────────────────────────────────────
 
@@ -855,10 +855,10 @@ local function voltageChecks()
   -- Settings normalisation clamps voltage_hold to 0..10 and voltage_callout
   -- to 0..2.
   do
-    local savedStore = package.loaded["wfsuite.lib.settings_store"]
-    package.loaded["wfsuite.lib.settings_store"] = nil
+    local savedStore = package.loaded["grsuite.lib.settings_store"]
+    package.loaded["grsuite.lib.settings_store"] = nil
     local store = assert(loadfile("lib/settings_store.lua"))()
-    package.loaded["wfsuite.lib.settings_store"] = savedStore
+    package.loaded["grsuite.lib.settings_store"] = savedStore
 
     local lower = store.audioEvents({events = {voltage_hold = -5, voltage_callout = -2}})
     check("a negative voltage_hold is clamped to 0", lower.voltage_hold == 0,
@@ -928,7 +928,7 @@ voltageChecks()
 local realIoOpen = io.open
 local savedSystem = _G.system
 local savedOsClock = os.clock
-local savedRequire = package.loaded["wfsuite.lib.require"]
+local savedRequire = package.loaded["grsuite.lib.require"]
 local scriptFiles = {}
 io.open = function(path, mode)
   if type(path) == "string" and path:sub(1, 8) == "SCRIPTS:" then
@@ -951,8 +951,8 @@ local function newMainPowerRig(events, source, evaluate)
   -- in none yet, so the fallbacks are what a pack resolves to today. A scenario
   -- that declares mainpower.wav present overwrites this to prove the order.
   scriptFiles = {
-    ["SCRIPTS:/wfsuite/audio/en/default/status/alerts/lowbat.wav"] = true,
-    ["SCRIPTS:/wfsuite/audio/en/default/events/alerts/battery.wav"] = true,
+    ["SCRIPTS:/grsuite/audio/en/default/status/alerts/lowbat.wav"] = true,
+    ["SCRIPTS:/grsuite/audio/en/default/events/alerts/battery.wav"] = true,
   }
 
   -- The bus and the store the task takes as chunk args, and the module-level
@@ -967,7 +967,7 @@ local function newMainPowerRig(events, source, evaluate)
     audioEvents = function(s) return s.events or {} end,
     audioTimer = function() return {} end,
   }
-  package.loaded["wfsuite.lib.require"] = function(name)
+  package.loaded["grsuite.lib.require"] = function(name)
     if name == "lib/battery_profile_index.lua" then
       return {index0 = function(v) return v end}
     elseif name == "lib/system_alerts.lua" then
@@ -1071,7 +1071,7 @@ local function mainPowerChecks()
   -- fallback. Proves the candidate list is ordered rather than decorative.
   do
     local rig = newMainPowerRig({main_power_lost = true})
-    scriptFiles["SCRIPTS:/wfsuite/audio/en/default/status/alerts/mainpower.wav"] = true
+    scriptFiles["SCRIPTS:/grsuite/audio/en/default/status/alerts/mainpower.wav"] = true
     rig.setClock(0); rig.step({connected = true, voltage = 22.2, becVoltage = 5.0})
     rig.setClock(1); rig.step({connected = true, voltage = 22.2, becVoltage = 5.0})
     rig.setClock(2); rig.step({connected = true, voltage = 0, becVoltage = 5.0})
@@ -1194,7 +1194,7 @@ mainPowerChecks()
 io.open = realIoOpen
 _G.system = savedSystem
 os.clock = savedOsClock
-package.loaded["wfsuite.lib.require"] = savedRequire
+package.loaded["grsuite.lib.require"] = savedRequire
 -- ── case 9: the telemetry link, gated by the armed state (issue #2311) ──────
 --
 -- The link announcement is the one event whose callout depends on the state
@@ -1234,8 +1234,8 @@ local function linkChecks()
     return nil
   end
 
-  local TELEMETRY_LOST_FILE = "SCRIPTS:/wfsuite/audio/en/default/events/alerts/telemetrylost.wav"
-  local TELEMETRY_OK_FILE = "SCRIPTS:/wfsuite/audio/en/default/events/alerts/telemetryok.wav"
+  local TELEMETRY_LOST_FILE = "SCRIPTS:/grsuite/audio/en/default/events/alerts/telemetrylost.wav"
+  local TELEMETRY_OK_FILE = "SCRIPTS:/grsuite/audio/en/default/events/alerts/telemetryok.wav"
 
   -- The store's real defaults for the repeat and vibrate keys (issue #2312). DEFAULT_EVENTS above
   -- only lists the keys (its values are placeholders), so these are written out and checked against

@@ -26,7 +26,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -51,9 +51,9 @@ loadfile = function(path, mode, env)
   end
 end
 
--- wfsuite.lib.require is loadfile() against Ethos' path prefixes on a radio.
+-- grsuite.lib.require is loadfile() against Ethos' path prefixes on a radio.
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -63,7 +63,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 -- ---------------------------------------------------------------------------
 -- Ethos stubs
@@ -154,10 +154,10 @@ pcall(descriptor.wakeup, state)
 -- Drive the real bar gauge
 -- ---------------------------------------------------------------------------
 
-local wfsuite = requireModule("widgets/dashboard/context.lua")
-wfsuite.tasks = wfsuite.tasks or {}
+local grsuite = requireModule("widgets/dashboard/context.lua")
+grsuite.tasks = grsuite.tasks or {}
 local sensors = {}
-wfsuite.tasks.telemetry = {
+grsuite.tasks.telemetry = {
   sensorTable = {smartfuel = {unit_string = "%"}},
   getSensor = function(name)
     local s = sensors[name]
@@ -165,7 +165,7 @@ wfsuite.tasks.telemetry = {
     return nil, nil, nil
   end,
 }
-wfsuite.flightmode = {current = "preflight"}
+grsuite.flightmode = {current = "preflight"}
 
 local bar = requireModule("widgets/dashboard/objects/gauge/bar.lua")
 check("the bar gauge module loads", type(bar) == "table" and type(bar.wakeup) == "function")
@@ -195,13 +195,13 @@ check("disconnected before flight: the bar shows the loading state",
 
 -- 3. Reconnected before flight: the new value is shown.
 sensors.smartfuel = {60, nil, "%"}
-wfsuite.flightmode.current = "preflight"
+grsuite.flightmode.current = "preflight"
 c = wake()
 check("reconnected: the bar shows 60", c.value == 60, "value=" .. tostring(c.value))
 
 -- 4. In flight the last reading is HELD, so a momentary telemetry gap does not
 --    blank a gauge the pilot is flying on, and does not discard the reading.
-wfsuite.flightmode.current = "inflight"
+grsuite.flightmode.current = "inflight"
 sensors.smartfuel = nil
 c = wake()
 check("inflight: a dropped sensor keeps the last 60%", c.value == 60, "value=" .. tostring(c.value))
@@ -211,14 +211,14 @@ c = wake()
 check("inflight: the value survives a second drop", c.value == 60, "value=" .. tostring(c.value))
 
 -- 5. Postflight keeps the last value on purpose (flight statistics for review).
-wfsuite.flightmode.current = "postflight"
+grsuite.flightmode.current = "postflight"
 sensors.smartfuel = nil
 c = wake()
 check("postflight: the last value 60 is kept for review", c.value == 60, "value=" .. tostring(c.value))
 
 -- 6. The watts text object follows the same rule (#2534). It reads two sensors
 --    and the context's session state, so both are set here and restored after.
-local wattsSession = wfsuite.session
+local wattsSession = grsuite.session
 local savedIsConnected, savedTelemetryState = wattsSession.isConnected, wattsSession.telemetryState
 wattsSession.isConnected = true
 wattsSession.telemetryState = true
@@ -237,7 +237,7 @@ local function wakeWatts()
     return wbox._currentDisplayValue
 end
 
-wfsuite.flightmode.current = "preflight"
+grsuite.flightmode.current = "preflight"
 sensors.voltage, sensors.current = {16.8}, {5}
 check("watts, connected: the text shows 84", wakeWatts() == "84", "display=" .. tostring(wbox._currentDisplayValue))
 
@@ -248,18 +248,18 @@ check("watts, disconnected before flight: the text shows the loading state",
 sensors.current = {5}
 check("watts, reconnected: the text shows 84", wakeWatts() == "84", "display=" .. tostring(wbox._currentDisplayValue))
 
-wfsuite.flightmode.current = "inflight"
+grsuite.flightmode.current = "inflight"
 sensors.current = nil
 check("watts, inflight: a dropped sensor keeps the last 84",
     wakeWatts() == "84", "display=" .. tostring(wbox._currentDisplayValue))
 
 -- 7. Watts with a stats source (min/max/avg) also shows loading dots when disconnected before flight
 wbox = {source = "max"}
-wfsuite.tasks.telemetry.sensorStats = {
+grsuite.tasks.telemetry.sensorStats = {
     voltage = {max = 16.8},
     current = {max = 5},
 }
-wfsuite.flightmode.current = "preflight"
+grsuite.flightmode.current = "preflight"
 sensors.voltage, sensors.current = {16.8}, {5}
 wattsSession.isConnected = true
 wattsSession.telemetryState = true
@@ -276,7 +276,7 @@ check("watts max, constituent sensor dropped before flight: shows loading dots",
     LOADING[wakeWatts()] == true, "display=" .. tostring(wbox._currentDisplayValue))
 
 -- In flight, dropped constituent sensor keeps the last valid stats reading:
-wfsuite.flightmode.current = "inflight"
+grsuite.flightmode.current = "inflight"
 sensors.current = {5}
 check("watts max, inflight restored: shows 84", wakeWatts() == "84", "display=" .. tostring(wbox._currentDisplayValue))
 sensors.current = nil

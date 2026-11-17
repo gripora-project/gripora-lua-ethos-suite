@@ -8,7 +8,7 @@ source: app/pages/governor.lua
 
 # Governor
 
-Configure Wingflight’s Throttle Range Governor. Mode controls which RPM, response and idle settings can be edited.
+Configure Gripora’s Throttle Range Governor. Mode controls which RPM, response and idle settings can be edited.
 
 ## Where to find it
 
@@ -36,6 +36,6 @@ Values are read from the connected FC. The control ranges describe what this edi
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/governor.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/governor.lua). Menu conditions come from `app/tool.lua`.
 
-*Reviewed against WFSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*
+*Reviewed against GRSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*

@@ -18,8 +18,8 @@ lcd = {
 }
 -- The radio's own screen size (getFontListsForResolution); the same 480x320 as the window.
 system = {getVersion = function() return {lcdWidth = 480, lcdHeight = 320} end}
-package.loaded['wfsuite.lib.require'] = function() return {version={}} end
-local context = assert(loadfile('src/wfsuite/widgets/dashboard/context.lua'))()
+package.loaded['grsuite.lib.require'] = function() return {version={}} end
+local context = assert(loadfile('src/grsuite/widgets/dashboard/context.lua'))()
 local utils = context.widgets.dashboard.utils
 local function equal(actual, expected)
   assert(actual == expected, tostring(actual) .. ' ~= ' .. tostring(expected))

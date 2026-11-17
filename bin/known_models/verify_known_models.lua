@@ -42,7 +42,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SRC = ROOT .. "/src/wfsuite"
+local SRC = ROOT .. "/src/grsuite"
 
 local realOpen = io.open
 local realRead = io.read
@@ -268,7 +268,7 @@ local LIB = {
 
 local function loadWorld(mut)
   for key in pairs(package.loaded) do
-    if type(key) == "string" and key:match("^wfsuite%.") then package.loaded[key] = nil end
+    if type(key) == "string" and key:match("^grsuite%.") then package.loaded[key] = nil end
   end
   local cache = {}
   local function shim(name)
@@ -281,7 +281,7 @@ local function loadWorld(mut)
     cache[name] = mod
     return mod
   end
-  package.loaded["wfsuite.lib.require"] = shim
+  package.loaded["grsuite.lib.require"] = shim
   return {
     modelPreferences = shim("lib/model_preferences.lua"),
     knownModels = shim("lib/known_models.lua"),
@@ -292,7 +292,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Parts 1 and 2: the stored name, and the listing
 -- ---------------------------------------------------------------------------
-local MODELS = "SCRIPTS:/wfsuite.user/models"
+local MODELS = "SCRIPTS:/grsuite.user/models"
 
 -- The name held in memory, nil where none has been recorded. The suite reads it from the
 -- prefs table directly, so the harness does too.
@@ -311,7 +311,7 @@ local function partLibrary(mut)
   -- 1. A name goes through lib/ini.lua, which reads "007", "0x10", "1e3" back as numbers and
   --    "true" as a boolean. It has to come back as what was written.
   local cases = {
-    { "WingFlight Wing 1", "WingFlight Wing 1" },
+    { "Gripora Wing 1", "Gripora Wing 1" },
     { "007", "007" },
     { "0x10", "0x10" },
     { "1e3", "1e3" },
@@ -356,7 +356,7 @@ local function partLibrary(mut)
 
   -- 3. A store written before the name existed.
   resetFs()
-  os.mkdir("SCRIPTS:/wfsuite.user")
+  os.mkdir("SCRIPTS:/grsuite.user")
   os.mkdir(MODELS)
   do
     local f = io.open(MODELS .. "/OLD.ini", "w")
@@ -369,7 +369,7 @@ local function partLibrary(mut)
 
   -- 4. The listing.
   resetFs()
-  os.mkdir("SCRIPTS:/wfsuite.user")
+  os.mkdir("SCRIPTS:/grsuite.user")
   os.mkdir(MODELS)
   local function put(path, content)
     local f = assert(io.open(path, "w"))
@@ -441,7 +441,7 @@ local SESSION_REAL = {
 
 local function newRig(sessionSource)
   for key in pairs(package.loaded) do
-    if type(key) == "string" and key:match("^wfsuite%.") then package.loaded[key] = nil end
+    if type(key) == "string" and key:match("^grsuite%.") then package.loaded[key] = nil end
   end
   local queue = {
     added = {},
@@ -460,7 +460,7 @@ local function newRig(sessionSource)
     return handler
   end
   local modules = {}
-  package.loaded["wfsuite.lib.require"] = function(name)
+  package.loaded["grsuite.lib.require"] = function(name)
     if name == "lib/flight_stats.lua" then return dofile(SRC .. "/lib/flight_stats.lua") end
     if SESSION_REAL[name] then
       if modules[name] == nil then modules[name] = assert(loadfile(SRC .. "/" .. name))() end

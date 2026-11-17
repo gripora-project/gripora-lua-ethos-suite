@@ -40,6 +40,6 @@ Use [Mixer](mixer_config.md) for shared stabilized-axis scaling and [Curves](cur
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/mixer_rules.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/mixer_rules.lua). Menu conditions come from `app/tool.lua`.
 
-*Reviewed against WFSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*
+*Reviewed against GRSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*

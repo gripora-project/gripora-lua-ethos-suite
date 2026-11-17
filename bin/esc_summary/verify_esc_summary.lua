@@ -42,7 +42,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 
 local VENDOR_PAGE_PATH = PREFIX .. "app/pages/esc_forward_vendor.lua"
@@ -147,7 +147,7 @@ _G.system = {
   getVersion = function() return { simulation = false, radio = { name = "stub" } } end,
 }
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   publish = function(topic, message)
@@ -159,7 +159,7 @@ package.loaded["wfsuite.lib.bus"] = {
   end,
 }
 
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   SPEED = { SLOW = 1, DEFAULT = 2 },
   open = function()
     return {
@@ -169,23 +169,23 @@ package.loaded["wfsuite.app.progress_dialog"] = {
   end,
 }
 
-package.loaded["wfsuite.app.close_key"] = {
+package.loaded["grsuite.app.close_key"] = {
   shouldHandleClose = function() return false end,
 }
 
-package.loaded["wfsuite.app.header"] = {
+package.loaded["grsuite.app.header"] = {
   build = function() end,
 }
 
-package.loaded["wfsuite.lib.msp_4wif_esc_fwd_prog"] = {
+package.loaded["grsuite.lib.msp_4wif_esc_fwd_prog"] = {
   buildWriteMessage = function() return {} end,
 }
 
-package.loaded["wfsuite.app.field_layout"] = {
+package.loaded["grsuite.app.field_layout"] = {
   buildSingle = function() end,
 }
 
-package.loaded["wfsuite.app.page_runtime"] = {
+package.loaded["grsuite.app.page_runtime"] = {
   new = function(spec)
     return {
       buildChrome = function() end,
@@ -203,7 +203,7 @@ local requireModule = assert(realLoadfile(PREFIX .. "lib/require.lua"))()
 -- ---------------------------------------------------------------------------
 local function runPageWithSummary(summaryReturn)
   resetObs()
-  package.loaded["wfsuite.app.pages.esc_forward_vendor"] = nil
+  package.loaded["grsuite.app.pages.esc_forward_vendor"] = nil
 
   local escVendor = requireModule("app/pages/esc_forward_vendor.lua")
 

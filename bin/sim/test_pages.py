@@ -1,6 +1,6 @@
-"""Opens every page of the Wingflight app and fails when one logs a Lua error.
+"""Opens every page of the Gripora app and fails when one logs a Lua error.
 
-The menu is read from MENUS in src/wfsuite/app/tool.lua, so a new page is covered as
+The menu is read from MENUS in src/grsuite/app/tool.lua, so a new page is covered as
 soon as it has a tile. Each tile is found on the screen by its English title (OCR),
 touched, and the page must load its script (the simulator and the radio log every
 loadFile()). The page is then left with RTN. One screenshot per page is saved.
@@ -22,9 +22,9 @@ import ethos_ocr
 from ethos_test import EthosBaseTest
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-SUITE = 'wfsuite'
-APP_TILE = 'Wingflight'
-BACKGROUND_TASK = 'Wingflight [Background]'
+SUITE = 'grsuite'
+APP_TILE = 'Gripora'
+BACKGROUND_TASK = 'Gripora [Background]'
 ROOT = '__root__'
 
 # Pages that act on the model as soon as they are used. They are opened in the
@@ -209,7 +209,7 @@ class PagesTest(EthosBaseTest):
         self.go_home()
 
     def open_app(self):
-        """System / Wingflight"""
+        """System / Gripora"""
         self.open_system_menu(APP_TILE)
         first = self.menus[ROOT][0]['title']
         if not self.find_tile(first, timeout=10):

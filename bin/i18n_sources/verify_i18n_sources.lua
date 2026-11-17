@@ -1,7 +1,7 @@
 -- Gate for #2561: every @i18n(key)@ the code uses must resolve in every
 -- locale source under bin/i18n/json/.
 --
--- The build (bin/i18n/build-single-json.py) regenerates src/wfsuite/i18n/<locale>.json
+-- The build (bin/i18n/build-single-json.py) regenerates src/grsuite/i18n/<locale>.json
 -- from these sources only. A key that is missing from a source is silently
 -- dropped from the next build, and the code then shows a missing string.
 --
@@ -176,7 +176,7 @@ end
 -- Every @i18n(key)@ reference in the Lua sources.
 local function referencedKeys()
   local keys, seen = {}, {}
-  for _, path in ipairs(listFiles("src/wfsuite", ".lua")) do
+  for _, path in ipairs(listFiles("src/grsuite", ".lua")) do
     for key in readFile(path):gmatch("@i18n%(([%w_%.%-]+)%)@") do
       if not seen[key] then
         seen[key] = true

@@ -34,6 +34,6 @@ Save writes the selected curve and commits to EEPROM. Curves are not scoped to t
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/curves.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/curves.lua). Menu conditions come from `app/tool.lua`.
 
-*Reviewed against WFSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*
+*Reviewed against GRSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*

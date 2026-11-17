@@ -29,7 +29,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 local TASKS = SUITE .. "/tasks"
 
 local function resolvePath(name)
@@ -72,7 +72,7 @@ local STUBS = {}
 
 local function requireModule(name)
   if STUBS[name] ~= nil then return STUBS[name] end
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -82,7 +82,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 -- The radio's globals the modules touch at load time.
 lcd = anyStub()

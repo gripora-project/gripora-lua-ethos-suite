@@ -18,7 +18,7 @@ local function scriptDir()
   return (path:match("^(.*)[/\\][^/\\]*$")) or "."
 end
 
-local TASK_PATH = scriptDir() .. "/../../src/wfsuite/tasks/sim_sensors.lua"
+local TASK_PATH = scriptDir() .. "/../../src/grsuite/tasks/sim_sensors.lua"
 local MAX_PER_WAKEUP = 4
 
 local checks, failures = 0, 0
@@ -50,7 +50,7 @@ local DiySensor = {
     }
   end,
 }
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   assert(name == "lib/diy_sensor.lua", "unexpected module " .. tostring(name))
   return DiySensor
 end

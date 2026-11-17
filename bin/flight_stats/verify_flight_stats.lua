@@ -30,12 +30,12 @@ CATEGORY_CHANNEL = nil
 
 -- The sensor reader the session passes: the same values the dashboard shows. No
 -- transport is set here, so it reads the session fields and never a live source.
-local READ = assert(loadfile(ROOT .. "/src/wfsuite/lib/live_sensors.lua"))().read
+local READ = assert(loadfile(ROOT .. "/src/grsuite/lib/live_sensors.lua"))().read
 
 -- A fresh copy of the module, so each section starts from clean state.
 local function newFlightStats()
-  package.loaded["wfsuite.lib.flight_stats"] = nil
-  return assert(loadfile(ROOT .. "/src/wfsuite/lib/flight_stats.lua"))().new()
+  package.loaded["grsuite.lib.flight_stats"] = nil
+  return assert(loadfile(ROOT .. "/src/grsuite/lib/flight_stats.lua"))().new()
 end
 
 -- One tick with a session-shaped table. `values` adds recorded values or overrides.
@@ -191,8 +191,8 @@ end
 
 print("layouts")
 do
-  package.loaded["wfsuite.lib.flight_stats"] = nil
-  local m = assert(loadfile(ROOT .. "/src/wfsuite/lib/flight_stats.lua"))()
+  package.loaded["grsuite.lib.flight_stats"] = nil
+  local m = assert(loadfile(ROOT .. "/src/grsuite/lib/flight_stats.lua"))()
   check("armed draws preflight, offline draws postflight",
     m.layoutPhase("armed") == "preflight" and m.layoutPhase("offline") == "postflight"
     and m.layoutPhase("inflight") == "inflight")

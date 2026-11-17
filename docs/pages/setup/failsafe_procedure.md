@@ -33,10 +33,10 @@ Requires a running background task and a flight controller connection.
 The delay fields display counts of 0.1 seconds: a value of 10 means one second.
 Save writes the complete failsafe configuration and commits to EEPROM; the page does not request a reboot or select a PID/rate profile.
 
-See [Ch. Fallback](failsafe.md) for Stage 1 and [GPS Navigation](gps_nav_config.md) for GPS Rescue navigation parameters. Actual procedure support depends on the connected Wingflight firmware.
+See [Ch. Fallback](failsafe.md) for Stage 1 and [GPS Navigation](gps_nav_config.md) for GPS Rescue navigation parameters. Actual procedure support depends on the connected Gripora firmware.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/failsafe_procedure.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/failsafe_procedure.lua). Menu conditions come from `app/tool.lua`.
 
-*Reviewed against WFSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*
+*Reviewed against GRSuite Ethos 2.3.1 page and shared-runtime source; not radio-tested.*

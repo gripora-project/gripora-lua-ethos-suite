@@ -4,7 +4,7 @@
 -- column only ever holds "OK" or a count, and the reasons get full-width rows
 -- (the joined list used to be cut off the right edge on narrow screens).
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -50,7 +50,7 @@ local stubs = {
   end},
 }
 local cache = {}
-package.loaded["wfsuite.lib.require"] = function(path)
+package.loaded["grsuite.lib.require"] = function(path)
   if stubs[path] then return stubs[path] end
   if cache[path] == nil then
     local result = assert(loadfile(ROOT .. path))()
@@ -78,7 +78,7 @@ form = {
 lcd = {getWindowSize = function() return 472, 320 end}
 GREEN, RED, LEFT = "green", "red", 0
 
-local libOk, armingFlags = pcall(package.loaded["wfsuite.lib.require"], "lib/arming_flags.lua")
+local libOk, armingFlags = pcall(package.loaded["grsuite.lib.require"], "lib/arming_flags.lua")
 
 -- ---------------------------------------------------------------------------
 -- lib/arming_flags.lua

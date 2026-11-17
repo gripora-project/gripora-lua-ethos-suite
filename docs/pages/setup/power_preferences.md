@@ -30,6 +30,6 @@ Requires a running background task and a flight controller connection.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/power_preferences.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/power_preferences.lua). Menu conditions come from `app/tool.lua`.
 
-*Documented against WFSuite Ethos 2.3.1.*
+*Documented against GRSuite Ethos 2.3.1.*

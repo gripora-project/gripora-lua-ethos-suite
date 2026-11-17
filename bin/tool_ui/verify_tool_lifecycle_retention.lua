@@ -1,7 +1,7 @@
 -- Retention check across repeated tool open/close cycles (#2425).
 --
 -- Ported from rotorflight-lua-ethos-suite#2425; the only adaptation is the
--- wfsuite module prefix below. The finding and the guard apply to the shared
+-- grsuite module prefix below. The finding and the guard apply to the shared
 -- tool/page machinery unchanged.
 --
 -- Run it:
@@ -9,7 +9,7 @@
 --     lua5.4 bin/tool_ui/verify_tool_lifecycle_retention.lua --self-test
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/tool.lua, so the whole chain a radio runs is
+--   * The real src/grsuite/app/tool.lua, so the whole chain a radio runs is
 --     under test: system.registerSystemTool -> create() -> the real
 --     app/menu_container.lua / app/header.lua / app/tile_grid.lua /
 --     app/close_key.lua / app/navigation.lua, and a real leaf page
@@ -33,7 +33,7 @@
 --       it" would necessarily move);
 --     * the Lua heap read after a forced full collect (the same figure the
 --       radio's "app.close (end)" marker prints), as a coarse backstop;
---     * live bus subscribers, wfsuite.* entries in package.loaded, the
+--     * live bus subscribers, grsuite.* entries in package.loaded, the
 --       field_layout pool size, and how many form widgets the cycle built.
 --   It requires every one of those to be flat from the second cycle on; only
 --   the heap byte count carries a small tolerance (see below).
@@ -74,7 +74,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local failedLabels = {}
@@ -251,8 +251,8 @@ _G.KEY_EXIT_BREAK = 0x07
 -- counted too. The wrapper is installed on the shared table, so every holder
 -- (the tool, the guards, every page) uses it.
 local bus = assert(realLoadfile(LOCAL_PREFIX .. "lib/bus.lua")())
-package.loaded["wfsuite.lib.bus"] = bus
-package.loaded["wfsuite.bus"] = bus
+package.loaded["grsuite.lib.bus"] = bus
+package.loaded["grsuite.bus"] = bus
 
 local liveSubscribers = {}
 local realSubscribe = bus.subscribe
@@ -295,16 +295,16 @@ local function subscriberTotal()
 end
 
 -- ── Counters ────────────────────────────────────────────────────────────────
-local function wfsuiteKeyCount()
+local function grsuiteKeyCount()
   local n = 0
   for k in pairs(package.loaded) do
-    if type(k) == "string" and k:match("^wfsuite%.") then n = n + 1 end
+    if type(k) == "string" and k:match("^grsuite%.") then n = n + 1 end
   end
   return n
 end
 
 local function poolSize()
-  local fl = package.loaded["wfsuite.app.field_layout"]
+  local fl = package.loaded["grsuite.app.field_layout"]
   if fl and fl.poolStats then
     local count, live = fl.poolStats()
     return count, live
@@ -468,7 +468,7 @@ local function runCycles(n)
   poolSize()
   census()
   subscriberTotal()
-  wfsuiteKeyCount()
+  grsuiteKeyCount()
   heapKB()
 
   for i = 1, n do
@@ -477,7 +477,7 @@ local function runCycles(n)
     m.tables[i], m.strings[i] = census()
     m.widgets[i] = widgetDelta
     m.subscribers[i] = subscriberTotal()
-    m.keys[i] = wfsuiteKeyCount()
+    m.keys[i] = grsuiteKeyCount()
     m.pool[i] = count
     m.poolLive[i] = live
     m.heap[i] = heapKB()

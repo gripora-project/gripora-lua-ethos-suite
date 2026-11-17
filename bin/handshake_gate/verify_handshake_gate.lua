@@ -1,5 +1,5 @@
 -- Behaviour check for the phased startup handshake (issue #2362), the
--- Wingflight parallel of rotorflight-lua-ethos-suite's
+-- Gripora parallel of rotorflight-lua-ethos-suite's
 -- bin/handshake_gate/verify_handshake_gate.lua.
 --
 -- Run it:
@@ -41,7 +41,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 local TASKS = SUITE .. "/tasks"
 local SESSION_PATH = TASKS .. "/session.lua"
 
@@ -72,7 +72,7 @@ end
 -- pass on a changed source.
 -- ---------------------------------------------------------------------------
 
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   if name == "lib/mspcodec.lua" then
     return assert(loadfile(SUITE .. "/lib/mspcodec.lua"))()
   end
@@ -169,7 +169,7 @@ local function newRig(opts)
     ["tasks/elrs_sensors.lua"] = { wakeup = function() return false end, reset = noop },
   }
 
-  package.loaded["wfsuite.lib.require"] = function(path)
+  package.loaded["grsuite.lib.require"] = function(path)
     if REAL[path] then return realModule(path) end
     if modules[path] then return modules[path] end
     error("unexpected dependency: " .. tostring(path))

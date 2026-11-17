@@ -49,7 +49,7 @@ Values are stored in the `dashboard.kse5` section of `settings.ini`.
 
 ## User themes
 
-A user theme in `SCRIPTS:/wfsuite.user/dashboard/<folder>/` that has a
+A user theme in `SCRIPTS:/grsuite.user/dashboard/<folder>/` that has a
 `configure.lua` gets a tile after the shipped themes, named after its folder.
 Its values are saved in the `dashboard.user/<folder>` section of
 `settings.ini`, apart from any shipped theme with the same name, so a copy of a
@@ -57,6 +57,6 @@ shipped theme starts from the theme's default values.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/settings_dashboard_settings.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/settings_dashboard_settings.lua). Menu conditions come from `app/tool.lua`.
 
-*Scaffolded against WFSuite Ethos 2.3.1; content awaiting review.*
+*Scaffolded against GRSuite Ethos 2.3.1; content awaiting review.*

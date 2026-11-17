@@ -1,23 +1,23 @@
 # MSP Framing and Transport Handling in Rotorflight Suite
 
-> **Wingflight note.** This document was written for the Rotorflight suite and describes the MSPv1/MSPv2
-> headers. Wingflight's `tasks/msp/common.lua` speaks only the compact framing, version `11` in the status
+> **Gripora note.** This document was written for the Rotorflight suite and describes the MSPv1/MSPv2
+> headers. Gripora's `tasks/msp/common.lua` speaks only the compact framing, version `11` in the status
 > byte: a 3-byte header of 16-bit command and 8-bit length (`0xFF` followed by a 16-bit length for long
 > messages), no flags byte and no CRC. The first 6-byte S.Port frame therefore carries 2 payload bytes.
 > The chunking, sequencing and reassembly below still apply; only the header layout differs. The
-> firmware side is `telemetry/msp_shared.c` in wingflight-firmware, and the Technical Reference page
-> "MSP over Telemetry" on doc.wingflight.org has the frame budget and the measured link limits.
+> firmware side is `telemetry/msp_shared.c` in gripora-firmware, and the Technical Reference page
+> "MSP over Telemetry" on doc.gripora.org has the frame budget and the measured link limits.
 
 This document describes how Rotorflight Suite currently turns an MSP API request into one or more telemetry transport frames, and how replies are reassembled. It is written for developers considering moving the MSP framing/splitting/reassembly code out of Lua and into Ethos firmware.
 
 The relevant Lua files are:
 
-- `src/wfsuite/tasks/scheduler/msp/msp.lua`: selects the active telemetry transport and wires the MSP queue to it.
-- `src/wfsuite/tasks/scheduler/msp/mspQueue.lua`: schedules logical MSP requests and handles retry/timeout policy.
-- `src/wfsuite/tasks/scheduler/msp/common.lua`: builds logical MSP request buffers, splits them into transport-sized chunks, and reassembles replies.
-- `src/wfsuite/tasks/scheduler/msp/crsf.lua`: wraps/unpacks Suite MSP chunks in CRSF MSP frames.
-- `src/wfsuite/tasks/scheduler/msp/sp.lua`: wraps/unpacks Suite MSP chunks in S.Port/F.Port telemetry frames.
-- `src/wfsuite/tasks/scheduler/msp/protocols.lua`: defines transport-specific limits and timing defaults.
+- `src/grsuite/tasks/scheduler/msp/msp.lua`: selects the active telemetry transport and wires the MSP queue to it.
+- `src/grsuite/tasks/scheduler/msp/mspQueue.lua`: schedules logical MSP requests and handles retry/timeout policy.
+- `src/grsuite/tasks/scheduler/msp/common.lua`: builds logical MSP request buffers, splits them into transport-sized chunks, and reassembles replies.
+- `src/grsuite/tasks/scheduler/msp/crsf.lua`: wraps/unpacks Suite MSP chunks in CRSF MSP frames.
+- `src/grsuite/tasks/scheduler/msp/sp.lua`: wraps/unpacks Suite MSP chunks in S.Port/F.Port telemetry frames.
+- `src/grsuite/tasks/scheduler/msp/protocols.lua`: defines transport-specific limits and timing defaults.
 
 ## High-Level Flow
 
@@ -128,7 +128,7 @@ The Lua code assumes one logical MSP transfer at a time in `common.lua`. `common
 
 ## Protocol Selection
 
-The active telemetry protocol is selected in `protocols.lua` from `wfsuite.session.telemetryType`.
+The active telemetry protocol is selected in `protocols.lua` from `grsuite.session.telemetryType`.
 
 Current protocol limits:
 

@@ -4,7 +4,7 @@
 --     lua5.4 bin/blackbox_erase/verify_blackbox_erase.lua
 --     lua5.4 bin/blackbox_erase/verify_blackbox_erase.lua --self-test
 --
--- What it drives: the real src/wfsuite/app/pages/blackbox_status.lua. The header, the
+-- What it drives: the real src/grsuite/app/pages/blackbox_status.lua. The header, the
 -- progress dialog, the form and the MSP messages are stubs; every message the page
 -- publishes is recorded, and the scenario answers each read and write by hand, in the
 -- order it wants. Nothing is timed.
@@ -27,7 +27,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local PAGE = ROOT .. "/src/wfsuite/app/pages/blackbox_status.lua"
+local PAGE = ROOT .. "/src/grsuite/app/pages/blackbox_status.lua"
 
 local checks, failures = 0, 0
 local function check(label, ok, detail)
@@ -58,7 +58,7 @@ local function anyStub()
   return setmetatable({}, { __index = function() return function() return {} end end })
 end
 
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   if name == "lib/bus.lua" then
     return {
       publish = function(topic, msg)
@@ -262,7 +262,7 @@ for _, a in ipairs(arg or {}) do
   if a == "--self-test" then selfTest = true end
 end
 
-print("page: src/wfsuite/app/pages/blackbox_status.lua")
+print("page: src/grsuite/app/pages/blackbox_status.lua")
 runChecks()
 
 if selfTest then

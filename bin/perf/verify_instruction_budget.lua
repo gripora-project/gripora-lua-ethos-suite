@@ -53,7 +53,7 @@ local function run(script, ...)
 end
 
 local function themes()
-  local f = assert(io.open(ROOT .. "/src/wfsuite/lib/dashboard_themes.lua", "r"))
+  local f = assert(io.open(ROOT .. "/src/grsuite/lib/dashboard_themes.lua", "r"))
   local src = f:read("a")
   f:close()
   local block = assert(src:match("local SHIPPED = (%b{})"), "SHIPPED not found")
@@ -102,7 +102,7 @@ local errorLine = out:match("ERROR:[^\n]*")
 check("background task ran without errors", not errorLine, errorLine)
 
 local function appPages()
-  local f = assert(io.open(ROOT .. "/src/wfsuite/app/tool.lua", "r"))
+  local f = assert(io.open(ROOT .. "/src/grsuite/app/tool.lua", "r"))
   local src = f:read("a")
   f:close()
   local list, seen = {}, {}

@@ -3,5 +3,5 @@
   "ethos.protocol": "EU",
   "ethos.release": "nightly26",
   "ethos.simulatorsFolder": "simulators",
-  "wfsuite.deploy.language": "en"
+  "grsuite.deploy.language": "en"
 }

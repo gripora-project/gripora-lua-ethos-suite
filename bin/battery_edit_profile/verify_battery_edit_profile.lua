@@ -5,7 +5,7 @@
 --     lua5.4 bin/battery_edit_profile/verify_battery_edit_profile.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/pages/power_battery.lua, the real app/page_runtime.lua
+--   * The real src/grsuite/app/pages/power_battery.lua, the real app/page_runtime.lua
 --     and the real app/field_layout.lua. The battery and profile MSP modules, the
 --     header, the progress dialog and the EEPROM and reboot writes are stubs. Each
 --     message the page publishes is recorded, and the scenario answers it as the FC
@@ -29,7 +29,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -46,7 +46,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -56,7 +56,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -111,15 +111,15 @@ end
 form.openDialog = function(opts) dialogs[#dialogs + 1] = opts end
 form.addStaticText = function() return anything() end
 
-package.loaded["wfsuite.app.header"] = {build = function() return anything() end}
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return true end}
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.header"] = {build = function() return anything() end}
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return true end}
+package.loaded["grsuite.app.progress_dialog"] = {
   SPEED = {DEFAULT = 1},
   open = function() return {value = function() end, close = function() end} end,
 }
-package.loaded["wfsuite.lib.memstats"] = {print = function() end}
-package.loaded["wfsuite.lib.debug_log"] = anything()
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.memstats"] = {print = function() end}
+package.loaded["grsuite.lib.debug_log"] = anything()
+package.loaded["grsuite.lib.settings_store"] = {
   load = function() return {} end,
   saveConfirmEnabled = function() return false end,   -- Save writes at once, no confirmation
   clone = function(t) return t end,
@@ -156,7 +156,7 @@ for _, base in ipairs({"batteryCellCount", "vbatmincellvoltage", "vbatmaxcellvol
                        "vbatfullcellvoltage", "vbatwarningcellvoltage", "consumptionWarningPercentage"}) do
   FIELD_META[base] = {min = 0, max = 100, default = 0, decimals = 2, suffix = "V"}
 end
-package.loaded["wfsuite.lib.msp_battery_config"] = {
+package.loaded["grsuite.lib.msp_battery_config"] = {
   FIELD_META = FIELD_META,
   buildReadMessage = function(onValues, onErr)
     return message("batteryRead", {processReply = function(v) if onValues then onValues(v) end end})
@@ -169,7 +169,7 @@ package.loaded["wfsuite.lib.msp_battery_config"] = {
 }
 
 local PROFILE_CHOICES = {{"1", 0}, {"2", 1}, {"3", 2}, {"4", 3}, {"5", 4}, {"6", 5}}
-package.loaded["wfsuite.lib.msp_battery_profile"] = {
+package.loaded["grsuite.lib.msp_battery_profile"] = {
   PROFILE_CHOICES = PROFILE_CHOICES,
   buildReadMessage = function(onValues, onErr)
     return message("profileRead", {processReply = function(v) if onValues then onValues(v) end end})
@@ -181,14 +181,14 @@ package.loaded["wfsuite.lib.msp_battery_profile"] = {
   end,
 }
 
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function(onOk, onErr)
     local m = message("eeprom", {processReply = function() if onOk then onOk() end end})
     sent[#sent + 1] = m
     return m
   end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = {
+package.loaded["grsuite.lib.msp_reboot"] = {
   buildWriteMessage = function(onOk)
     local m = message("reboot", {processReply = function() if onOk then onOk() end end})
     sent[#sent + 1] = m

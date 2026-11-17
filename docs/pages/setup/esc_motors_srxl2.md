@@ -38,8 +38,8 @@ Requires a running background task and a flight controller connection. Lit only 
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/esc_motors_srxl2.lua), codec
+[Page implementation](../../../src/grsuite/app/pages/esc_motors_srxl2.lua), codec
 `lib/msp_srxl2_esc_config.lua` (MSP2_WING_SRXL2_ESC_CONFIG / MSP2_WING_SET_SRXL2_ESC_CONFIG,
-wingflight-firmware PR #257), PR #279. Menu conditions come from `app/tool.lua`.
+gripora-firmware PR #257), PR #279. Menu conditions come from `app/tool.lua`.
 
-*Documented against WFSuite Ethos 2.3.1.*
+*Documented against GRSuite Ethos 2.3.1.*

@@ -5,13 +5,13 @@
 --     lua5.4 bin/reboot_policy/verify_reboot_policy.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/page_runtime.lua, to drive a save that DOES
+--   * The real src/grsuite/app/page_runtime.lua, to drive a save that DOES
 --     restart the board and pin what the page does while it waits. The MSP
 --     answers are delivered inline (a queue that drains at once), which is
 --     enough here because the subject is the UI wait, not read ordering.
 --
 -- Why there is no governor-page part here (the sibling suite's harness has one):
---   Wingflight's Setup -> Governor page is its own fixed-wing Throttle Range
+--   Gripora's Setup -> Governor page is its own fixed-wing Throttle Range
 --   Governor (lib/msp_governor_config.lua), not Rotorflight's heli governor, so
 --   #2361's "no governor page may request a reboot" check has no counterpart to
 --   pin on this side -- the four pages that check names do not exist here, and
@@ -39,7 +39,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local out = print
@@ -69,7 +69,7 @@ _G.PREFIX = SUITE_PREFIX
 local realLoadfile = loadfile
 
 -- requireModule() calls loadfile() with a path that carries no directory part;
--- on the radio the working directory is src/wfsuite.
+-- on the radio the working directory is src/grsuite.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
     local absolute = path:sub(1, 1) == "/" and path or (SUITE_PREFIX .. path)
@@ -209,7 +209,7 @@ end
 
 -- ── module stubs ───────────────────────────────────────────────────────────
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function(topic, handler)
     if topic == "session.update" then sessionHandlers[#sessionHandlers + 1] = handler end
   end,
@@ -230,32 +230,32 @@ package.loaded["wfsuite.lib.bus"] = {
     if message.onData then message.onData({}) end
   end,
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return false end,
   reloadConfirmEnabled = function() return false end,
   load = function() return {} end,
   save = function() end,
   DEFAULTS = {},
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function(onWritten, onError)
     return { onData = onWritten, onError = onError }
   end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = {
+package.loaded["grsuite.lib.msp_reboot"] = {
   buildWriteMessage = function(onWritten, onError)
     return { isReboot = true, onData = onWritten, onError = onError }
   end,
 }
-package.loaded["wfsuite.app.header"] = {
+package.loaded["grsuite.app.header"] = {
   build = function()
     return {
       setTitle = function() end,
@@ -268,7 +268,7 @@ package.loaded["wfsuite.app.header"] = {
     }
   end,
 }
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   SPEED = { DEFAULT = 1.0, FAST = 2.0, SLOW = 0.75, VSLOW = 0.5 },
   open = function(opts)
     local d = {
@@ -470,7 +470,7 @@ if selfTest then
   f:close()
   local sabotagedSource, replacementCount = source:gsub("self_%.pendingReboot = true", "self_.pendingReboot = false", 1)
   assert(replacementCount == 1, "splice did not apply to page_runtime")
-  package.loaded["wfsuite.app.page_runtime"] = nil
+  package.loaded["grsuite.app.page_runtime"] = nil
   local sabotaged = assert(load(sabotagedSource, "@page_runtime_pre_fix"))()
 
   local heldTrace = rebootTrace(sabotaged, true)
@@ -481,7 +481,7 @@ if selfTest then
     heldTrace.reloadAfterReturn == false,
     "the spliced page_runtime still reloaded after the reconnect")
 
-  package.loaded["wfsuite.app.page_runtime"] = realPageRuntime
+  package.loaded["grsuite.app.page_runtime"] = realPageRuntime
 end
 
 out("")

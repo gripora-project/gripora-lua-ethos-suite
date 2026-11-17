@@ -4,7 +4,7 @@
 -- Run it:
 --     lua5.4 bin/dashboard_erase/verify_dashboard_erase.lua
 --
--- What it drives: the real src/wfsuite/widgets/dashboard.lua through the widget table
+-- What it drives: the real src/grsuite/widgets/dashboard.lua through the widget table
 -- it registers with system.registerWidget(). The erase starts the way a user starts it:
 -- the Erase toolbar item (key event), then OK on the confirmation dialog. The bus, the MSP
 -- messages, the clock and the forms are stubs; every message is recorded and each reply
@@ -21,7 +21,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local DASHBOARD = ROOT .. "/src/wfsuite/widgets/dashboard.lua"
+local DASHBOARD = ROOT .. "/src/grsuite/widgets/dashboard.lua"
 
 local checks, failures = 0, 0
 local function check(label, ok, detail)
@@ -102,7 +102,7 @@ local codec = {
 }
 local realSummaryModule
 local function realSummary()
-  realSummaryModule = realSummaryModule or dofile(ROOT .. "/src/wfsuite/lib/msp_dataflash_summary.lua")
+  realSummaryModule = realSummaryModule or dofile(ROOT .. "/src/grsuite/lib/msp_dataflash_summary.lua")
   return realSummaryModule
 end
 
@@ -116,7 +116,7 @@ local dataflashEraseMsg = {
   buildWriteMessage = function(ok, err) return { kind = "erase", ok = ok, err = err } end,
 }
 
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   if name == "lib/bus.lua" then
     return {
       publish = function(topic, msg)
@@ -387,7 +387,7 @@ local function runChecks()
   end
 end
 
-print("widget: src/wfsuite/widgets/dashboard.lua")
+print("widget: src/grsuite/widgets/dashboard.lua")
 runChecks()
 -- D11, D12: the real decoder, fed the bytes a reply carries.
 local function runDecoderChecks()

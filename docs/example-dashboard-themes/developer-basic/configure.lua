@@ -1,14 +1,14 @@
- local wfsuite = require("wfsuite")
+ local grsuite = require("grsuite")
 local activateWakeup = false
 
 -- temp var to hold config while editing
 local config = {}
 
 local function configure()
-    wfsuite.utils.log("configure dashboard theme","info")
+    grsuite.utils.log("configure dashboard theme","info")
     activateWakeup = true
 
-    config.setting1 = wfsuite.widgets.dashboard.getPreference("setting1") or 0
+    config.setting1 = grsuite.widgets.dashboard.getPreference("setting1") or 0
     
     -- add form field
     local line = form.addLine("Setting 1")
@@ -29,7 +29,7 @@ end
 local function write()
     -- write config to preferences file
     for i,v in pairs(config) do
-        wfsuite.widgets.dashboard.savePreference(i, v)
+        grsuite.widgets.dashboard.savePreference(i, v)
     end
 end
 
@@ -43,7 +43,7 @@ end
 local function event(widget, category, value, x, y)
     -- if close event detected go to section home page
     if category == EVT_CLOSE and value == 0 or value == 35 then
-        wfsuite.app.ui.openPage(
+        grsuite.app.ui.openPage(
             pageIdx,
             "@i18n(app.modules.settings.dashboard)@",
             "settings/tools/dashboard.lua"

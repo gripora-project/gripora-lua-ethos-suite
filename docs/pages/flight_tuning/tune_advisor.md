@@ -113,7 +113,7 @@ away and saves it when you disarm.
   so they can be improved without a firmware update.
 - Each time you disarm, the background task reads all three axes from the flight controller, saves them as
   one flight, then clears the flight controller so the next flight is measured on its own. This happens
-  whether or not this page is open. The flights are kept in `LOGS:/wfsuite/tune/<model>/history.csv` on the
+  whether or not this page is open. The flights are kept in `LOGS:/grsuite/tune/<model>/history.csv` on the
   radio's SD card, one row per axis, newest last; only the last 5 flights are kept. `<model>` is the same
   flight controller ID that names the flight log folders, and a `logs.ini` beside the history holds the model
   name.
@@ -146,7 +146,7 @@ away and saves it when you disarm.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/tune_advisor.lua). Menu conditions come from `app/tool.lua`.
-Firmware side: `src/main/flight/tune_advisor.c` in wingflight-firmware.
+[Page implementation](../../../src/grsuite/app/pages/tune_advisor.lua). Menu conditions come from `app/tool.lua`.
+Firmware side: `src/main/flight/tune_advisor.c` in gripora-firmware.
 
-*Checked against WFSuite Ethos 2.3.1.*
+*Checked against GRSuite Ethos 2.3.1.*

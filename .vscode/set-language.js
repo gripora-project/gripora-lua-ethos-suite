@@ -9,7 +9,7 @@ if (fs.existsSync(settingsPath)) {
   settings = JSON.parse(fs.readFileSync(settingsPath));
 }
 
-settings["wfsuite.deploy.language"] = lang;
+settings["grsuite.deploy.language"] = lang;
 
 fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
 fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));

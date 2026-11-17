@@ -40,6 +40,6 @@ Damping needs firmware with MSP API 22.13 or later; the suite requires it.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/autolevel_angle.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/autolevel_angle.lua). Menu conditions come from `app/tool.lua`.
 
-*Checked against WFSuite Ethos 2.3.1.*
+*Checked against GRSuite Ethos 2.3.1.*

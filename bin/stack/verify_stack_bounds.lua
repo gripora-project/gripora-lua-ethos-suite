@@ -5,10 +5,10 @@
 --     lua5.4 bin/stack/verify_stack_bounds.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/lib/bus.lua and the real
---     src/wfsuite/lib/stack_probe.lua, loaded the way the suite loads them
+--   * The real src/grsuite/lib/bus.lua and the real
+--     src/grsuite/lib/stack_probe.lua, loaded the way the suite loads them
 --     (requireModule from lib/require.lua, literal paths relative to
---     src/wfsuite). The point is not to test the bus's routing; it is to
+--     src/grsuite). The point is not to test the bus's routing; it is to
 --     establish what happens when a handler publishes from inside a handler,
 --     because that is the only unbounded term left in this suite and a
 --     runaway one does not raise a catchable Lua error -- it eats the C stack
@@ -40,7 +40,7 @@ local function scriptDir()
   return (path:match("^(.*)[/\\][^/\\]*$")) or "."
 end
 
-local SUITE = (scriptDir() .. "/../../src/wfsuite"):gsub("\\", "/")
+local SUITE = (scriptDir() .. "/../../src/grsuite"):gsub("\\", "/")
 local SUITE_PREFIX = SUITE .. "/"
 
 local checks, failures = 0, 0

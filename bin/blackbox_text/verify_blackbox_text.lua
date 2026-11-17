@@ -5,7 +5,7 @@
 --     lua5.4 bin/blackbox_text/verify_blackbox_text.lua
 --     lua5.4 bin/blackbox_text/verify_blackbox_text.lua --self-test
 --
--- What it drives: the real src/wfsuite/widgets/dashboard/objects/text/blackbox.lua,
+-- What it drives: the real src/grsuite/widgets/dashboard/objects/text/blackbox.lua,
 -- render.wakeup(), with the session fields set the way tasks/session.lua sets them.
 -- The layout and paint functions are stubs; the value the widget decided to show
 -- is read back from box._currentDisplayValue.
@@ -25,7 +25,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local WIDGET = ROOT .. "/src/wfsuite/widgets/dashboard/objects/text/blackbox.lua"
+local WIDGET = ROOT .. "/src/grsuite/widgets/dashboard/objects/text/blackbox.lua"
 
 local checks, failures = 0, 0
 local function check(label, ok, detail)
@@ -75,7 +75,7 @@ local utils = {
 }
 ctx.widgets.dashboard.utils = utils
 
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   if name == "widgets/dashboard/context.lua" then return ctx end
   return setmetatable({}, { __index = function() return function() return {} end end })
 end
@@ -181,7 +181,7 @@ for _, a in ipairs(arg or {}) do
   if a == "--self-test" then selfTest = true end
 end
 
-print("widget: src/wfsuite/widgets/dashboard/objects/text/blackbox.lua")
+print("widget: src/grsuite/widgets/dashboard/objects/text/blackbox.lua")
 runChecks(loadWidget(nil))
 
 if selfTest then

@@ -1,4 +1,4 @@
-# WFSuite documentation
+# GRSuite documentation
 
 Start with the [configuration page index](pages/README.md) to find a radio page.
 Each entry is marked **draft** or **reviewed**. Drafts are scaffolds, not complete
@@ -21,7 +21,7 @@ The dashboard widget's toolbar and info panel are described in
 ## Maintaining page documentation
 
 The documentation tools run on a development computer and are not radio code.
-They read `src/wfsuite/app/tool.lua` and the runtime English locale directly.
+They read `src/grsuite/app/tool.lua` and the runtime English locale directly.
 They do not regenerate menus or locale files.
 
 ```sh

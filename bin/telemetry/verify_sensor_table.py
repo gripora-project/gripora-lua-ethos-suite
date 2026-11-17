@@ -11,8 +11,8 @@ stop updating.
 
 Nothing about that failure points at the cause, so the invariant is checked
 instead: the decoder table must cover the firmware's appId set. This compares
-`src/wfsuite/lib/elrs_sensor_table.lua` against the `TLM_SENSOR(...)` list in
-wingflight-firmware's `src/main/telemetry/crsf.c`, which is where those appIds
+`src/grsuite/lib/elrs_sensor_table.lua` against the `TLM_SENSOR(...)` list in
+gripora-firmware's `src/main/telemetry/crsf.c`, which is where those appIds
 are declared.
 
     python bin/telemetry/verify_sensor_table.py
@@ -34,12 +34,12 @@ import urllib.request
 
 # Pinned so a firmware that adds an appId shows up as a deliberate change here
 # rather than as a silent frame-walk abort on someone's radio.
-# wingflight-firmware has no release tags yet, so this is a master commit.
+# gripora-firmware has no release tags yet, so this is a master commit.
 DEFAULT_FIRMWARE_REF = "706bd4bdbb6d256179ae8afc6b41644dcb205754"
-RAW_URL = "https://raw.githubusercontent.com/WingFlight/wingflight-firmware/{ref}/src/main/telemetry/crsf.c"
+RAW_URL = "https://raw.githubusercontent.com/gripora-project/gripora-firmware/{ref}/src/main/telemetry/crsf.c"
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-TABLE_PATH = os.path.join(REPO_ROOT, "src", "wfsuite", "lib", "elrs_sensor_table.lua")
+TABLE_PATH = os.path.join(REPO_ROOT, "src", "grsuite", "lib", "elrs_sensor_table.lua")
 
 # TLM_SENSOR(NAME, 0xAPPID, ...) and TLM_SENSOR_FULL(...). Entries with appId 0
 # are not sent as custom telemetry and are rightly not matched.
@@ -93,7 +93,7 @@ def verdict(firmware_text, suite_text):
         return False, (
             "the flight controller broadcasts %d appId(s) the suite cannot decode, so "
             "parseFrame() aborts the frame walk and every sensor packed after them is lost:\n%s\n\n"
-            "Add each one to src/wfsuite/lib/elrs_sensor_table.lua. An appId that is not in "
+            "Add each one to src/grsuite/lib/elrs_sensor_table.lua. An appId that is not in "
             "the table cannot be skipped -- its byte width only exists there -- so this is "
             "the only fix." % (len(missing), listed)
         )
@@ -156,7 +156,7 @@ def self_test():
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--firmware", help="path to wingflight-firmware's src/main/telemetry/crsf.c")
+    ap.add_argument("--firmware", help="path to gripora-firmware's src/main/telemetry/crsf.c")
     ap.add_argument("--ref", default=DEFAULT_FIRMWARE_REF,
                     help="firmware revision to read (default: %(default)s)")
     ap.add_argument("--self-test", action="store_true",

@@ -24,7 +24,7 @@ local function scriptDir()
 end
 
 local ROOT = (scriptDir() .. "/../.."):gsub("\\", "/")
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 local SELF_TEST = arg and arg[1] == "--self-test"
 
 local checks, failures = 0, 0
@@ -106,7 +106,7 @@ local function runThemeProbingCheck(useOldBehavior)
     addStaticText = function() end,
   }
 
-  fakeEnv.wfsuite = {
+  fakeEnv.grsuite = {
     session = {},
     widgets = {
       dashboard = {
@@ -118,7 +118,7 @@ local function runThemeProbingCheck(useOldBehavior)
 
   fakeEnv.package = {
     loaded = {
-      ["wfsuite.lib.require"] = function(p)
+      ["grsuite.lib.require"] = function(p)
         if p == "lib/bus.lua" then
           return { publish = function() end, subscribe = function() return 1 end, unsubscribe = function() end }
         elseif p == "app/close_key.lua" then
@@ -139,7 +139,7 @@ local function runThemeProbingCheck(useOldBehavior)
             clone = function(s) return s end,
           }
         elseif p == "widgets/dashboard/context.lua" then
-          return fakeEnv.wfsuite
+          return fakeEnv.grsuite
         elseif p == "lib/dashboard_themes.lua" then
           -- No user themes: the check is about the shipped list's probing.
           return { listUser = function() return {} end }
@@ -220,7 +220,7 @@ local function runDiagnosticsStatusCheck(useOldBehavior)
 
   fakeEnv.package = {
     loaded = {
-      ["wfsuite.lib.require"] = function(p)
+      ["grsuite.lib.require"] = function(p)
         if p == "app/diagnostics_common.lua" then
           return {
             openReadOnlyPage = function(opts, title, builder)

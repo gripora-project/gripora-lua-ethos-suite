@@ -24,8 +24,8 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local TASKS = ROOT .. "/src/wfsuite/tasks"
-local SUITE = ROOT .. "/src/wfsuite"
+local TASKS = ROOT .. "/src/grsuite/tasks"
+local SUITE = ROOT .. "/src/grsuite"
 
 local failures = 0
 local checks = 0
@@ -239,7 +239,7 @@ end
 
 -- Unique per process: a shared path made two concurrent runs (e.g. two Lua
 -- sweeps in parallel) delete and inherit each other's files.
-local LOG_SCRATCH = os.tmpname() .. "_wfsuite_flight_record_logs"
+local LOG_SCRATCH = os.tmpname() .. "_grsuite_flight_record_logs"
 
 -- Loads logging.lua with its three chunk args stubbed, and LOGS:/ paths
 -- redirected to a scratch directory. Returns the module, the bus handlers it
@@ -260,14 +260,14 @@ local function loadLogging()
 
   local started = {}
   local realOpen, realRename, realRemove, realMkdir = io.open, os.rename, os.remove, os.mkdir
-  local previousRequire = package.loaded["wfsuite.lib.require"]
+  local previousRequire = package.loaded["grsuite.lib.require"]
 
   local function redirect(path)
     return (tostring(path):gsub("^LOGS:", LOG_SCRATCH))
   end
 
-  package.loaded["wfsuite.lib.require"] = function(name)
-    local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  package.loaded["grsuite.lib.require"] = function(name)
+    local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
     local cached = package.loaded[key]
     if cached ~= nil then return cached end
     local chunk, err = loadfile(SUITE .. "/" .. name)
@@ -297,13 +297,13 @@ local function loadLogging()
   end)
   if not ok then
     io.open, os.rename, os.remove, os.mkdir = realOpen, realRename, realRemove, realMkdir
-    package.loaded["wfsuite.lib.require"] = previousRequire
+    package.loaded["grsuite.lib.require"] = previousRequire
     removeTree(LOG_SCRATCH)
     error(mod)
   end
   local function restore()
     io.open, os.rename, os.remove, os.mkdir = realOpen, realRename, realRemove, realMkdir
-    package.loaded["wfsuite.lib.require"] = previousRequire
+    package.loaded["grsuite.lib.require"] = previousRequire
     removeTree(LOG_SCRATCH)
   end
   return mod, handlers, started, restore

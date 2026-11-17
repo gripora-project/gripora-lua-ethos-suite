@@ -77,7 +77,7 @@ assert(loadfile("main.lua"))().init()
 local task = assert(H.registered.tasks[1], "background task did not register")
 local dash
 for _, def in ipairs(H.registered.widgets) do
-  if def.key == "wfsdh" then dash = def end
+  if def.key == "grsdh" then dash = def end
 end
 local widgets = {}
 for i = 1, DASHBOARDS do widgets[i] = dash.create() end

@@ -50,6 +50,6 @@ There is nothing to change here. The lines shown:
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/diagnostics_rx_input_backup.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/diagnostics_rx_input_backup.lua). Menu conditions come from `app/tool.lua`.
 
-*Checked against the source at PR #277 (WFSuite Ethos 2.3.x).*
+*Checked against the source at PR #277 (GRSuite Ethos 2.3.x).*

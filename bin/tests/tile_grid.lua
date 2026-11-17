@@ -28,7 +28,7 @@ lcd = {
   getTextSize = function(text) measurements = measurements + 1; return textWidth(text), 12 end,
   getWindowSize = function() return 472, 288 end,
 }
-local grid = assert(loadfile("src/wfsuite/app/tile_grid.lua"))()
+local grid = assert(loadfile("src/grsuite/app/tile_grid.lua"))()
 local function equal(actual, expected)
   assert(actual == expected, tostring(actual) .. " ~= " .. tostring(expected))
 end

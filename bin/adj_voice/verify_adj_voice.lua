@@ -38,7 +38,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local SUITE_PREFIX = SUITE .. "/"
 local AUDIO_PATH = SUITE .. "/tasks/audio_events.lua"
 
@@ -69,7 +69,7 @@ local function readFile(path)
 end
 
 -- The task loads its own modules with loadfile() and a path that has no
--- directory part; on the radio the working directory is src/wfsuite. Same
+-- directory part; on the radio the working directory is src/grsuite. Same
 -- redirect the audio harness uses, for the same reason.
 package.path = SUITE_PREFIX .. "?.lua;" .. package.path
 _G.PREFIX = SUITE_PREFIX
@@ -84,7 +84,7 @@ end
 
 local savedSystem = _G.system
 local savedOsClock = os.clock
-local savedRequire = package.loaded["wfsuite.lib.require"]
+local savedRequire = package.loaded["grsuite.lib.require"]
 
 local function spokenValues(rig)
   local values = {}
@@ -100,7 +100,7 @@ local function newRig(events, source)
   local handlers = {}
   local played, spoken = {}, {}
 
-  package.loaded["wfsuite.lib.require"] = function(name)
+  package.loaded["grsuite.lib.require"] = function(name)
     if name == "lib/bus.lua" then
       return {
         subscribe = function(topic, fn) handlers[topic] = fn end,
@@ -130,7 +130,7 @@ local function newRig(events, source)
   local clock = 0
   os.clock = function() return clock end
 
-  -- WingFlight's task takes the bus and the settings store as its chunk
+  -- Gripora's task takes the bus and the settings store as its chunk
   -- arguments (`local bus, settingsStore = ...`), the instances background.lua
   -- already loaded, rather than requiring them itself.
   local bus = {
@@ -295,7 +295,7 @@ end
 -- Put back what the rig replaced, so nothing after this file sees a stub.
 _G.system = savedSystem
 os.clock = savedOsClock
-package.loaded["wfsuite.lib.require"] = savedRequire
+package.loaded["grsuite.lib.require"] = savedRequire
 _G.loadfile = realLoadfile
 
 out("")

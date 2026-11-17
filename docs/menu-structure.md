@@ -1,6 +1,6 @@
 # Menu structure
 
-The menu source of truth is [`app/tool.lua`](../src/wfsuite/app/tool.lua).
+The menu source of truth is [`app/tool.lua`](../src/grsuite/app/tool.lua).
 `ROOT_ENTRIES` defines the root tiles and `MENUS` defines named submenus.
 The [page index](pages/README.md) lists all reachable leaf pages and their conditions;
 each page document contains its full breadcrumb.

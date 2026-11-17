@@ -10,7 +10,7 @@ if os.path.exists(settings_path):
     with open(settings_path, "r", encoding="utf-8") as f:
         settings = json.load(f)
 
-settings["wfsuite.deploy.language"] = lang
+settings["grsuite.deploy.language"] = lang
 
 os.makedirs(os.path.dirname(settings_path), exist_ok=True)
 with open(settings_path, "w", encoding="utf-8") as f:

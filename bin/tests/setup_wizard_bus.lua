@@ -5,7 +5,7 @@
 -- inputs and expected values, so a change on either side that the other lacks
 -- shows up here. The codec checks at the end are the suite's own.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -101,7 +101,7 @@ end
 print("MSP2_WING_FBUS_MASTER_CONFIG: the port wiring is read and written only when sent")
 do
   assert(loadfile(ROOT .. "lib/require.lua"))()
-  package.loaded["wfsuite.lib.mspcodec"] = assert(loadfile(ROOT .. "lib/mspcodec.lua"))()
+  package.loaded["grsuite.lib.mspcodec"] = assert(loadfile(ROOT .. "lib/mspcodec.lua"))()
   local C = assert(loadfile(ROOT .. "lib/msp_fbus_master_config.lua"))()
 
   local v2 = C.decode({2, 10, 255, 255, 255, 255, 255, 255, 255, 1, 0})

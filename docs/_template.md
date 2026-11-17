@@ -33,4 +33,4 @@ firmware defaults; wire values may need scaling before display.
 
 [Page implementation]({{source_link}}). Menu conditions come from `app/tool.lua`.
 
-*Scaffolded against WFSuite Ethos {{version}}; content awaiting review.*
+*Scaffolded against GRSuite Ethos {{version}}; content awaiting review.*

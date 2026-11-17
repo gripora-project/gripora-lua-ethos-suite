@@ -5,8 +5,8 @@
 --     lua5.4 bin/adjfunctions_audio/verify_adjfunctions_audio.lua
 --     lua5.4 bin/adjfunctions_audio/verify_adjfunctions_audio.lua --self-test
 --
--- What it reads: the real src/wfsuite/tasks/adjfunctions/wavs.lua (the name table) and
--- the real src/wfsuite/app/pages/adjustments.lua (the functions the page offers), and the
+-- What it reads: the real src/grsuite/tasks/adjfunctions/wavs.lua (the name table) and
+-- the real src/grsuite/app/pages/adjustments.lua (the functions the page offers), and the
 -- audio folders of the English pack: default, us and gb.
 --
 -- Ported from rotorflight-lua-ethos-suite PR #2572 (issue #2501).
@@ -18,9 +18,9 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local WAVS = ROOT .. "/src/wfsuite/tasks/adjfunctions/wavs.lua"
-local PAGE = ROOT .. "/src/wfsuite/app/pages/adjustments.lua"
-local PACK = ROOT .. "/src/wfsuite/audio/en"
+local WAVS = ROOT .. "/src/grsuite/tasks/adjfunctions/wavs.lua"
+local PAGE = ROOT .. "/src/grsuite/app/pages/adjustments.lua"
+local PACK = ROOT .. "/src/grsuite/audio/en"
 -- The English package is built from this folder, not from src/ (bin/package/build_package.py,
 -- copy_sound_pack), so the check covers both.
 local SOUND_PACK = ROOT .. "/bin/sound-generator/soundpack/en"
@@ -108,8 +108,8 @@ local function runChecks(names, offered)
     #missing == 0, #missing > 0 and ("missing: " .. table.concat(missing, "; ")) or nil)
 end
 
-print("names: src/wfsuite/tasks/adjfunctions/wavs.lua")
-print("page:  src/wfsuite/app/pages/adjustments.lua")
+print("names: src/grsuite/tasks/adjfunctions/wavs.lua")
+print("page:  src/grsuite/app/pages/adjustments.lua")
 local names = loadNames(WAVS)
 runChecks(names, pageIds(PAGE))
 

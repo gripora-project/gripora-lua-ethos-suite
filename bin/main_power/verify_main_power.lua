@@ -7,7 +7,7 @@
 --   * lib/main_power.lua: the shared test used by tasks/session.lua (publishes the flag)
 --     and through it by the audio alert and the dashboard banner.
 --   * The same test against the function it replaced in tasks/audio_events.lua, copied
---     verbatim from wingflight-lua-ethos-suite master (8222d3c7), where the latch is written
+--     verbatim from gripora-lua-ethos-suite master (8222d3c7), where the latch is written
 --     by notePackVoltage() before the test runs. Both get the same readings in the same
 --     order, so the new code is shown to change where the test lives, not what it says.
 
@@ -18,7 +18,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local main_power = assert(loadfile(ROOT .. "/src/wfsuite/lib/main_power.lua"))()
+local main_power = assert(loadfile(ROOT .. "/src/grsuite/lib/main_power.lua"))()
 
 local failures = 0
 local checks = 0
@@ -34,7 +34,7 @@ local function check(label, ok, detail)
   end
 end
 
--- The audio task's test on wingflight master, with its module-level latch and session
+-- The audio task's test on gripora master, with its module-level latch and session
 -- table replaced by parameters, and nothing else changed: notePackVoltage() sets the
 -- latch first, then mainPowerLost() reads it.
 local MAIN_POWER_LOST_VOLTS_MASTER = 1.0
@@ -88,7 +88,7 @@ local low = main_power.newLatch()
 check("a reading just under the threshold is treated as gone", main_power.evaluate(0.9, 5.0, low) == false)
 
 -- ---------------------------------------------------------------------------
-print("equivalence with the audio test on wingflight master")
+print("equivalence with the audio test on gripora master")
 -- ---------------------------------------------------------------------------
 
 -- A fixed set of realistic sequences: connect, flight, pack lost with and without BEC,

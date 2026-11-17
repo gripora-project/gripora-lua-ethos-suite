@@ -36,7 +36,7 @@
 --     drives the real dashboard widget over its real bus event, so it is the
 --     case that goes red on the pre-fix tree, where clearThemeCache() passed
 --     {theme = true} and the images branch had no caller anywhere.
---   * Two cases are wingflight's own, for the one place this port differs
+--   * Two cases are gripora's own, for the one place this port differs
 --     from upstream -- drawImageInRect() keeps a per-draw memo, because it
 --     runs on paint:
 --     (10) a draw that hits that memo still re-stamps the LRU record, so an
@@ -56,7 +56,7 @@ local function scriptDir()
 end
 
 local ROOT = (scriptDir() .. "/../.."):gsub("\\", "/")
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -99,10 +99,10 @@ end
 -- Harness
 -- ---------------------------------------------------------------------------
 
--- wfsuite.lib.require is loadfile() against Ethos' path prefixes on a radio.
+-- grsuite.lib.require is loadfile() against Ethos' path prefixes on a radio.
 -- Here it resolves relative to the suite directory when run from repository root.
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -112,7 +112,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 -- Which paths the stub filesystem claims to have. Kept explicit so a case can
 -- make a file appear between two resolutions -- that is the only way to tell
@@ -285,9 +285,9 @@ check("case 5: clearCaches({theme = true}) alone still leaves the bitmaps alone"
 -- Case 6 -- session.dialImageCache belongs to the images branch
 -- ---------------------------------------------------------------------------
 
--- objects/dial/image.lua holds this table under `wfsuite.session`, and
--- `wfsuite` there is this very module (its own header does
--- `local wfsuite = requireModule("widgets/dashboard/context.lua")`).
+-- objects/dial/image.lua holds this table under `grsuite.session`, and
+-- `grsuite` there is this very module (its own header does
+-- `local grsuite = requireModule("widgets/dashboard/context.lua")`).
 context.session.dialImageCache = {panel1 = {}}
 clearCaches({theme = true})
 check("case 6: a theme-only clear does not touch session.dialImageCache",

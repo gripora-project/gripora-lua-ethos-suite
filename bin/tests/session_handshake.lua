@@ -5,10 +5,10 @@ local clock = os.clock
 -- The production version check, so a version the suite would refuse cannot
 -- pass a handshake here. It needs only lib/mspcodec.lua, which is pure.
 local apiVersion = (function()
-  local saved = package.loaded['wfsuite.lib.require']
-  package.loaded['wfsuite.lib.require'] = function(name) return assert(loadfile('src/wfsuite/'..name))() end
-  local module = assert(loadfile('src/wfsuite/lib/msp_api_version.lua'))()
-  package.loaded['wfsuite.lib.require'] = saved
+  local saved = package.loaded['grsuite.lib.require']
+  package.loaded['grsuite.lib.require'] = function(name) return assert(loadfile('src/grsuite/'..name))() end
+  local module = assert(loadfile('src/grsuite/lib/msp_api_version.lua'))()
+  package.loaded['grsuite.lib.require'] = saved
   return module
 end)()
 local function fixture(armed)
@@ -24,7 +24,7 @@ local function fixture(armed)
   local noop=function() end
   -- a module whose every method is a no-op returning nothing
   local function inert() return setmetatable({},{__index=function() return noop end}) end
-  local status=assert(loadfile('src/wfsuite/lib/system_status.lua'))()
+  local status=assert(loadfile('src/grsuite/lib/system_status.lua'))()
   local modules={
     ['lib/msp_handshake.lua']={buildFcVersionReadMessage=builder('fcVariant'),buildUidReadMessage=builder('mcuId'),
       buildNameReadMessage=builder('craftName'),buildRtcSyncMessage=builder('clockSynced')},
@@ -40,19 +40,19 @@ local function fixture(armed)
     ['lib/model_preferences.lua']={load=function() return {} end,stats=function() return {} end,
       timerTarget=function() return 300 end,smartfuelModelType=function() return 0 end,
       escCurrentLimit=function() return nil end},
-    ['tasks/flight_timer.lua']=assert(loadfile('src/wfsuite/tasks/flight_timer.lua'))(),   -- pure: the real one
+    ['tasks/flight_timer.lua']=assert(loadfile('src/grsuite/tasks/flight_timer.lua'))(),   -- pure: the real one
     ['tasks/elrs_sensors.lua']={wakeup=noop,reset=noop},
     -- pure arithmetic, no Ethos API: the real module
-    ['lib/battery_profile_index.lua']=assert(loadfile('src/wfsuite/lib/battery_profile_index.lua'))(),
+    ['lib/battery_profile_index.lua']=assert(loadfile('src/grsuite/lib/battery_profile_index.lua'))(),
     -- flight records and live sensor sources: not part of the handshake; any call is a no-op
     ['lib/flight_stats.lua']={new=function() return inert() end},
     ['lib/live_sensors.lua']=inert(),['lib/frsky_sensors.lua']=inert(),
-    ['lib/main_power.lua']=assert(loadfile('src/wfsuite/lib/main_power.lua'))(),   -- pure: the real one
+    ['lib/main_power.lua']=assert(loadfile('src/grsuite/lib/main_power.lua'))(),   -- pure: the real one
     ['lib/system_status.lua']={copy=status.copy,decodeConfig=status.decodeConfig,decodeStatus=function(value)
       decodes=decodes+1; return status.decodeStatus(value)
     end},
   }
-  package.loaded['wfsuite.lib.require']=function(path) return assert(modules[path],path) end
+  package.loaded['grsuite.lib.require']=function(path) return assert(modules[path],path) end
   local queue={add=function(_,msg)
     counts[msg.key]=(counts[msg.key] or 0)+1
     if msg.key==reject then if msg.err then msg.err('queue_full') end; return false end
@@ -65,7 +65,7 @@ local function fixture(armed)
     if topic=='session.update' then snapshots[#snapshots+1]=value
     elseif topic=='msp.request' then queue:add(value) end
   end}
-  local task=assert(loadfile('src/wfsuite/tasks/session.lua'))(bus,
+  local task=assert(loadfile('src/grsuite/tasks/session.lua'))(bus,
     {load=function() return {} end,syncNameEnabled=function() return false end},{print=noop})
   task.setTelemetrySensors({getValue=function(_,key) if key=='system_status' then return raw end end,reset=noop})
   return {

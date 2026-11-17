@@ -1,11 +1,11 @@
 -- Run from the repository root with Lua 5.3+: lua bin/tests/mode_override.lua
--- Checks the timed bench overrides of wingflight-firmware API 22.14:
+-- Checks the timed bench overrides of gripora-firmware API 22.14:
 -- lib/msp_mode_override.lua and lib/msp_servo_override.lua against the
 -- firmware's wire format (src/main/msp/msp.c), and lib/override_keepalive.lua
 -- re-sending held overrides until they are released, only on 22.14+ and only
 -- while connected.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -34,7 +34,7 @@ local stubs = {
   },
 }
 local cache = {}
-package.loaded["wfsuite.lib.require"] = function(path)
+package.loaded["grsuite.lib.require"] = function(path)
   if stubs[path] then return stubs[path] end
   if cache[path] == nil then
     local result = assert(loadfile(ROOT .. path))()
@@ -46,7 +46,7 @@ end
 local clock = 100
 os.clock = function() return clock end
 
-local requireModule = package.loaded["wfsuite.lib.require"]
+local requireModule = package.loaded["grsuite.lib.require"]
 local keepalive = requireModule("lib/override_keepalive.lua")
 local modeOverride = requireModule("lib/msp_mode_override.lua")
 local servoOverride = requireModule("lib/msp_servo_override.lua")

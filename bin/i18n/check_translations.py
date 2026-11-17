@@ -49,10 +49,10 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 
-SOURCE_ROOT = os.path.join("src", "wfsuite")
+SOURCE_ROOT = os.path.join("src", "grsuite")
 
 #: The translation files are the one place an untranslated-looking literal is the point.
-EXEMPT_PREFIXES = ("src/wfsuite/i18n/",)
+EXEMPT_PREFIXES = ("src/grsuite/i18n/",)
 
 ALLOWLIST_PATH = os.path.join("bin", "i18n", "allowed_untranslated.txt")
 
@@ -78,7 +78,7 @@ FIELD_RE = re.compile(
     r'(?<![\w.])(' + "|".join(TEXT_FIELDS) + r')\s*=\s*(["\'])(.*?)\2')
 
 #: A form row's label is the fifth positional argument of every `Controls.append*` helper
-#: (`children, x, y, w, labelText, ...` -- see `src/wfsuite/ui/controls.lua`), so it has
+#: (`children, x, y, w, labelText, ...` -- see `src/grsuite/ui/controls.lua`), so it has
 #: no field name to key on and the pattern above cannot reach it.
 CONTROL_LABEL_RE = re.compile(
     r'\bControls\.append(?:SectionHeader|StaticSectionHeader|RadioSwitch|NumberField'

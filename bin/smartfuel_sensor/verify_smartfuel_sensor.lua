@@ -36,7 +36,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local SUITE_PREFIX = SUITE .. "/"
 local DIY_PATH = SUITE .. "/lib/diy_sensor.lua"
 local CALC_PATH = SUITE .. "/lib/smartfuel_calc.lua"
@@ -64,7 +64,7 @@ local function readFile(path)
 end
 
 local savedSystem, savedModel, savedOsClock = _G.system, _G.model, os.clock
-local savedRequire = package.loaded["wfsuite.lib.require"]
+local savedRequire = package.loaded["grsuite.lib.require"]
 
 local realLoadfile = loadfile
 _G.loadfile = function(path, ...)
@@ -77,7 +77,7 @@ end
 
 -- The modules these two files require. Only the names they use are provided.
 local function installRequire()
-  package.loaded["wfsuite.lib.require"] = function(name)
+  package.loaded["grsuite.lib.require"] = function(name)
     if name == "lib/debug_log.lua" then
       return {print = function() end, format = function() end, msp = function() end, enabled = function() return false end}
     elseif name == "lib/ethos_version.lua" then
@@ -287,7 +287,7 @@ end
 -- Put back what the harness replaced, so nothing after this file sees a stub.
 _G.system, _G.model = savedSystem, savedModel
 os.clock = savedOsClock
-package.loaded["wfsuite.lib.require"] = savedRequire
+package.loaded["grsuite.lib.require"] = savedRequire
 _G.loadfile = realLoadfile
 
 out(string.rep("-", 60))

@@ -60,4 +60,4 @@ Available without a flight controller connection; the background task must be ru
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/settings_audio_events_voltage.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/settings_audio_events_voltage.lua). Menu conditions come from `app/tool.lua`.

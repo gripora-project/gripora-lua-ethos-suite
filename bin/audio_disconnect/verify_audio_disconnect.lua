@@ -33,7 +33,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local SUITE_PREFIX = SUITE .. "/"
 local AUDIO_PATH = SUITE .. "/tasks/audio_events.lua"
 
@@ -64,7 +64,7 @@ local function readFile(path)
 end
 
 -- The task loads its own modules with loadfile() and a path that has no
--- directory part; on the radio the working directory is src/wfsuite. Same
+-- directory part; on the radio the working directory is src/grsuite. Same
 -- redirect the other audio harnesses use, for the same reason.
 package.path = SUITE_PREFIX .. "?.lua;" .. package.path
 _G.PREFIX = SUITE_PREFIX
@@ -79,7 +79,7 @@ end
 
 local savedSystem = _G.system
 local savedOsClock = os.clock
-local savedRequire = package.loaded["wfsuite.lib.require"]
+local savedRequire = package.loaded["grsuite.lib.require"]
 
 -- One fresh task per scenario, so its upvalues (the speaking clock, the held
 -- changes, the previous values) cannot carry between them. `source` replaces
@@ -104,7 +104,7 @@ local function newRig(events, source)
     audioTimer = function() return {} end,
   }
 
-  package.loaded["wfsuite.lib.require"] = function(name)
+  package.loaded["grsuite.lib.require"] = function(name)
     if name == "lib/bus.lua" then
       return busStub
     elseif name == "lib/settings_store.lua" then
@@ -223,7 +223,7 @@ end
 -- Put back what the rig replaced, so nothing after this file sees a stub.
 _G.system = savedSystem
 os.clock = savedOsClock
-package.loaded["wfsuite.lib.require"] = savedRequire
+package.loaded["grsuite.lib.require"] = savedRequire
 
 out(string.rep("-", 60))
 out(string.format("checks: %d   failures: %d", checks, failures))

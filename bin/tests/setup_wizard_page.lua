@@ -22,7 +22,7 @@
 --     it there);
 --   * firmware without timed overrides gets an explanation and no writes.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -174,8 +174,8 @@ local stubs = {
 -- Cached in package.loaded under lib/require.lua's keys, so the checks can see
 -- what the wizard frees when a step or the page closes.
 local cache = package.loaded
-local function keyOf(path) return "wfsuite." .. path:gsub("%.lua$", ""):gsub("/", ".") end
-package.loaded["wfsuite.lib.require"] = function(path)
+local function keyOf(path) return "grsuite." .. path:gsub("%.lua$", ""):gsub("/", ".") end
+package.loaded["grsuite.lib.require"] = function(path)
   if stubs[path] then return stubs[path] end
   local key = keyOf(path)
   if cache[key] == nil then
@@ -184,7 +184,7 @@ package.loaded["wfsuite.lib.require"] = function(path)
   end
   return cache[key]
 end
-local requireModule = package.loaded["wfsuite.lib.require"]
+local requireModule = package.loaded["grsuite.lib.require"]
 
 local function session(data)
   inBackground = true
@@ -317,10 +317,10 @@ local function openPage(apiMinor, stepKey)
   heldMessages = {}
   subscribers["session.update"] = nil
   for k in pairs(package.loaded) do
-    if type(k) == "string" and k:match("^wfsuite%.") and k ~= "wfsuite.lib.require" then package.loaded[k] = nil end
+    if type(k) == "string" and k:match("^grsuite%.") and k ~= "grsuite.lib.require" then package.loaded[k] = nil end
   end
   -- Where the wizard opens: the step it remembers (app/pages/setup_wizard.lua).
-  package.loaded["wfsuite.setup_wizard.memory"] = {stepKey = stepKey or "direction"}
+  package.loaded["grsuite.setup_wizard.memory"] = {stepKey = stepKey or "direction"}
   local page = assert(realLoadfile(ROOT .. "app/pages/setup_wizard.lua"))()
   ctx = {back = 0}
   page.open({
@@ -479,9 +479,9 @@ check("Back with nothing pending leaves the wizard", ctx.back == 1)
 local release = writesOf(0x5F1B, before + 1)
 check("leaving releases the setup state", #release == 1 and bytes(release[1].payload) == "0,0,0")
 check("leaving frees the wizard's own modules but keeps the override ones",
-  package.loaded["wfsuite.lib.msp_mixer_rules"] == nil and package.loaded["wfsuite.app.setup_wizard_ui"] == nil
-  and package.loaded["wfsuite.app.plane3d"] == nil
-  and package.loaded["wfsuite.lib.msp_servo_config"] == nil and package.loaded["wfsuite.lib.msp_mixer_override"] ~= nil)
+  package.loaded["grsuite.lib.msp_mixer_rules"] == nil and package.loaded["grsuite.app.setup_wizard_ui"] == nil
+  and package.loaded["grsuite.app.plane3d"] == nil
+  and package.loaded["grsuite.lib.msp_servo_config"] == nil and package.loaded["grsuite.lib.msp_mixer_override"] ~= nil)
 check("nothing is held after leaving", not requireModule("lib/override_keepalive.lua").isActive("mode_override"))
 
 -- Discard writes back what was loaded ----------------------------------------
@@ -628,9 +628,9 @@ check("sensors: the restart shows a progress dialog with the countdown",
   and restartDialog.text == T("reboot_wait_fmt") and not restartDialog.closed,
   restartDialog and tostring(restartDialog.title) .. " " .. tostring(restartDialog.text))
 check("sensors: the step's own modules are freed when it closes",
-  package.loaded["wfsuite.lib.msp_board_mount_trim"] == nil and package.loaded["wfsuite.lib.msp_acc_calibration"] == nil
-  and package.loaded["wfsuite.lib.acc_calibration_wait"] == nil
-  and package.loaded["wfsuite.lib.msp_attitude"] == nil)
+  package.loaded["grsuite.lib.msp_board_mount_trim"] == nil and package.loaded["grsuite.lib.msp_acc_calibration"] == nil
+  and package.loaded["grsuite.lib.acc_calibration_wait"] == nil
+  and package.loaded["grsuite.lib.msp_attitude"] == nil)
 tick(3)
 check("sensors: the bar fills while the FC restarts",
   restartDialog and (restartDialog.values[#restartDialog.values] or 0) >= 10,
@@ -2272,11 +2272,11 @@ check("the last screen's way forward is Save and finish", footer()[#footer()].te
 
 do
   local ui = requireModule("app/setup_wizard_ui.lua")
-  package.loaded["wfsuite.test.loaded_first"] = {}
-  local owned = ui.notLoaded({"wfsuite.test.loaded_first", "wfsuite.test.absent"})
+  package.loaded["grsuite.test.loaded_first"] = {}
+  local owned = ui.notLoaded({"grsuite.test.loaded_first", "grsuite.test.absent"})
   check("a step frees only modules nothing else had loaded first",
-    #owned == 1 and owned[1] == "wfsuite.test.absent")
-  package.loaded["wfsuite.test.loaded_first"] = nil
+    #owned == 1 and owned[1] == "grsuite.test.absent")
+  package.loaded["grsuite.test.loaded_first"] = nil
 end
 
 -- Older firmware: explain and stop -------------------------------------------

@@ -116,7 +116,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 local CODEC_SRC = SUITE .. "/lib/msp_esc_parameters_hw5.lua"
 
@@ -162,7 +162,7 @@ local realLoadfile = loadfile
 local REPLACE_MATCH, REPLACE_FILE, replaceHits = nil, nil, 0
 
 -- requireModule() calls loadfile() with a path carrying no directory part; on the
--- radio the working directory is src/wfsuite.
+-- radio the working directory is src/grsuite.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
     if REPLACE_MATCH and REPLACE_FILE and path:match(REPLACE_MATCH) then
@@ -301,7 +301,7 @@ _G.form = {
   openProgressDialog = function() return dialogStub() end,
 }
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   publish = function(topic, message)
@@ -321,19 +321,19 @@ package.loaded["wfsuite.lib.bus"] = {
   end,
 }
 
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   open = function() return dialogStub() end,
   SPEED = { DEFAULT = 1, SLOW = 2, VSLOW = 3 },
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return false end,
   reloadConfirmEnabled = function() return true end,
   developerModeEnabled = function() return false end,
@@ -341,10 +341,10 @@ package.loaded["wfsuite.lib.settings_store"] = {
   save = function() end,
   DEFAULTS = { general = {}, developer = {} },
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { command = 250, isWrite = true } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
 
 local requireModule = assert(realLoadfile(PREFIX .. "lib/require.lua"))()
 
@@ -370,7 +370,7 @@ end
 -- The codec, and the block it reads
 -- ---------------------------------------------------------------------------
 
-local CODEC_KEY = "wfsuite.lib.msp_esc_parameters_hw5"
+local CODEC_KEY = "grsuite.lib.msp_esc_parameters_hw5"
 
 -- realLoadfile, deliberately, not the redirect above: the redirect prepends the
 -- suite prefix to anything ending in .lua, which is right for requireModule()'s bare

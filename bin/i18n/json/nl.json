@@ -232,8 +232,8 @@
       "max_length": 27
     },
     "msg_background_task_missing_body": {
-      "english": "Wingflight background task is not running. Enable it before opening menus.",
-      "translation": "Wingflight-achtergrondtaak wordt niet uitgevoerd. Schakel het in voordat u menu's opent.",
+      "english": "Gripora background task is not running. Enable it before opening menus.",
+      "translation": "Gripora-achtergrondtaak wordt niet uitgevoerd. Schakel het in voordat u menu's opent.",
       "needs_translation": false,
       "reverse_text": false,
       "max_length": 74
@@ -1468,8 +1468,8 @@
           "max_length": 11
         },
         "tbl_rotorflight": {
-          "english": "Wingflight",
-          "translation": "Wingflight",
+          "english": "Gripora",
+          "translation": "Gripora",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 10
@@ -2270,8 +2270,8 @@
           "max_length": 8
         },
         "feature_activelook": {
-          "english": "Wingflight ActiveLook",
-          "translation": "Wingflight Actieve look",
+          "english": "Gripora ActiveLook",
+          "translation": "Gripora Actieve look",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 21
@@ -5761,8 +5761,8 @@
           "reverse_text": false
         },
         "rf_version": {
-          "english": "Wingflight Version",
-          "translation": "Wingflight Versie",
+          "english": "Gripora Version",
+          "translation": "Gripora Versie",
           "needs_translation": false,
           "max_length": 18,
           "reverse_text": false
@@ -6272,9 +6272,9 @@
           "reverse_text": false,
           "max_length": 6
         },
-        "action_elrs_to_wf": {
-          "english": "ELRS -> WF",
-          "translation": "ELRS -> WF",
+        "action_elrs_to_gr": {
+          "english": "ELRS -> GR",
+          "translation": "ELRS -> GR",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 10
@@ -6293,9 +6293,9 @@
           "reverse_text": false,
           "max_length": 10
         },
-        "action_wf_to_elrs": {
-          "english": "WF -> ELRS",
-          "translation": "WF -> ELRS",
+        "action_gr_to_elrs": {
+          "english": "GR -> ELRS",
+          "translation": "GR -> ELRS",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 10
@@ -6328,9 +6328,9 @@
           "reverse_text": false,
           "max_length": 14
         },
-        "wingflight": {
-          "english": "Wingflight",
-          "translation": "Wingflight",
+        "gripora": {
+          "english": "Gripora",
+          "translation": "Gripora",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 10
@@ -6349,8 +6349,8 @@
           "reverse_text": false,
           "max_length": 24
         },
-        "status_elrs_matches_wf": {
-          "english": "ELRS module already matches Wingflight",
+        "status_elrs_matches_gr": {
+          "english": "ELRS module already matches Gripora",
           "translation": "ELRS module komt overeen",
           "needs_translation": false,
           "reverse_text": false,
@@ -6364,7 +6364,7 @@
           "max_length": 26
         },
         "status_elrs_updated": {
-          "english": "ELRS module updated from Wingflight",
+          "english": "ELRS module updated from Gripora",
           "translation": "ELRS module bijgewerkt",
           "needs_translation": false,
           "reverse_text": false,
@@ -6475,44 +6475,44 @@
           "reverse_text": false,
           "max_length": 28
         },
-        "status_waiting_wf_config": {
-          "english": "Waiting for Wingflight telemetry config",
-          "translation": "Wacht op Wingflight telemetrie config",
+        "status_waiting_gr_config": {
+          "english": "Waiting for Gripora telemetry config",
+          "translation": "Wacht op Gripora telemetrie config",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 39
         },
-        "status_wf_config_not_ready": {
-          "english": "Wingflight telemetry config was not ready",
-          "translation": "Wingflight telemetrie config was niet",
+        "status_gr_config_not_ready": {
+          "english": "Gripora telemetry config was not ready",
+          "translation": "Gripora telemetrie config was niet",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 41
         },
-        "status_wf_matches_elrs": {
-          "english": "Wingflight already matches ELRS",
-          "translation": "Wingflight komt al overeen met",
+        "status_gr_matches_elrs": {
+          "english": "Gripora already matches ELRS",
+          "translation": "Gripora komt al overeen met",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 31
         },
-        "status_wf_save_failed": {
-          "english": "Wingflight sync failed while saving",
-          "translation": "Wingflight sync mislukt bij opslaan",
+        "status_gr_save_failed": {
+          "english": "Gripora sync failed while saving",
+          "translation": "Gripora sync mislukt bij opslaan",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 35
         },
-        "status_wf_updated": {
-          "english": "Wingflight updated from ELRS",
-          "translation": "Wingflight bijgewerkt van",
+        "status_gr_updated": {
+          "english": "Gripora updated from ELRS",
+          "translation": "Gripora bijgewerkt van",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 28
         },
-        "status_wf_write_failed": {
-          "english": "Wingflight sync write failed",
-          "translation": "Wingflight sync schrijven",
+        "status_gr_write_failed": {
+          "english": "Gripora sync write failed",
+          "translation": "Gripora sync schrijven",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 28
@@ -6531,16 +6531,16 @@
           "reverse_text": false,
           "max_length": 8
         },
-        "status_writing_wf": {
-          "english": "Writing Wingflight telemetry settings",
-          "translation": "Wingflight telemetrie instellingen",
+        "status_writing_gr": {
+          "english": "Writing Gripora telemetry settings",
+          "translation": "Gripora telemetrie instellingen",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 37
         },
-        "status_saving_wf": {
-          "english": "Saving Wingflight telemetry",
-          "translation": "Wingflight telemetrie",
+        "status_saving_gr": {
+          "english": "Saving Gripora telemetry",
+          "translation": "Gripora telemetrie",
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 27
@@ -13948,8 +13948,8 @@
         "max_length": 24
       },
       "startup_waiting_task_detail": {
-        "english": "Waiting for Wingflight task.",
-        "translation": "Wachten op taak Wingflight.",
+        "english": "Waiting for Gripora task.",
+        "translation": "Wachten op taak Gripora.",
         "needs_translation": false,
         "reverse_text": false,
         "max_length": 28

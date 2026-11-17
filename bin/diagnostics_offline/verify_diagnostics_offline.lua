@@ -9,8 +9,8 @@
 --   * The Status page's API line is OK only on a live link whose MSP API version is
 --     supported. Without a connection it is "-", never OK.
 --
--- What it drives: the real src/wfsuite/app/tool.lua menu text (the offline flags, read
--- from source), and the real src/wfsuite/app/pages/diagnostics_rfstatus.lua, with a
+-- What it drives: the real src/grsuite/app/tool.lua menu text (the offline flags, read
+-- from source), and the real src/grsuite/app/pages/diagnostics_rfstatus.lua, with a
 -- recording form and a header stub. The Ethos colour globals are stubbed too.
 
 local function scriptDir()
@@ -20,7 +20,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -37,7 +37,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -47,7 +47,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -122,10 +122,10 @@ system = {
 }
 model = {getModule = function() return nil end}
 
-package.loaded["wfsuite.app.header"] = {build = function()
+package.loaded["grsuite.app.header"] = {build = function()
   return {focusReload = function() end, focusTool = function() end, setToolEnabled = function() end}
 end}
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return false end}
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return false end}
 
 local page = requireModule("app/pages/diagnostics_rfstatus.lua")
 local bus = requireModule("lib/bus.lua")

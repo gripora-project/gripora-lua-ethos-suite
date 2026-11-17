@@ -43,8 +43,8 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local BUS_LUA = ROOT .. "/src/wfsuite/lib/bus.lua"
-local CONTEXT_LUA = ROOT .. "/src/wfsuite/widgets/dashboard/context.lua"
+local BUS_LUA = ROOT .. "/src/grsuite/lib/bus.lua"
+local CONTEXT_LUA = ROOT .. "/src/grsuite/widgets/dashboard/context.lua"
 
 local failures = 0
 local checks = 0
@@ -128,7 +128,7 @@ print("bus.lua")
 -- bus.lua caches itself in package.loaded, so every scenario needs the cache
 -- cleared first or it would get the previous scenario's instance.
 local function newBus()
-  package.loaded["wfsuite.bus"] = nil
+  package.loaded["grsuite.bus"] = nil
   return assert(loadfile(BUS_LUA))()
 end
 
@@ -331,18 +331,18 @@ end
 print("")
 print("widgets/dashboard/context.lua -- transform")
 
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   if name == "lib/build_info.lua" then return { version = "harness" } end
   if name == "lib/engine_type.lua" then return {} end
   if name == "lib/ethos_version.lua" then return "1.0" end
   -- The shared min/max/average sampler the dashboard records with (#2344).
-  if name == "lib/flight_stats.lua" then return assert(loadfile(ROOT .. "/src/wfsuite/lib/flight_stats.lua"))() end
-  if name == "lib/live_sensors.lua" then return assert(loadfile(ROOT .. "/src/wfsuite/lib/live_sensors.lua"))() end
+  if name == "lib/flight_stats.lua" then return assert(loadfile(ROOT .. "/src/grsuite/lib/flight_stats.lua"))() end
+  if name == "lib/live_sensors.lua" then return assert(loadfile(ROOT .. "/src/grsuite/lib/live_sensors.lua"))() end
   error("unexpected dependency: " .. tostring(name))
 end
 lcd = { RGB = function(r, g, b, a) return r end }
 
-package.loaded["wfsuite.dashboard.context"] = nil
+package.loaded["grsuite.dashboard.context"] = nil
 local context = assert(loadfile(CONTEXT_LUA))()
 local utils = context.widgets.dashboard.utils
 
@@ -543,8 +543,8 @@ do
   -- Record through the real path: the session's flight record on this state, the armed
   -- edge and then 2.5 s in flight with the governor active, so the powered gate has
   -- opened and the rpm and current minima are taken too.
-  local liveSensors = dofile(ROOT .. "/src/wfsuite/lib/live_sensors.lua")
-  local record = dofile(ROOT .. "/src/wfsuite/lib/flight_stats.lua").new()
+  local liveSensors = dofile(ROOT .. "/src/grsuite/lib/live_sensors.lua")
+  local record = dofile(ROOT .. "/src/grsuite/lib/flight_stats.lua").new()
   record.stats = stats
   widget.isArmed, widget.governorState, widget.mcuId = true, 4, "churn"
   for tick = 1, 6 do record:update(widget, liveSensors.read, tick * 0.5) end
@@ -605,9 +605,9 @@ do
   widget.tempMcu = 20
   context.preferences.general.temperature_unit = 0
   -- Recorded by the session's flight record, as on the radio (#2344).
-  local record = dofile(ROOT .. "/src/wfsuite/lib/flight_stats.lua").new()
+  local record = dofile(ROOT .. "/src/grsuite/lib/flight_stats.lua").new()
   record.stats = widget.dashboardStats
-  local liveSensors = dofile(ROOT .. "/src/wfsuite/lib/live_sensors.lua")
+  local liveSensors = dofile(ROOT .. "/src/grsuite/lib/live_sensors.lua")
   widget.isArmed, widget.governorState, widget.mcuId = true, 4, "temp"
   record:update(widget, liveSensors.read, 0.5)
   record:update(widget, liveSensors.read, 1.0)

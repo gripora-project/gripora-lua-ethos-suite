@@ -6,7 +6,7 @@ sidebar_label: Pages
 # Configuration pages
 
 Reference documentation for each configuration and settings page reachable
-within the WFSuite Ethos system tool.
+within the GRSuite Ethos system tool.
 
 **Coverage:** 88 reachable pages in navigation hierarchy. Drafts require review.
 

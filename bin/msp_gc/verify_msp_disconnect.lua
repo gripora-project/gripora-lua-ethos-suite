@@ -29,7 +29,7 @@ local function scriptDir()
 end
 
 local ROOT = (scriptDir() .. "/../.."):gsub("\\", "/")
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 local TASKS = SUITE .. "/tasks"
 local MSP = TASKS .. "/msp"
 
@@ -51,7 +51,7 @@ end
 -- tasks/session.lua
 -- ---------------------------------------------------------------------------
 
--- session.lua resolves its dependencies through wfsuite.lib.require and reads
+-- session.lua resolves its dependencies through grsuite.lib.require and reads
 -- several Ethos globals at load time. Both are replaced here: the loader by a
 -- map handing out the smallest module satisfying each call site (the same map
 -- bin/tests/session_handshake.lua uses), the globals by the values session.lua
@@ -114,7 +114,7 @@ local function loadSession(opts)
     -- session.lua publishes the main-power flag through this pure module (#2358 port).
     ["lib/main_power.lua"] = assert(loadfile(SUITE .. "/lib/main_power.lua"))(),
   }
-  package.loaded["wfsuite.lib.require"] = function(path)
+  package.loaded["grsuite.lib.require"] = function(path)
     return assert(modules[path], "unexpected dependency: " .. tostring(path))
   end
 

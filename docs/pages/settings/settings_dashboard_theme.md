@@ -40,7 +40,7 @@ firmware defaults; wire values may need scaling before display.
 
 ## User themes
 
-Themes in folders under `SCRIPTS:/wfsuite.user/dashboard/<folder>/` are listed
+Themes in folders under `SCRIPTS:/grsuite.user/dashboard/<folder>/` are listed
 after the shipped themes, under their folder names, in every theme field on this
 page. The folder is read again each time the page opens. A user theme that
 cannot be loaded is drawn as **Default**. This page shows **Default** for a
@@ -83,6 +83,6 @@ in once a flight has been recorded.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/settings_dashboard_theme.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/settings_dashboard_theme.lua). Menu conditions come from `app/tool.lua`.
 
-*Scaffolded against WFSuite Ethos 2.3.1; content awaiting review.*
+*Scaffolded against GRSuite Ethos 2.3.1; content awaiting review.*

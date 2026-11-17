@@ -4,7 +4,7 @@ local function equal(a,b) assert(a==b,tostring(a)..' ~= '..tostring(b)) end
 KEY_ENTER_LONG,KEY_ENTER_BREAK=100,101
 system={killEvents=function(key) equal(key,KEY_ENTER_BREAK) end}
 local function fixture(multi, armedGate, prefetched)
-  package.loaded['wfsuite.app.page_runtime']=nil
+  package.loaded['grsuite.app.page_runtime']=nil
   local reads, writes, dialogs={},{},{}
   local wakeup,event,cleanup,headerOptions
   local focused,enabled,enableCalls=nil,nil,0
@@ -26,7 +26,7 @@ local function fixture(multi, armedGate, prefetched)
     ['lib/msp_eeprom.lua']={buildWriteMessage=function(ok,err) return {kind='eeprom',ok=ok,err=err} end},
     ['lib/msp_reboot.lua']={},
     ['app/close_key.lua']={shouldHandleClose=function() return false end},
-    ['app/leave_confirm.lua']=assert(loadfile('src/wfsuite/app/leave_confirm.lua'))(),
+    ['app/leave_confirm.lua']=assert(loadfile('src/grsuite/app/leave_confirm.lua'))(),
     ['app/header.lua']={build=function(_,options)
       headerOptions=options
       return {setTitle=function() end,setSaveEnabled=function(value) enabled=value; enableCalls=enableCalls+1 end,
@@ -38,12 +38,12 @@ local function fixture(multi, armedGate, prefetched)
       saveConfirmEnabled=function() return confirmations end,reloadConfirmEnabled=function() return false end},
     ['app/progress_dialog.lua']=progress,
   }
-  package.loaded['wfsuite.lib.require']=function(path) return assert(modules[path],path) end
+  package.loaded['grsuite.lib.require']=function(path) return assert(modules[path],path) end
   form={openDialog=function(spec)
     local dialog={spec=spec,close=function(self) self.closed=true; if spec.close then spec.close() end end}
     dialogs[#dialogs+1]=dialog; return dialog
   end}
-  local Runtime=assert(loadfile('src/wfsuite/app/page_runtime.lua'))()
+  local Runtime=assert(loadfile('src/grsuite/app/page_runtime.lua'))()
   local opts={setWakeupHandler=function(fn) wakeup=fn end,setEventHandler=function(fn) event=fn end,
     setCleanupHandler=function(fn) cleanup=fn end}
   local config={pageTitle='Test',mspModule=codec,opts=opts,isMspPage=armedGate,initialData=prefetched}

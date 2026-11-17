@@ -1,10 +1,10 @@
--- Behaviour check for the WingFlight Ports page labels (#2359, ported from Rotorflight).
+-- Behaviour check for the Gripora Ports page labels (#2359, ported from Rotorflight).
 --
 -- Run it:
 --     lua5.4 bin/port_labels/verify_port_labels.lua
 --
 -- What it drives:
---   * lib/port_labels.lua: the Wingflight Configurator's connector names per board design
+--   * lib/port_labels.lua: the Gripora Configurator's connector names per board design
 --     (the Setup Wizard's Servo bus step finds the SBUS connector by them), and the lookup
 --     logic itself with test entries injected into the same tables.
 --   * lib/msp_board_info.lua: parse() of MSP_BOARD_INFO replies, including truncated and
@@ -17,13 +17,13 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local LIB = ROOT .. "/src/wfsuite/lib/"
+local LIB = ROOT .. "/src/grsuite/lib/"
 
 -- Modules resolve their own requires through lib/require.lua relative to the working
 -- directory. Load the memoizer and the codec from the repo root, so the harness works
 -- from any directory.
 assert(loadfile(LIB .. "require.lua"))()
-package.loaded["wfsuite.lib.mspcodec"] = assert(loadfile(LIB .. "mspcodec.lua"))()
+package.loaded["grsuite.lib.mspcodec"] = assert(loadfile(LIB .. "mspcodec.lua"))()
 
 local port_labels = assert(loadfile(LIB .. "port_labels.lua"))()
 local msp_board_info = assert(loadfile(LIB .. "msp_board_info.lua"))()
@@ -52,7 +52,7 @@ end
 -- (msp.c) and the Configurator parser.
 local function boardInfoReply(opts)
   local buf = {}
-  for _, b in ipairs(bytesOf(opts.identifier or "WGFL")) do buf[#buf + 1] = b end
+  for _, b in ipairs(bytesOf(opts.identifier or "GRPA")) do buf[#buf + 1] = b end
   local version = opts.version or 0
   buf[#buf + 1] = version % 256
   buf[#buf + 1] = math.floor(version / 256)
@@ -72,7 +72,7 @@ local function truncate(buf, n)
 end
 
 -- ---------------------------------------------------------------------------
-print("labels: the Wingflight Configurator's names per board design")
+print("labels: the Gripora Configurator's names per board design")
 -- ---------------------------------------------------------------------------
 
 check("RF007 (F7B5): UART1 is S.BUS", port_labels.lookup("F7B5", 0) == "S.BUS", port_labels.lookup("F7B5", 0))

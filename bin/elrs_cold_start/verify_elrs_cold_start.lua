@@ -33,7 +33,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local TASKS = ROOT .. "/src/wfsuite/tasks"
+local TASKS = ROOT .. "/src/grsuite/tasks"
 
 local failures = 0
 local checks = 0
@@ -91,7 +91,7 @@ local function decodeOneByte(data, pos)
   return data[pos], pos + 1
 end
 
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   if name == "lib/debug_log.lua" then
     return {
       print = function() end,

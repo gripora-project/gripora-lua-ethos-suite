@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Generate and verify configuration page documentation for WFSuite Ethos.
+"""Generate and verify configuration page documentation for GRSuite Ethos.
 
 Adapted from rotorflight/rotorflight-lua-ethos-suite PR #2369 (GPLv3).
 
-Parses the menu navigation structure in src/wfsuite/app/tool.lua and
-page definitions in src/wfsuite/app/pages/*.lua to generate, update, and
+Parses the menu navigation structure in src/grsuite/app/tool.lua and
+page definitions in src/grsuite/app/pages/*.lua to generate, update, and
 validate documentation skeletons in docs/pages/ conforming to docs/_template.md.
 
 Usage:
@@ -22,16 +22,16 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-TOOL_PATH = REPO_ROOT / "src" / "wfsuite" / "app" / "tool.lua"
-I18N_PATH = REPO_ROOT / "src" / "wfsuite" / "i18n" / "en.json"
+TOOL_PATH = REPO_ROOT / "src" / "grsuite" / "app" / "tool.lua"
+I18N_PATH = REPO_ROOT / "src" / "grsuite" / "i18n" / "en.json"
 DOCS_PAGES_DIR = REPO_ROOT / "docs" / "pages"
 TEMPLATE_PATH = REPO_ROOT / "docs" / "_template.md"
 INDEX_PATH = DOCS_PAGES_DIR / "README.md"
-MAIN_PATH = REPO_ROOT / "src" / "wfsuite" / "main.lua"
+MAIN_PATH = REPO_ROOT / "src" / "grsuite" / "main.lua"
 
 
 def get_suite_version():
-    """Extract suite version string from src/wfsuite/main.lua."""
+    """Extract suite version string from src/grsuite/main.lua."""
     if not MAIN_PATH.exists():
         raise ValueError("Cannot determine suite version from main.lua")
     content = MAIN_PATH.read_text(encoding="utf-8")
@@ -71,7 +71,7 @@ def tr(text):
 
 
 # Stable filenames derived from the script, grouped by the root menu ID.
-# No second, manually maintained inventory of Wingflight pages.
+# No second, manually maintained inventory of Gripora pages.
 def doc_path_for(script, domain=""):
     prefix = domain.removesuffix("_menu")
     return f"{prefix + '/' if prefix else ''}{Path(script).stem}.md"
@@ -239,14 +239,14 @@ def parse_lua_menus():
     if len(paths) != len(set(paths)):
         raise ValueError("Duplicate documentation paths; review menu aliases")
     for page in pages_list:
-        if not (REPO_ROOT / "src/wfsuite" / page["script"]).is_file():
+        if not (REPO_ROOT / "src/grsuite" / page["script"]).is_file():
             raise ValueError(f"Missing page source: {page['script']}")
     return pages_list
 
 
 def parse_page_lua(script_path):
     """Best-effort literal control labels, in source order; never execute Lua."""
-    content = strip_comments((REPO_ROOT / "src/wfsuite" / script_path).read_text(encoding="utf-8"))
+    content = strip_comments((REPO_ROOT / "src/grsuite" / script_path).read_text(encoding="utf-8"))
     quoted = r'("(?:[^"\\]|\\.)*")'
     matches = []
     for pattern in (
@@ -301,7 +301,7 @@ def format_settings_table(fields):
 def generate_page_doc(page_info, suite_version):
     """Create a draft from the shared template; edited docs are maintained by hand."""
     parsed = parse_page_lua(page_info["script"])
-    source = REPO_ROOT / "src/wfsuite" / page_info["script"]
+    source = REPO_ROOT / "src/grsuite" / page_info["script"]
     target = DOCS_PAGES_DIR / page_info["doc_path"]
     values = {
         "title_yaml": json.dumps(page_info["title"], ensure_ascii=False),
@@ -372,7 +372,7 @@ def update_index():
         "# Configuration pages",
         "",
         "Reference documentation for each configuration and settings page reachable",
-        "within the WFSuite Ethos system tool.",
+        "within the GRSuite Ethos system tool.",
         "",
         f"**Coverage:** {len(pages)} reachable pages in navigation hierarchy. Drafts require review.",
         "",

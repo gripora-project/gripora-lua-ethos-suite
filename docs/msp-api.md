@@ -9,11 +9,11 @@ The intended audience is developers who need to understand or reimplement the Lu
 
 Main files:
 
-- `src/wfsuite/tasks/scheduler/msp/api.lua`: API module loader, caches, help injection, apidata storage helpers.
-- `src/wfsuite/tasks/scheduler/msp/api/core.lua`: factory functions used by individual API modules.
-- `src/wfsuite/tasks/scheduler/msp/api/*.lua`: individual API definitions.
-- `src/wfsuite/tasks/scheduler/msp/apihelp/*.lua`: optional field help metadata.
-- `src/wfsuite/app/lib/ui.lua`: main page read/save orchestration and `apidata` persistence.
+- `src/grsuite/tasks/scheduler/msp/api.lua`: API module loader, caches, help injection, apidata storage helpers.
+- `src/grsuite/tasks/scheduler/msp/api/core.lua`: factory functions used by individual API modules.
+- `src/grsuite/tasks/scheduler/msp/api/*.lua`: individual API definitions.
+- `src/grsuite/tasks/scheduler/msp/apihelp/*.lua`: optional field help metadata.
+- `src/grsuite/app/lib/ui.lua`: main page read/save orchestration and `apidata` persistence.
 
 ## Purpose
 
@@ -30,7 +30,7 @@ The MSP API layer converts named API definitions such as `BATTERY_CONFIG` or `ES
 The API layer does not send bytes directly. It always hands logical messages to:
 
 ```lua
-wfsuite.tasks.msp.mspQueue:add(message)
+grsuite.tasks.msp.mspQueue:add(message)
 ```
 
 The queue and transport layers then handle retries, framing, chunking, and telemetry I/O.
@@ -117,7 +117,7 @@ Only one candidate is normally active. A registered path replaces the default pa
 The main entry point is:
 
 ```lua
-local API = wfsuite.tasks.msp.api.load("BATTERY_CONFIG")
+local API = grsuite.tasks.msp.api.load("BATTERY_CONFIG")
 ```
 
 Optional help loading:

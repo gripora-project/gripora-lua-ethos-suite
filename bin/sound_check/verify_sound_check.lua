@@ -1,7 +1,7 @@
 -- Verification harness for bin/sound-generator/generate-googleapi.py --check (issue #2366).
 --
 -- The generator reconciles the announcement manifests (bin/sound-generator/json/<locale>.json)
--- with the shipped audio tree (src/wfsuite/audio/<locale>/<variant>/). It runs offline: neither
+-- with the shipped audio tree (src/grsuite/audio/<locale>/<variant>/). It runs offline: neither
 -- Google speech credentials nor the sox / google-cloud-texttospeech packages are imported
 -- unless prompts are actually built.
 --
@@ -68,7 +68,7 @@ local function writeFile(path, content)
 end
 
 local SCRATCH = (os.getenv("TMPDIR") or os.getenv("TEMP") or os.getenv("TMP")
-  or (IS_WINDOWS and "." or "/tmp")) .. "/wfsuite_sound_check"
+  or (IS_WINDOWS and "." or "/tmp")) .. "/grsuite_sound_check"
 removeTree(SCRATCH)
 makeDir(SCRATCH)
 

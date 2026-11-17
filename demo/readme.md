@@ -1,18 +1,18 @@
-**WFSUITE DEMO**
+**GRSUITE DEMO**
 
 Frsky have been making some fantastic new features.
 
-This tool allows you to run a fully setup 'wfsuite' install within your browser.
+This tool allows you to run a fully setup 'grsuite' install within your browser.
 
 To view the demo; click the link below
 
 
-[Launch WFSuite Demo - English](https://ethos.studio1247.com/nightly16/X20PRO_FCC?backup=https:%2F%2Fgithub.com%2Frotorflight%2Frotorflight-lua-ethos-suite%2Fraw%2Frefs%2Fheads%2Fmaster%2Fdemo%2FDEMO.zip&reset=all&language=en&sidenav=false)
+[Launch GRSuite Demo - English](https://ethos.studio1247.com/nightly16/X20PRO_FCC?backup=https:%2F%2Fgithub.com%2Frotorflight%2Frotorflight-lua-ethos-suite%2Fraw%2Frefs%2Fheads%2Fmaster%2Fdemo%2FDEMO.zip&reset=all&language=en&sidenav=false)
 
-[Launch WFSuite Demo - German](https://ethos.studio1247.com/nightly16/X20PRO_FCC?backup=https:%2F%2Fgithub.com%2Frotorflight%2Frotorflight-lua-ethos-suite%2Fraw%2Frefs%2Fheads%2Fmaster%2Fdemo%2FDEMO.zip&reset=all&language=de&sidenav=false)
+[Launch GRSuite Demo - German](https://ethos.studio1247.com/nightly16/X20PRO_FCC?backup=https:%2F%2Fgithub.com%2Frotorflight%2Frotorflight-lua-ethos-suite%2Fraw%2Frefs%2Fheads%2Fmaster%2Fdemo%2FDEMO.zip&reset=all&language=de&sidenav=false)
 
-[Launch WFSuite Demo - Dutch](https://ethos.studio1247.com/nightly16/X20PRO_FCC?backup=https:%2F%2Fgithub.com%2Frotorflight%2Frotorflight-lua-ethos-suite%2Fraw%2Frefs%2Fheads%2Fmaster%2Fdemo%2FDEMO.zip&reset=all&language=nl&sidenav=false)
+[Launch GRSuite Demo - Dutch](https://ethos.studio1247.com/nightly16/X20PRO_FCC?backup=https:%2F%2Fgithub.com%2Frotorflight%2Frotorflight-lua-ethos-suite%2Fraw%2Frefs%2Fheads%2Fmaster%2Fdemo%2FDEMO.zip&reset=all&language=nl&sidenav=false)
 
-[Launch WFSuite Demo - Spanish](https://ethos.studio1247.com/nightly16/X20PRO_FCC?backup=https:%2F%2Fgithub.com%2Frotorflight%2Frotorflight-lua-ethos-suite%2Fraw%2Frefs%2Fheads%2Fmaster%2Fdemo%2FDEMO.zip&reset=all&language=es&sidenav=false)
+[Launch GRSuite Demo - Spanish](https://ethos.studio1247.com/nightly16/X20PRO_FCC?backup=https:%2F%2Fgithub.com%2Frotorflight%2Frotorflight-lua-ethos-suite%2Fraw%2Frefs%2Fheads%2Fmaster%2Fdemo%2FDEMO.zip&reset=all&language=es&sidenav=false)
 
 Please be patient and allow the page to load - without clicking on any of the links on the page.

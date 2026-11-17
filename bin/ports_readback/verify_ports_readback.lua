@@ -5,7 +5,7 @@
 --     lua5.4 bin/ports_readback/verify_ports_readback.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/pages/ports.lua, the real bus and the real
+--   * The real src/grsuite/app/pages/ports.lua, the real bus and the real
 --     lib/port_labels.lua. The MSP modules are stubs: each message records its kind,
 --     and the scenario answers it the way the FC would (processReply on success,
 --     errorHandler on refusal).
@@ -28,7 +28,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -45,7 +45,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -55,7 +55,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -100,10 +100,10 @@ form.openDialog = function(opts) dialogs[#dialogs + 1] = opts end
 
 local headerOpts = nil
 local headerHandle = anything()
-package.loaded["wfsuite.app.header"] = {build = function(_, opts) headerOpts = opts; return headerHandle end}
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return true end}
-package.loaded["wfsuite.app.progress_dialog"] = {open = function() return {value = function() end, close = function() end} end}
-package.loaded["wfsuite.lib.memstats"] = {print = function() end}
+package.loaded["grsuite.app.header"] = {build = function(_, opts) headerOpts = opts; return headerHandle end}
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return true end}
+package.loaded["grsuite.app.progress_dialog"] = {open = function() return {value = function() end, close = function() end} end}
+package.loaded["grsuite.lib.memstats"] = {print = function() end}
 
 -- Every MSP message the page publishes, in order, each with its kind.
 local sent = {}
@@ -116,18 +116,18 @@ local function message(kind, onOk, onErr, extra)
 end
 
 local rxReads = 0
-package.loaded["wfsuite.lib.msp_rx_config"] = {
+package.loaded["grsuite.lib.msp_rx_config"] = {
   buildReadMessage = function(onOk, onErr)
     rxReads = rxReads + 1
     return message("rxRead", onOk, onErr)
   end,
 }
-package.loaded["wfsuite.lib.msp_board_info"] = {
+package.loaded["grsuite.lib.msp_board_info"] = {
   buildReadMessage = function(onOk, onErr)
     return message("boardInfo", onOk, onErr)
   end,
 }
-package.loaded["wfsuite.lib.msp_serial_config"] = {
+package.loaded["grsuite.lib.msp_serial_config"] = {
   buildReadMessage = function(onOk, onErr)
     return message("serialRead", onOk, onErr)
   end,
@@ -135,12 +135,12 @@ package.loaded["wfsuite.lib.msp_serial_config"] = {
     return message("serialWrite", onOk, onErr)
   end,
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function(onOk, onErr)
     return message("eeprom", onOk, onErr)
   end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = {
+package.loaded["grsuite.lib.msp_reboot"] = {
   buildWriteMessage = function()
     return message("reboot", nil, nil)
   end,
@@ -189,7 +189,7 @@ local function openAndLoad(firstFunction, apiMinor)
   -- The session's snapshot carries the firmware's minor API version (#2497). It is published on
   -- every open, nil included: the bus retains session.update and replays it to a new page, so a
   -- stale version from an earlier open would otherwise stand in for "not known yet".
-  require("wfsuite.lib.bus").publish("session.update", {isArmed = false, apiVersionMinor = apiMinor})
+  require("grsuite.lib.bus").publish("session.update", {isArmed = false, apiVersionMinor = apiMinor})
   lastMessage().processReply({board_design = "", board_name = "", identifier = 0})   -- boardInfo
   lastMessage().processReply(boardPorts(firstFunction))                              -- serialRead
   -- The unpatched page also reads MSP_RX_CONFIG before it renders. The read is counted
@@ -320,7 +320,7 @@ check("a port that already carries CRSF sensors keeps it on a 12.09 board",
 print("function list after the handshake")
 openAndLoad(0, nil)
 choiceCalls = {}
-require("wfsuite.lib.bus").publish("session.update", {isArmed = false, apiVersionMinor = 10})
+require("grsuite.lib.bus").publish("session.update", {isArmed = false, apiVersionMinor = 10})
 if wakeupHandler then wakeupHandler() end
 check("a handshake that lands after the load rebuilds the list with CRSF sensors",
   anyFunctionListHas(CRSF_SENSORS))

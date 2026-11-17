@@ -11,7 +11,7 @@
 -- accelerometer ended in "focusFn is not callable (a table value)" from
 -- closeDialog().
 --
--- What it drives: the real src/wfsuite/app/page_runtime.lua under stubs, with
+-- What it drives: the real src/grsuite/app/page_runtime.lua under stubs, with
 -- a header stub that keeps the opts buildChrome() hands it, so pressing Tool
 -- runs exactly the closure the radio would. The checks go red on the pre-fix
 -- page_runtime.lua: the page receives the runtime table, and closeDialog()
@@ -24,7 +24,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local out = print
@@ -108,34 +108,34 @@ _G.KEY_ENTER_LONG, _G.KEY_RTN_BREAK, _G.KEY_EXIT_BREAK, _G.KEY_ENTER_BREAK = 0x0
 
 -- ── module stubs ───────────────────────────────────────────────────────────
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   publish = function() end,
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return true end,
   reloadConfirmEnabled = function() return true end,
   load = function() return {} end,
   save = function() end,
   DEFAULTS = {},
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return {} end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
 
 local headerOpts = nil
 local toolFocused = 0
-package.loaded["wfsuite.app.header"] = {
+package.loaded["grsuite.app.header"] = {
   build = function(_, opts)
     headerOpts = opts
     return {

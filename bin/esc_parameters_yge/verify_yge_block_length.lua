@@ -2,7 +2,7 @@
 --
 -- This is the port of the same change on the Rotorflight side of the pair -- see
 -- rotorflight/rotorflight-lua-ethos-suite #2458 -- and the two codecs this file
--- drives differ in four lines, all of them the `rfsuite` -> `wfsuite` namespace. The
+-- drives differ in four lines, all of them the `rfsuite` -> `grsuite` namespace. The
 -- defect was present here identically and was measured here before anything was
 -- changed: the shipped fixture is 58 bytes, bytes 3..4 read 32, and 2 + 32 * 2 = 66.
 --
@@ -75,7 +75,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 
 local SELF_TEST = arg[1] == "--self-test"
@@ -251,7 +251,7 @@ _G.form = {
   openProgressDialog = function() return dialogStub() end,
 }
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   publish = function(topic, message)
@@ -267,19 +267,19 @@ package.loaded["wfsuite.lib.bus"] = {
   end,
 }
 
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   open = function() return dialogStub() end,
   SPEED = { DEFAULT = 1, SLOW = 2, VSLOW = 3 },
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return false end,
   reloadConfirmEnabled = function() return true end,
   developerModeEnabled = function() return false end,
@@ -287,10 +287,10 @@ package.loaded["wfsuite.lib.settings_store"] = {
   save = function() end,
   DEFAULTS = { general = {}, developer = {} },
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { command = 250, isWrite = true } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
 
 local requireModule = assert(realLoadfile(PREFIX .. "lib/require.lua"))()
 
@@ -366,12 +366,12 @@ local function freshOpts()
 end
 
 local function resetModules()
-  package.loaded["wfsuite.app.pages.esc_forward_vendor"] = nil
-  package.loaded["wfsuite.app.esc_error"] = nil
-  package.loaded["wfsuite.app.close_key"] = nil
-  package.loaded["wfsuite.lib.msp_4wif_esc_fwd_prog"] = nil
-  package.loaded["wfsuite.app.pages.esc_forward_yge"] = nil
-  package.loaded["wfsuite.lib.msp_esc_parameters_yge"] = nil
+  package.loaded["grsuite.app.pages.esc_forward_vendor"] = nil
+  package.loaded["grsuite.app.esc_error"] = nil
+  package.loaded["grsuite.app.close_key"] = nil
+  package.loaded["grsuite.lib.msp_4wif_esc_fwd_prog"] = nil
+  package.loaded["grsuite.app.pages.esc_forward_yge"] = nil
+  package.loaded["grsuite.lib.msp_esc_parameters_yge"] = nil
 end
 
 local function rowField(key)
@@ -854,7 +854,7 @@ if SELF_TEST then
   -- payload is 58 bytes whatever the count says, and decode() reports no length at
   -- all. Any one of them alone could be satisfied by a partial cut.
   do
-    package.loaded["wfsuite.lib.msp_esc_parameters_yge"] = nil
+    package.loaded["grsuite.lib.msp_esc_parameters_yge"] = nil
     local pre = assert(realLoadfile(file))()
     local problems = {}
     local fixture = pre.buildReadMessage(function() end, function() end).simulatorResponse

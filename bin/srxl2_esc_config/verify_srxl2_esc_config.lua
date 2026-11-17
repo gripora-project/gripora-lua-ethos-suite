@@ -1,8 +1,8 @@
 -- Behaviour check for the SRXL2 ESC config codec (lib/msp_srxl2_esc_config.lua)
 -- and the page and menu row that use it.
 --
--- Ported from rotorflight-lua-ethos-suite PR #2680; adapted to the wfsuite/
--- paths and wingflight-firmware's command ids.
+-- Ported from rotorflight-lua-ethos-suite PR #2680; adapted to the grsuite/
+-- paths and gripora-firmware's command ids.
 --
 -- Run it:
 --     lua5.4 bin/srxl2_esc_config/verify_srxl2_esc_config.lua
@@ -12,7 +12,7 @@
 --     decode/encode path runs on a workstation through the real message
 --     builders.
 --   * The wire sizes are transcribed from the firmware handler
---     (wingflight-firmware PR #257, msp.c): MSP2_WING_SRXL2_ESC_CONFIG (0x5F35)
+--     (gripora-firmware PR #257, msp.c): MSP2_WING_SRXL2_ESC_CONFIG (0x5F35)
 --     replies U8 version (1), U16 throttle_rate_hz, U8 telem_interval_frames,
 --     U8 motor2_channel = 5 bytes; MSP2_WING_SET_SRXL2_ESC_CONFIG (0x5F36) takes
 --     the same fields without the version byte, 4 bytes.
@@ -31,7 +31,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local failures = 0
 local checks = 0
@@ -47,8 +47,8 @@ local function check(label, ok, detail)
   end
 end
 
-package.loaded["wfsuite.lib.require"] = function(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+package.loaded["grsuite.lib.require"] = function(name)
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(SUITE .. "/" .. name)
@@ -59,7 +59,7 @@ package.loaded["wfsuite.lib.require"] = function(name)
   return package.loaded[key]
 end
 
-local requireModule = package.loaded["wfsuite.lib.require"]
+local requireModule = package.loaded["grsuite.lib.require"]
 local codec = requireModule("lib/msp_srxl2_esc_config.lua")
 
 local function readFile(path)

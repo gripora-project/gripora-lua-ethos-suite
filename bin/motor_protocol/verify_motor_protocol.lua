@@ -56,7 +56,7 @@
 --    change.
 --
 --    The firmware kept slot 4 as a placeholder so the numbers after it would not
---    move; wingflight-firmware src/main/drivers/motor.h:34 still carries
+--    move; gripora-firmware src/main/drivers/motor.h:34 still carries
 --    "// BRUSHED" on PWM_TYPE_RESERVED, and checkMotorProtocolEnabled() in
 --    drivers/motor.c:155-177 has no case for it -- an FC configured with 4 reports the
 --    motor output as not enabled. So the menu offered a value the firmware calls
@@ -107,7 +107,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 local CODEC_SRC = SUITE .. "/lib/msp_motor_config.lua"
 
@@ -164,11 +164,11 @@ local REPLACE_ENABLED = false
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
     -- requireModule() calls loadfile() with a path carrying no directory part; on the
-    -- radio the working directory is src/wfsuite.
+    -- radio the working directory is src/grsuite.
     --
     -- NO sabotage redirect here. An earlier version of this file put one in, and it
     -- broke two unrelated things at once: it double-prefixed the absolute paths the
-    -- page loaders pass (giving "wfsuite/bin/.../wfsuite/app/pages/..."), and because
+    -- page loaders pass (giving "grsuite/bin/.../grsuite/app/pages/..."), and because
     -- lib/require.lua resolves its own modules through the global loadfile, it also
     -- re-prefixed names it had already resolved -- "cannot open app/field_layout.lua".
     -- The redirect belongs where the path is built, not in every load in the process.
@@ -357,7 +357,7 @@ _G.form = {
 -- the real one does.
 local sessionSnapshot = nil
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function(topic, handler)
     if topic == "session.update" and sessionSnapshot and type(handler) == "function" then
       handler(sessionSnapshot)
@@ -381,19 +381,19 @@ package.loaded["wfsuite.lib.bus"] = {
   end,
 }
 
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   open = function() return dialogStub() end,
   SPEED = { DEFAULT = 1, SLOW = 2, VSLOW = 3 },
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return false end,
   reloadConfirmEnabled = function() return true end,
   developerModeEnabled = function() return false end,
@@ -401,10 +401,10 @@ package.loaded["wfsuite.lib.settings_store"] = {
   save = function() end,
   DEFAULTS = { general = {}, developer = {} },
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { command = 250, isWrite = true } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
 
 local requireModule = assert(realLoadfile(PREFIX .. "lib/require.lua"))()
 
@@ -425,7 +425,7 @@ end
 -- The codec
 -- ---------------------------------------------------------------------------
 
-local CODEC_KEY = "wfsuite.lib.msp_motor_config"
+local CODEC_KEY = "grsuite.lib.msp_motor_config"
 
 local function loadCodec(file)
   package.loaded[CODEC_KEY] = nil
@@ -463,7 +463,7 @@ local codec
 -- The firmware's enum, transcribed
 -- ---------------------------------------------------------------------------
 --
--- wingflight-firmware src/main/drivers/motor.h:29-43. This is the authority for every
+-- gripora-firmware src/main/drivers/motor.h:29-43. This is the authority for every
 -- number below; the values are NOT read from the suite, because a check that reads the
 -- suite's own tables only proves the suite agrees with itself. That is precisely how a
 -- list drifts out of step with an enum without anything noticing.

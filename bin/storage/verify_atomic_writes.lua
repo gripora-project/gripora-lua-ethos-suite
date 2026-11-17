@@ -10,7 +10,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local failures = 0
 local checks = 0
@@ -50,7 +50,7 @@ local function removeTree(path)
 end
 
 local SCRATCH_ROOT = (os.getenv("TMPDIR") or os.getenv("TEMP") or os.getenv("TMP")
-  or (IS_WINDOWS and "." or "/tmp")) .. "/wfsuite_atomic_writes"
+  or (IS_WINDOWS and "." or "/tmp")) .. "/grsuite_atomic_writes"
 removeTree(SCRATCH_ROOT)
 makeDir(SCRATCH_ROOT)
 
@@ -60,8 +60,8 @@ io.read = function(a, b)
   return realIoRead(a, b)
 end
 
-package.loaded["wfsuite.lib.require"] = function(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+package.loaded["grsuite.lib.require"] = function(name)
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(SUITE .. "/" .. name)
@@ -72,7 +72,7 @@ package.loaded["wfsuite.lib.require"] = function(name)
   return package.loaded[key]
 end
 
-local requireModule = package.loaded["wfsuite.lib.require"]
+local requireModule = package.loaded["grsuite.lib.require"]
 local ini = requireModule("lib/ini.lua")
 local atomicWrite = requireModule("lib/atomic_write.lua")
 

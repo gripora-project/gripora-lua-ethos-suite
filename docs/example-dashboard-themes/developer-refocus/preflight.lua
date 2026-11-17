@@ -14,7 +14,7 @@
  *
  * Note: Some icons have been sourced from https://www.flaticon.com/
 ]]--
- local wfsuite = require("wfsuite")
+ local grsuite = require("grsuite")
 
 local activeLayoutIndex = 1  -- 1 or 2
 
@@ -124,7 +124,7 @@ local boxes2 = {
 
 
 local function wakeup()
-    --wfsuite.utils.log("wakeup preflight", "info")
+    --grsuite.utils.log("wakeup preflight", "info")
 end
 
 local function event(widget, category, value, x, y)
@@ -132,7 +132,7 @@ local function event(widget, category, value, x, y)
 end    
 
 local function paint()
-    --wfsuite.utils.log("paint preflight", "info")
+    --grsuite.utils.log("paint preflight", "info")
 end
 
 local function screenErrorOverlay(message)

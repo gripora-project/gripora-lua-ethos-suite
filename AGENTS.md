@@ -9,26 +9,26 @@ Keep behavior correct while minimizing runtime memory churn and CPU load on Etho
 
 ## 2) Architecture Quick Map
 
-- Entry point: `src/wfsuite/main.lua` (thin: loads and initialises three
+- Entry point: `src/grsuite/main.lua` (thin: loads and initialises three
   independent subsystems -- app/tool.lua, widgets/dashboard.lua +
   widgets/activelook.lua, tasks/background.lua -- eagerly, not lazily; see
   its own header comment and Section 11 below before assuming lazy-loading
   or feature gating is available/wanted here)
-- App/UI: `src/wfsuite/app/` -- pages live flat in `app/pages/*.lua`, menu
+- App/UI: `src/grsuite/app/` -- pages live flat in `app/pages/*.lua`, menu
   structure is a static Lua table (`MENUS` in `app/tool.lua`), not a
   generated file. There is no `app/modules/` any more.
-- Background scheduler/tasks/MSP transport: `src/wfsuite/tasks/`
+- Background scheduler/tasks/MSP transport: `src/grsuite/tasks/`
   (`tasks/scheduler.lua`, `tasks/session.lua`, `tasks/msp/*` for the
   transport/queue layer)
-- MSP command codecs: `src/wfsuite/lib/msp_*.lua` -- one flat
+- MSP command codecs: `src/grsuite/lib/msp_*.lua` -- one flat
   self-contained file per MSP command (schema + decode/encode +
   message-builders together), not a factory/`api/` pattern. There is no
   `tasks/scheduler/msp/` path any more.
-- Dashboard widgets/objects: `src/wfsuite/widgets/`
-- Shared utilities: `src/wfsuite/lib/`
+- Dashboard widgets/objects: `src/grsuite/widgets/`
+- Shared utilities: `src/grsuite/lib/`
 - i18n sources and generators: `bin/i18n/` -- see Section 7 for the
   edit-then-generate workflow.
-- `bin/menu/` -- wingflight-only tooling with no equivalent in the
+- `bin/menu/` -- gripora-only tooling with no equivalent in the
   current architecture; see Section 11, do not use it expecting it to do
   anything for the current menu system.
 
@@ -82,7 +82,7 @@ When clearing collections:
 ## 6) Menu System Rules
 
 No generator: the menu is a static Lua table (`MENUS`) hand-written
-directly in `src/wfsuite/app/tool.lua`. Each entry is either
+directly in `src/grsuite/app/tool.lua`. Each entry is either
 `{title=, icon=, script="app/pages/<page>.lua"}` (leaf page) or
 `{title=, icon=, menuId="<other MENUS key>"}` (submenu). There is no
 `app/modules/manifest.lua`, no `bin/menu/manifest.source.json`, and no
@@ -104,7 +104,7 @@ i18n source of truth:
 - `bin/i18n/json/<locale>.json`
 
 Generated runtime locale files:
-- `src/wfsuite/i18n/<locale>.json`
+- `src/grsuite/i18n/<locale>.json`
 
 Commands:
 - `python bin/i18n/update-missing-translations.py [--only <locale...>]`
@@ -114,13 +114,13 @@ Commands:
 Workflow: edit `bin/i18n/json/en.json` (new or changed English), then run
 the three commands above in order. They copy new keys to every locale
 (English text, `needs_translation: true`), reset a translation whose
-English changed, refresh `max_length`, and regenerate `src/wfsuite/i18n/`.
+English changed, refresh `max_length`, and regenerate `src/grsuite/i18n/`.
 Running them again changes nothing. `bin/i18n/auto-translate.py` fills
 `needs_translation` entries in `bin/i18n/json/` (needs `ANTHROPIC_API_KEY`);
 run `build-single-json.py` afterwards so the translations reach `src/`.
 
 Rules:
-- Do not hand-edit generated files in `src/wfsuite/i18n/`: edit `bin/i18n/json/`
+- Do not hand-edit generated files in `src/grsuite/i18n/`: edit `bin/i18n/json/`
   and regenerate, or the next regeneration silently discards the edit.
 - Keep translation key structure consistent with `en.json`.
 - Every `@i18n(key)@` tag must resolve: a missing key is not a build error,
@@ -148,9 +148,9 @@ Rules:
   decode/encode + buildReadMessage/buildWriteMessage together in one
   file, self-caching via `package.loaded`) -- not the old
   `tasks/scheduler/msp/api/` factory pattern, which no longer exists.
-- **Wire schemas must be verified against wingflight-firmware's actual
+- **Wire schemas must be verified against gripora-firmware's actual
   `src/main/msp/msp.c` serializer, not assumed from a rotorflight-based
-  guess or a field's old name.** wingflight-firmware has hardcoded,
+  guess or a field's old name.** gripora-firmware has hardcoded,
   zeroed, or entirely removed a substantial number of heli-only fields
   and commands (MSP_GOVERNOR_CONFIG/PROFILE and MSP_RESCUE_PROFILE are
   gone outright; MSP_PID_PROFILE/MSP_PID_TUNING/MSP_RC_TUNING/
@@ -181,7 +181,7 @@ Before finishing:
 - Check for hot-path allocations introduced by the change.
 - Confirm close/cleanup path exists for new dialogs, handles, or caches.
 - Run targeted sanity checks for affected module flows.
-- If you change behaviour under `src/wfsuite/` (a codec, a page, a task), find the `bin/`
+- If you change behaviour under `src/grsuite/` (a codec, a page, a task), find the `bin/`
   harnesses that load the changed file (`grep -rl <file name> bin/`) and run each with
   `lua5.4` (CI's version), passing `--self-test` to any that take it. When the change is
   intended and a harness still expects the old behaviour, update the harness, and its
@@ -201,18 +201,20 @@ If the repository is already dirty:
 - Do not modify unrelated files.
 - Touch only files needed for the requested task.
 
-## 11) Wingflight Migration Notes
+## 11) Gripora Migration Notes
 
-`src/wfsuite/` was rebuilt wholesale from `rotorflight-lua-ethos-suite`'s
+`src/grsuite/` was rebuilt wholesale from `rotorflight-lua-ethos-suite`'s
 `rfsuite-full-rewrite` branch (a from-scratch architectural rewrite of
-that project), then rebranded and re-aligned for wingflight (fixed-wing
-firmware) rather than rotorflight (helicopter firmware). Status:
+that project), then rebranded and re-aligned for Wingflight (fixed-wing
+firmware) rather than rotorflight (helicopter firmware). Gripora (an RC car
+stability controller) was later copied from Wingflight with full history and
+rebranded; the car conversion is still to come. Status:
 
 - **Done**: base replacement + full rebrand; heli-only pages/gfx/MSP
   files removed (governor, rescue, swashplate mixer, main/tail rotor
   PID, rates_type/cyclic/collective-axis UI); `lib/msp_pid_profile.lua`/
   `lib/msp_rc_tuning.lua`/`lib/rate_curve_scale.lua` rebuilt against
-  wingflight-firmware's actual wire format (see Section 8).
+  gripora-firmware's actual wire format (see Section 8).
 - **Not ported: the pre-rewrite `lib/features.lua` "Feature Flags" RAM
   system** (a user-preference toggle to skip registering the dashboard/
   toolbox/ActiveLook widgets, added to save RAM on constrained radios).
@@ -228,11 +230,11 @@ firmware) rather than rotorflight (helicopter firmware). Status:
   `system.registerGlassesWidget` exists (an automatic hardware/firmware
   capability check), not a manual preference.
 - **i18n sources reconciled**: `bin/i18n/json/` had drifted from
-  `src/wfsuite/i18n/` during the migration (src had newer keys and
+  `src/grsuite/i18n/` during the migration (src had newer keys and
   English; bin had translations src never received), so for a while src
   was hand-edited directly. The two were merged and `bin/i18n/json/` is
   the source of truth again: follow Section 7's workflow and don't
-  hand-edit `src/wfsuite/i18n/`.
+  hand-edit `src/grsuite/i18n/`.
 - **`bin/menu/` is stale**, not just unused: it still generates a
   manifest for the old `app/modules/manifest.lua` structure, which this
   architecture doesn't have (see Section 6). Running it does not error,
@@ -255,7 +257,7 @@ firmware) rather than rotorflight (helicopter firmware). Status:
   order.
 - **Setup Wizard** (`app/pages/setup_wizard.lua` and one
   `app/pages/setup_wizard_<step>.lua` per step) is the radio's copy of
-  wingflight-configurator's `src/tabs/setup_wizard/`, ported a step at a
+  gripora-configurator's `src/tabs/setup_wizard/`, ported a step at a
   time; every step is here, and only the receiver port and protocol are left
   to the Configurator. Screens are built by
   `app/setup_wizard_ui.lua` and pictures drawn by `app/setup_wizard_art.lua`.
@@ -268,7 +270,7 @@ firmware) rather than rotorflight (helicopter firmware). Status:
   whenever one is added on the configurator side. The wizard holds mixer inputs with
   `lib/msp_mixer_override.lua`'s timed `hold()`/`release()`.
 - **Phase 3 MSP audit: complete.** Every `lib/msp_*.lua` file has now
-  been checked field-by-field against wingflight-firmware's `msp.c` --
+  been checked field-by-field against gripora-firmware's `msp.c` --
   zero wire-format bugs found (see HANDOVER.md's "Done" list, item 11,
   for the two harmless pre-existing quirks noted and the ESC-vendor
   passthrough files' out-of-scope caveat). Treat any *new* `msp_*.lua`
@@ -302,20 +304,20 @@ This repository:
   (`<VS Code user dir>/globalStorage/bsongis.ethos/cache`).
 - **Deploy first:** `python .vscode/scripts/deploy.py --lang en --step i18n --step soundpack --step sensors`
   (the same command as the "Deploy & Launch [SIM]" VS Code task).
-  This writes `src/wfsuite` to `simulators/<BOARD>_<PROTOCOL>@<release>/scripts/wfsuite`.
+  This writes `src/grsuite` to `simulators/<BOARD>_<PROTOCOL>@<release>/scripts/grsuite`.
 - **Mount that folder** (`simulators/<BOARD>_<PROTOCOL>@<release>/`) as the radio's root directory.
   It is git-ignored, so mounting it directly is fine. Don't run a second simulator on the same folder at the same time, for example the VS Code extension's.
 - **Boot dialogs:** booting shows a *Select Battery* dialog, then *Battery Profile*, then *Checklist warning*.
   Dismiss each one before any other input. Menu keys are ignored while a dialog is open.
-- **Opening the app:** `SYS`, then `PAGE` to System page 2, then the **Wingflight** tile. The app's own pages are tile grids with a **BACK** button at the top right.
+- **Opening the app:** `SYS`, then `PAGE` to System page 2, then the **Gripora** tile. The app's own pages are tile grids with a **BACK** button at the top right.
 - **Another board, or a fresh radio folder:** a model saved by a newer Ethos build
   will not load on an older one ("Need firmware update"), so for a second board
   (e.g. `X18S_EU`, the smallest screen at 480x320) mount a new folder under the
-  scratchpad holding only `scripts/wfsuite` copied from the deployed one. It boots
+  scratchpad holding only `scripts/grsuite` copied from the deployed one. It boots
   through *Select language*, *Storage error, default settings restored* and the
   *Create model* wizard; finish the wizard, then set the model up, or every app tile
   shows *Background task not running*:
-  1. Model menu, page 3, **Lua**: turn **Wingflight [Background]** on.
+  1. Model menu, page 3, **Lua**: turn **Gripora [Background]** on.
   2. Model menu, page 1, **RF system**, **Internal module**: turn **State** on.
   3. Model menu, page 2, **Telemetry**: discover sensors if the list is empty.
 - **After a redeploy, `reload ALL`:** `app/header.lua` and other shared modules cache themselves in
@@ -324,7 +326,7 @@ This repository:
   boot dialogs show again.
 - **Any board, without VS Code:** `startSimulator(radio, release, rootDirectory)` (or
   `run_wasm.js --radio X18-EU`) downloads the simulator of an Ethos release, 26.2 or newer.
-- **No flight controller needed:** the suite's built-in simulated sensors and MSP responses (`src/wfsuite/sim/sensors/` and the `simulatorResponse` tables in `src/wfsuite/lib/msp_*.lua`) populate pages such as PIDs.
+- **No flight controller needed:** the suite's built-in simulated sensors and MSP responses (`src/grsuite/sim/sensors/` and the `simulatorResponse` tables in `src/grsuite/lib/msp_*.lua`) populate pages such as PIDs.
 - **Lua errors** appear in the output of `getLog`, not on screen. The log also has a line for every
   `loadFile()`, which shows what a page loads and what is loaded again and again, and the suite's
   `[mem]` lines when memory logs are enabled. One call returns at most the last 200 lines, so read it
@@ -349,7 +351,7 @@ The simulator answers MSP from the `simulatorResponse` tables, so anything that 
 - **Firmware:** Ethos 26 nightly from 2026-10-16 or later. Older firmware has no remote control over USB.
 - **Start:** `pip install pyserial hidapi`, then `python radio_remote.py mode serial` (or pick *Serial* when plugging in), then `python radio_remote.py --serve`.
 - **A person must accept** the connection prompt on the radio screen. Every new connection asks again. Agents: ask the user to start the server and accept it, then use the MCP tools, or `python radio_remote.py screenshot|press|touch|turnRotaryEncoder|listFiles|readFile|writeFile|getLog ...` (port 8766).
-- **Deploying:** `writeFile` can copy files into `/scripts/wfsuite/` without switching to storage mode, but scripts load at boot, so restart the radio by hand before testing.
+- **Deploying:** `writeFile` can copy files into `/scripts/grsuite/` without switching to storage mode, but scripts load at boot, so restart the radio by hand before testing.
 - **Never send `reload ALL` to a radio.** On an X20S with 26.2.0-RC11 it restarted the radio into its STM32 bootloader (USB id `0483:DF11`): the serial port went away and the radio had to be turned off and on again. `bin/sim/test_pages.py` skips its reload step on a radio for this reason. `reload SCRIPTS` has not been tried on a radio.
 - **One program on the serial port at a time:** stop `radio_remote.py` (`quit`) before `deploy.py --radio --connect-only` streams `print()` output, and the other way round.
 - **No sticks, pots or switches**, and don't try them: the radio may be bound to a powered model.

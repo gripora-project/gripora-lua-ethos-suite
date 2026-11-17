@@ -10,11 +10,11 @@
 -- same loaded flag as Save, and the header passes it to the button.
 --
 -- What it drives:
---   part 1  the real src/wfsuite/app/page_runtime.lua with a bus stub that
+--   part 1  the real src/grsuite/app/page_runtime.lua with a bus stub that
 --           holds, answers or fails each read, so every loaded transition is
 --           visible: build, first read in flight, read answered, reload,
 --           read failed.
---   part 2  the real src/wfsuite/app/header.lua with a form stub, so the
+--   part 2  the real src/grsuite/app/header.lua with a form stub, so the
 --           runtime's setToolEnabled() call is checked on the button itself.
 -- Both go red on the pre-fix sources: there is no setToolEnabled, and the Tool
 -- button stays enabled while the page is unloaded.
@@ -26,7 +26,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local out = print
@@ -133,7 +133,7 @@ _G.KEY_ENTER_LONG, _G.KEY_RTN_BREAK, _G.KEY_EXIT_BREAK, _G.KEY_ENTER_BREAK = 0x0
 local mode = "answer"          -- "answer" | "hold" | "fail"
 local held = {}
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   publish = function(topic, message)
@@ -147,30 +147,30 @@ package.loaded["wfsuite.lib.bus"] = {
     end
   end,
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return true end,
   reloadConfirmEnabled = function() return true end,
   load = function() return {} end,
   save = function() end,
   DEFAULTS = {},
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { onData = function() end, onError = function() end } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
 
 -- The runtime's view of the header: records what it was told.
 local toolCalls = {}
 local headerOpts = nil
-package.loaded["wfsuite.app.header"] = {
+package.loaded["grsuite.app.header"] = {
   build = function(_, opts)
     headerOpts = opts
     return {
@@ -296,11 +296,11 @@ check("Tool stays off after a failed read", lastTool() == false,
 out("")
 out("part 2: the real header sets the Tool button's enable state")
 
-package.loaded["wfsuite.app.header"] = nil
-package.loaded["wfsuite.lib.require"] = function(path)
+package.loaded["grsuite.app.header"] = nil
+package.loaded["grsuite.lib.require"] = function(path)
   if path == "app/tile_grid.lua" then return {} end
   if path == "app/connection_details.lua" then return dofile(SUITE .. "/app/connection_details.lua") end
-  if path == "lib/bus.lua" then return package.loaded["wfsuite.lib.bus"] end
+  if path == "lib/bus.lua" then return package.loaded["grsuite.lib.bus"] end
   error("unexpected require in header harness: " .. tostring(path))
 end
 local header = dofile(SUITE .. "/app/header.lua")

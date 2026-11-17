@@ -4,7 +4,7 @@
 -- Run it:
 --     lua5.4 bin/runtime_read_validator/verify_runtime_read_validator.lua
 --
--- What it drives: the real src/wfsuite/app/page_runtime.lua, through its own
+-- What it drives: the real src/grsuite/app/page_runtime.lua, through its own
 -- loadData() path, which is the Reload path (the first read of a visit is the page's
 -- own). The codec is a stub whose read reply the scenario chooses: a reply with another
 -- ESC's signature, a reply with the page's signature, and a read error.
@@ -25,7 +25,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -42,7 +42,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -52,7 +52,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -84,8 +84,8 @@ form = anything()
 form.clear = function() end
 form.invalidate = function() end
 form.openDialog = function() end
-package.loaded["wfsuite.lib.memstats"] = {print = function() end}
-package.loaded["wfsuite.lib.debug_log"] = anything()
+package.loaded["grsuite.lib.memstats"] = {print = function() end}
+package.loaded["grsuite.lib.debug_log"] = anything()
 
 local bus = requireModule("lib/bus.lua")
 local reads = {}

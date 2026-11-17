@@ -130,8 +130,8 @@ end
 -- Load module under test
 -- ---------------------------------------------------------------------------
 
-package.loaded["wfsuite.app.field_layout"] = nil
-local field_layout = dofile(ROOT .. "/src/wfsuite/app/field_layout.lua")
+package.loaded["grsuite.app.field_layout"] = nil
+local field_layout = dofile(ROOT .. "/src/grsuite/app/field_layout.lua")
 
 print("Checking field_layout slot pooling and lifecycle:")
 

@@ -4,7 +4,7 @@
 -- a first reading is only recorded, a reading while the FC reports no battery
 -- is ignored, and a genuinely empty pack is still announced.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 local BATTERY = {OK = 0, NOT_PRESENT = 3, INIT = 4}
 
 local failures, checks = 0, 0
@@ -22,7 +22,7 @@ end
 -- Real lib/ modules, loaded from the repository root instead of the radio's
 -- script directory.
 local cache = {}
-package.loaded["wfsuite.lib.require"] = function(path)
+package.loaded["grsuite.lib.require"] = function(path)
   if cache[path] == nil then
     local result = assert(loadfile(ROOT .. path))()
     cache[path] = result == nil and true or result

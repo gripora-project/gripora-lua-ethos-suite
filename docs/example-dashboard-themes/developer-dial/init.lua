@@ -17,7 +17,7 @@
  * 
 ]] --
 -- Theme initialization table
- local wfsuite = require("wfsuite")
+ local grsuite = require("grsuite")
 local init = {
     name        = "Developer Dials",   -- Theme name
     preflight   = "preflight.lua",     -- Script to run before takeoff

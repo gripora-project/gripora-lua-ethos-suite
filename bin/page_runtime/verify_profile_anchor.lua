@@ -4,7 +4,7 @@
 --     lua5.4 bin/page_runtime/verify_profile_anchor.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/page_runtime.lua under stubs for the six things
+--   * The real src/grsuite/app/page_runtime.lua under stubs for the six things
 --     it reaches out to. The pages themselves are not needed: the anchor is
 --     PageRuntime's own state, and every page built on it goes through this one
 --     method.
@@ -36,7 +36,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local out = print
@@ -100,7 +100,7 @@ _G.PREFIX = SUITE_PREFIX
 local realLoadfile = loadfile
 
 -- requireModule() calls loadfile() with a path that carries no directory part;
--- on the radio the working directory is src/wfsuite.
+-- on the radio the working directory is src/grsuite.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
     -- A Windows drive-letter path ("C:/...") is already absolute too.
@@ -198,7 +198,7 @@ _G.KEY_ENTER_BREAK = 0x08
 
 -- ── module stubs ───────────────────────────────────────────────────────────
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function(topic, handler)
     if topic == "session.update" then sessionHandlers[#sessionHandlers + 1] = handler end
   end,
@@ -216,26 +216,26 @@ package.loaded["wfsuite.lib.bus"] = {
     end
   end,
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return true end,
   reloadConfirmEnabled = function() return true end,
   load = function() return {} end,
   save = function() end,
   DEFAULTS = {},
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { onData = function() end, onError = function() end } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
-package.loaded["wfsuite.app.header"] = {
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.app.header"] = {
   build = function()
     return {
       setTitle = function() end,

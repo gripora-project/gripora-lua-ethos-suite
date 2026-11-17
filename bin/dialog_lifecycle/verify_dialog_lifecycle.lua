@@ -26,7 +26,7 @@
 --      form.openProgressDialog handle -- not the app/progress_dialog.lua
 --      wrapper -- so value()/close() reach the form directly.
 -- Cases 3 and 6 pin behaviour that has to survive the fix rather than
--- anything it repairs. Case 7 is wingflight's own: its page_runtime already
+-- anything it repairs. Case 7 is gripora's own: its page_runtime already
 -- kept the load-error modal's handle (loadErrorDialog) and closed it in
 -- dispose(), but unprotected, so on a refusing form that close raised too.
 --
@@ -41,7 +41,7 @@ local function scriptDir()
 end
 
 local ROOT = (scriptDir() .. "/../.."):gsub("\\", "/")
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 
@@ -175,7 +175,7 @@ _G.PREFIX = SUITE_PREFIX
 local realLoadfile = loadfile
 
 -- requireModule() calls loadfile() with a path that carries no directory
--- part; on the radio the working directory is src/wfsuite. Same redirect the
+-- part; on the radio the working directory is src/grsuite. Same redirect the
 -- tool_ui harness uses, for the same reason.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
@@ -265,7 +265,7 @@ _G.KEY_ENTER_BREAK = 0x08
 -- the real tree is something that would otherwise reach io.open, the radio's
 -- settings store, or an MSP codec this harness has no business running.
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   -- Answers a read immediately, the way the queue does when the link is up.
@@ -279,13 +279,13 @@ package.loaded["wfsuite.lib.bus"] = {
     end
   end,
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = { print = function() end }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = { print = function() end }
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { onData = function() end, onError = function() end } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
-package.loaded["wfsuite.lib.msp_experimental"] = {
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_experimental"] = {
   buildReadMessage = function(onData, onError)
     return { onData = onData, onError = onError, data = {} }
   end,
@@ -293,7 +293,7 @@ package.loaded["wfsuite.lib.msp_experimental"] = {
     return { onData = onData, onError = onError, data = {} }
   end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   -- Both confirmations ON, so the modal is what gets exercised -- a stub that
   -- returned false would route straight into performSave() and the case would
   -- pass without a dialog ever appearing.
@@ -310,23 +310,23 @@ package.loaded["wfsuite.lib.settings_store"] = {
 -- answers reads inline with a message that carries onData, so the board read is answered
 -- with an empty board, as on a board without label data. The real parser is covered by
 -- bin/port_labels/verify_port_labels.lua.
-package.loaded["wfsuite.lib.msp_board_info"] = {
+package.loaded["grsuite.lib.msp_board_info"] = {
   buildReadMessage = function(onData, onError)
     return { onData = onData, onError = onError, data = {} }
   end,
 }
-package.loaded["wfsuite.lib.msp_serial_config"] = {
+package.loaded["grsuite.lib.msp_serial_config"] = {
   buildReadMessage = function(onData, onError)
     return { onData = onData, onError = onError, data = { ports = {} } }
   end,
   buildWriteMessage = function() return { onData = function() end, onError = function() end } end,
 }
-package.loaded["wfsuite.lib.msp_rx_config"] = {
+package.loaded["grsuite.lib.msp_rx_config"] = {
   buildReadMessage = function(onData, onError)
     return { onData = onData, onError = onError, data = { serialrx_provider = 0 } }
   end,
 }
-package.loaded["wfsuite.app.header"] = headerStub()
+package.loaded["grsuite.app.header"] = headerStub()
 
 -- One MSP module shape shared by every runtime built below.
 local function mspModuleStub()

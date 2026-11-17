@@ -1,5 +1,5 @@
 -- Behaviour check for user dashboard themes: a theme folder the pilot puts in
--- SCRIPTS:/wfsuite.user/dashboard/<folder>/ is listed, can be chosen, keeps
+-- SCRIPTS:/grsuite.user/dashboard/<folder>/ is listed, can be chosen, keeps
 -- settings of its own, and is drawn by the widget -- and one that is missing or
 -- broken is replaced by Default instead of stopping the dashboard.
 --
@@ -9,7 +9,7 @@
 -- What it drives, and why:
 --   * lib/dashboard_themes.lua and lib/settings_store.lua, real. The user
 --     folder is the fixtures/dashboard/ folder beside this file, served at
---     SCRIPTS:/wfsuite.user/dashboard through loadfile, io.open and
+--     SCRIPTS:/grsuite.user/dashboard through loadfile, io.open and
 --     system.listFiles. The listing carries "..", a file and a folder name
 --     with a space, as a card can.
 --   * widgets/dashboard.lua, real, on bin/perf/instruction_harness.lua's Ethos
@@ -30,7 +30,7 @@ local function scriptDir()
 end
 local DIR = scriptDir()
 local LUA = os.getenv("LUA") or (arg and arg[-1]) or "lua5.4"
-local USER = "SCRIPTS:/wfsuite.user/dashboard"
+local USER = "SCRIPTS:/grsuite.user/dashboard"
 
 local MUTATIONS = {
   parse_user = {file = "lib/dashboard_themes.lua", from = 'elseif source == "user" then', to = "elseif false then"},

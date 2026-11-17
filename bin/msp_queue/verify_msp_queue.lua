@@ -39,7 +39,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local MSP = ROOT .. "/src/wfsuite/tasks/msp"
+local MSP = ROOT .. "/src/grsuite/tasks/msp"
 
 local failures = 0
 local checks = 0
@@ -473,7 +473,7 @@ end
 -- sequence 1, then sequence 3. The queue sees the break on the tick that reads
 -- the out-of-sequence frame and resends on the next tick, without waiting for
 -- the retry window -- on firmware at MSP API 22.12 or later, which answers a
--- replacement request with its own start frame (wingflight-firmware #173).
+-- replacement request with its own start frame (gripora-firmware #173).
 -- 22.15 also offers version 3 of the framing; 22.11 has neither.
 local API_WITH_REPLACEMENT_START = {22, 15}
 local API_4_6 = {22, 11}
@@ -842,7 +842,7 @@ end
 -- arriving and is discarded. On API 22.12 the queue resends on the tick after
 -- it sees the break, while that tail is still arriving: the firmware answers a
 -- request that replaces a reply in progress with its own start frame
--- (wingflight-firmware #173), so there is nothing to wait for. It used to
+-- (gripora-firmware #173), so there is nothing to wait for. It used to
 -- wait for the whole broken reply to finish and then the retry window on top
 -- -- here, 7s of stale frames plus 0.8s of silence for one lost frame. The
 -- stale frames must not trigger any further resend.

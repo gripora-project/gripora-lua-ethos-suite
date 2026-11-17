@@ -45,6 +45,6 @@ The Lua heap and free RAM are on *Diagnostics / Status*.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/diagnostics_info.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/diagnostics_info.lua). Menu conditions come from `app/tool.lua`.
 
-*Scaffolded against WFSuite Ethos 2.3.1; content awaiting review.*
+*Scaffolded against GRSuite Ethos 2.3.1; content awaiting review.*

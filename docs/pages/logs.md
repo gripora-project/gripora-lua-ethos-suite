@@ -50,9 +50,9 @@ starts dropping the oldest, so memory use stays bounded either way.
 Each failure prints one line to the script log:
 
 ```
-[logging] cannot open LOGS:/wfsuite/telemetry/<id>/<file>.csv -- keeping 20 samples
-[logging] write to LOGS:/wfsuite/telemetry/<id>/<file>.csv failed -- keeping 43 samples
-[logging] log ended with 61 unwritten samples in LOGS:/wfsuite/telemetry/<id>/<file>.csv
+[logging] cannot open LOGS:/grsuite/telemetry/<id>/<file>.csv -- keeping 20 samples
+[logging] write to LOGS:/grsuite/telemetry/<id>/<file>.csv failed -- keeping 43 samples
+[logging] log ended with 61 unwritten samples in LOGS:/grsuite/telemetry/<id>/<file>.csv
 ```
 
 That is one line per streak, not one per attempt, so a card that stays away for
@@ -88,6 +88,6 @@ firmware defaults; wire values may need scaling before display.
 
 ## Source
 
-[Page implementation](../../src/wfsuite/app/pages/logs.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../src/grsuite/app/pages/logs.lua). Menu conditions come from `app/tool.lua`.
 
-*Scaffolded against WFSuite Ethos 2.3.1; content awaiting review.*
+*Scaffolded against GRSuite Ethos 2.3.1; content awaiting review.*

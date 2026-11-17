@@ -5,11 +5,11 @@
 --     lua5.4 bin/armed_unconfirmed/verify_armed_unconfirmed.lua --self-test
 --
 -- What it drives, and why:
---   * The real src/wfsuite/tasks/session.lua, through session.wakeup() and the
+--   * The real src/grsuite/tasks/session.lua, through session.wakeup() and the
 --     session.update snapshot it publishes. A disconnect sets isArmed to nil;
 --     the latch armedUnconfirmed must carry "the model was armed" across that
 --     window and clear only on a fresh "disarmed" answer.
---   * The real src/wfsuite/app/page_runtime.lua, through PageRuntime.canSave().
+--   * The real src/grsuite/app/page_runtime.lua, through PageRuntime.canSave().
 --     The reboot-after-save gate in performSave() uses the same predicate, but
 --     performSave() is not driven here: it needs the whole save flow. That gate
 --     is covered by reading the code, not by this harness.
@@ -34,7 +34,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local TASKS = SUITE .. "/tasks"
 local APP = SUITE .. "/app"
 
@@ -93,7 +93,7 @@ end
 
 local published = {}
 local function installRequireStub()
-  package.loaded["wfsuite.lib.require"] = function(name)
+  package.loaded["grsuite.lib.require"] = function(name)
     if name == "lib/flight_stats.lua" then return dofile(TASKS .. "/../lib/flight_stats.lua") end
     if name == "lib/bus.lua" then
       return {
@@ -321,7 +321,7 @@ if selfTest then
     "and armedOrUnconfirmed%(self%) then", "and self.isArmed == true then", 1)
   assert(m == 1, "page_runtime splice did not apply")
   print("self-test: page_runtime with the pre-fix gate")
-  package.loaded["wfsuite.app.page_runtime"] = nil
+  package.loaded["grsuite.app.page_runtime"] = nil
   local preFix = loadPageRuntime(splicedRuntime)
   local beforePage = failures
   runPageChecks(preFix)

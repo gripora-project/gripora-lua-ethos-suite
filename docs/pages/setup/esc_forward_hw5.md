@@ -114,6 +114,6 @@ listed and only *ESC 1* can be opened. The page does not guess.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/esc_forward_hw5.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/esc_forward_hw5.lua). Menu conditions come from `app/tool.lua`.
 
-*Documented against WFSuite Ethos 2.3.1.*
+*Documented against GRSuite Ethos 2.3.1.*

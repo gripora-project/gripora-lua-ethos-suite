@@ -52,11 +52,11 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 local CODEC_SRC = PREFIX .. "lib/msp_esc_parameters_bluejay.lua"
 local PAGE_SRC = PREFIX .. "app/pages/esc_forward_bluejay.lua"
-local CODEC_KEY = "wfsuite.lib.msp_esc_parameters_bluejay"
+local CODEC_KEY = "grsuite.lib.msp_esc_parameters_bluejay"
 
 local SELF_TEST = arg[1] == "--self-test"
 
@@ -98,10 +98,10 @@ end
 -- The shared editor and the 4-way page decide nothing about the fields; their
 -- open() only hands the config on, and that config carries FIELDS. Captured the
 -- same way bin/bluejay_led_control/verify_bluejay_led_control.lua captures it.
-package.loaded["wfsuite.app.pages.esc_forward_vendor"] = {
+package.loaded["grsuite.app.pages.esc_forward_vendor"] = {
   open = function(_, config) captured.vendor = config end,
 }
-package.loaded["wfsuite.app.pages.esc_forward_4way"] = {
+package.loaded["grsuite.app.pages.esc_forward_4way"] = {
   open = function(_, config) captured.fourway = config end,
 }
 

@@ -60,7 +60,7 @@ def _load_connect_module():
         module_dir = os.path.dirname(CONNECT_MODULE_PATH)
         if module_dir not in sys.path:
             sys.path.insert(0, module_dir)
-        spec = importlib.util.spec_from_file_location("wfsuite_connect", CONNECT_MODULE_PATH)
+        spec = importlib.util.spec_from_file_location("grsuite_connect", CONNECT_MODULE_PATH)
         if spec and spec.loader:
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)  # type: ignore
@@ -166,7 +166,7 @@ def _staging_is_enabled(args=None):
         return False
     return STAGING_ENABLED
 
-def _stage_mkdir(prefix='wfsuite-stage-'):
+def _stage_mkdir(prefix='grsuite-stage-'):
     root = tempfile.mkdtemp(prefix=prefix)
     _STAGE_ROOTS.append(root)
     return root
@@ -1260,7 +1260,7 @@ def copy_files(src_override, fileext, targets, lang="en", steps=None):
         shutil.copytree(src_dir, dst_dir, dirs_exist_ok=True)
 
     def _stage_tree(src_dir: str):
-        stage_root = _stage_mkdir(prefix="wfsuite-stage-")
+        stage_root = _stage_mkdir(prefix="grsuite-stage-")
         staged_out_dir = os.path.join(stage_root, tgt)
         _local_recreate_tree(src_dir, staged_out_dir)
         return stage_root, staged_out_dir
@@ -1449,8 +1449,8 @@ def main():
     p.add_argument('--no-stage', action='store_true',
                    help='Disable local staging; run steps directly on destination (not recommended for radio).')
     p.add_argument('--connect-only', action='store_true')
-    p.add_argument('--lang', default=os.environ.get("WFSUITE_LANG", "en"),
-                   help='Locale to resolve (e.g. en, de, fr). Defaults to env WFSUITE_LANG or "en".')
+    p.add_argument('--lang', default=os.environ.get("GRSUITE_LANG", "en"),
+                   help='Locale to resolve (e.g. en, de, fr). Defaults to env GRSUITE_LANG or "en".')
     p.add_argument('--force', action='store_true',
                    help='Take over a stale single-instance lock if the previous run crashed.')
     p.add_argument('--clear-lock', action='store_true',

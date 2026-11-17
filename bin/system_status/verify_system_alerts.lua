@@ -26,7 +26,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SRC = ROOT .. "/src/wfsuite"
+local SRC = ROOT .. "/src/grsuite"
 local ALERTS_PATH = SRC .. "/lib/system_alerts.lua"
 
 local SELF_TEST = arg and arg[1] == "--self-test"
@@ -60,9 +60,9 @@ local function mutate(source, old, new)
 end
 
 local function loadAlerts(source)
-  package.loaded["wfsuite.lib.system_status"] = nil
-  package.loaded["wfsuite.lib.system_alerts"] = nil
-  package.loaded["wfsuite.lib.require"] = function(name)
+  package.loaded["grsuite.lib.system_status"] = nil
+  package.loaded["grsuite.lib.system_alerts"] = nil
+  package.loaded["grsuite.lib.require"] = function(name)
     local path = SRC .. "/" .. name
     return assert(loadfile(path))()
   end

@@ -14,7 +14,7 @@ class DocumentationTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        self.source = self.root / 'src/wfsuite'
+        self.source = self.root / 'src/grsuite'
         (self.source / 'app/pages').mkdir(parents=True)
         (self.source / 'app/pages/example.lua').write_text('return {}\n')
         (self.source / 'main.lua').write_text('local version = {major = 1, minor = 2, revision = 3}\n')

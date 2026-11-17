@@ -5,7 +5,7 @@
 --     lua5.4 bin/esc_guard/verify_esc_guard_retry.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/esc_protocol_guard.lua, together with the
+--   * The real src/grsuite/app/esc_protocol_guard.lua, together with the
 --     real lib/msp_esc_sensor_config.lua, so the decode path is the
 --     production one. Only the bus and os.clock() are stubbed, which lets
 --     the sequence be stepped instead of waited out.
@@ -46,7 +46,7 @@ end
 
 local arg1 = ...
 local ROOT = (arg1 or (scriptDir() .. "/../..")):gsub("\\", "/")
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local out = print
@@ -89,7 +89,7 @@ _G.system = {
 package.path = SUITE .. "/?.lua;" .. package.path
 
 -- The suite resolves its module paths the way tool.lua:3 does:
---   package.loaded["wfsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
+--   package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 -- and loadfile("lib/bus.lua") from inside that. Both are paths WITHOUT a
 -- directory part. A prefix on loadfile gives this harness the same route.
 local realLoadfile = loadfile
@@ -109,7 +109,7 @@ local requireStub = function(name)
   if name == "lib/bus.lua" then return busStub end
   return realLoadfile(SUITE_PREFIX .. name)()
 end
-package.loaded["wfsuite.lib.require"] = requireStub
+package.loaded["grsuite.lib.require"] = requireStub
 
 local escSensorConfig = requireStub("lib/msp_esc_sensor_config.lua")
 local esc_protocol_guard = realLoadfile(SUITE_PREFIX .. "app/esc_protocol_guard.lua", ...)()
@@ -151,7 +151,7 @@ local function newGuard(connected)
   })
 end
 
--- Tiles from src/wfsuite/app/tool.lua's esc_forward_menu -- all of them carry an
+-- Tiles from src/grsuite/app/tool.lua's esc_forward_menu -- all of them carry an
 -- escProtocolId.
 local BLHELI = { escProtocolId = 1 }
 local SCORPION = { escProtocolId = 4 }

@@ -5,10 +5,10 @@
 --     lua5.4 bin/tool_ui/verify_tool_ui_lazy.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/tool.lua under an Ethos stub environment. The
+--   * The real src/grsuite/app/tool.lua under an Ethos stub environment. The
 --     point is not to test the tool -- it is to establish WHICH modules appear
 --     in package.loaded, and WHEN.
---   * Module paths resolve against src/wfsuite, because that is what the suite
+--   * Module paths resolve against src/grsuite, because that is what the suite
 --     itself does: on the radio the working directory is the script's own
 --     folder, so tool.lua's loadfile("lib/require.lua") is relative to it.
 --
@@ -32,7 +32,7 @@ local function scriptDir()
   return (path:match("^(.*)[/\\][^/\\]*$")) or "."
 end
 
-local SUITE = (scriptDir() .. "/../../src/wfsuite"):gsub("\\", "/")
+local SUITE = (scriptDir() .. "/../../src/grsuite"):gsub("\\", "/")
 local SUITE_PREFIX = SUITE .. "/"
 
 local checks, failures = 0, 0
@@ -54,7 +54,7 @@ local function check(label, ok, detail)
 end
 
 -- ── Ethos stubs ─────────────────────────────────────────────────────────────
--- Every relative .lua path is resolved against src/wfsuite and recorded, so
+-- Every relative .lua path is resolved against src/grsuite and recorded, so
 -- the checks can count loadfile() calls per module as well as package.loaded.
 local loadOrder = {}
 local realLoadfile = loadfile
@@ -157,9 +157,9 @@ local function countUnder(name)
   return n
 end
 
--- lib/require.lua caches under "wfsuite." .. path without .lua
+-- lib/require.lua caches under "grsuite." .. path without .lua
 local function moduleLoaded(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   return package.loaded[key] ~= nil
 end
 
@@ -206,7 +206,7 @@ out("case 3: close() loads nothing further and logs memstats")
 local before = snapshot()
 
 local memstatsPrints = {}
-local memstatsMod = package.loaded["wfsuite.lib.memstats"]
+local memstatsMod = package.loaded["grsuite.lib.memstats"]
 local origMemstatsPrint = memstatsMod and memstatsMod.print
 if memstatsMod then
   memstatsMod.print = function(tag)

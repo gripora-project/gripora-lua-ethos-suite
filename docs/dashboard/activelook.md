@@ -1,9 +1,9 @@
 # ActiveLook
 
-The Wingflight ActiveLook widget displays up to four values on the EnGo 2's
+The Gripora ActiveLook widget displays up to four values on the EnGo 2's
 304 x 256 pixel display. Each flight phase has its own layout and slot
 assignments. ActiveLook preferences are stored on the transmitter in
-`SCRIPTS:/wfsuite.user/settings.ini`; they are not flight-controller EEPROM
+`SCRIPTS:/grsuite.user/settings.ini`; they are not flight-controller EEPROM
 settings.
 
 ## Configure
@@ -46,12 +46,12 @@ a Min/Max slot to display an extreme value.
 
 Run **ActiveLook Preview** from the VS Code task or launch configuration. It
 reads sensor profiles from the configured Ethos simulator's
-`scripts/wfsuite/sim/sensors` folder and loads/saves phase layouts and slots in
-`scripts/wfsuite.user/settings.ini`. If the settings file does not exist yet,
+`scripts/grsuite/sim/sensors` folder and loads/saves phase layouts and slots in
+`scripts/grsuite.user/settings.ini`. If the settings file does not exist yet,
 the first preview save creates it. Saving preserves unrelated INI sections and
 rejects stale edits if the file changes concurrently.
 
-The preview uses Wingflight slot IDs, including `rpm`, `rpm_min` and `rpm_max`.
+The preview uses Gripora slot IDs, including `rpm`, `rpm_min` and `rpm_max`.
 For profiles that return `math.random(...)`, it samples the configured range;
 it cannot read the exact random sample currently held by the simulator. The
 preview edits layouts and slots, not the widget enable switch or display
@@ -59,7 +59,7 @@ offsets.
 
 ## Source
 
-Widget logic: `src/wfsuite/widgets/activelook.lua`. The flight phase comes from the session
-(`src/wfsuite/lib/flight_stats.lua`), the same one the dashboard shows. Settings and slot definitions:
-`src/wfsuite/lib/activelook_config.lua`. Simulator preview:
+Widget logic: `src/grsuite/widgets/activelook.lua`. The flight phase comes from the session
+(`src/grsuite/lib/flight_stats.lua`), the same one the dashboard shows. Settings and slot definitions:
+`src/grsuite/lib/activelook_config.lua`. Simulator preview:
 `bin/activelook_preview/`.

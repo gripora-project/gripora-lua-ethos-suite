@@ -2,7 +2,7 @@
 """Normalise tile and theme icons to exactly 70x70 px, RGB PNG without alpha.
 
 Scope: every PNG in src/<suite>/app/gfx/ and the theme preview icon.png of each
-dashboard theme, for every suite under src/ (rfsuite and wfsuite). Dashboard graphics (dials, logos, toolbar,
+dashboard theme, for every suite under src/ (rfsuite and grsuite). Dashboard graphics (dials, logos, toolbar,
 default image) are deliberately NOT in scope: they are drawn at their own
 size and would be destroyed by a rescale.
 

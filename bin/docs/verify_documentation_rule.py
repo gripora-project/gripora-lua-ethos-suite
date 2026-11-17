@@ -62,7 +62,7 @@ def verdict(paths, body):
     return False, (
         "this pull request changes %s and no file under %s.\n"
         "  Update the file of the page that changed -- the docs/pages/<section>/<page>.md\n"
-        "  whose `source:` names the changed page under src/wfsuite/app/pages/ -- or, if\n"
+        "  whose `source:` names the changed page under src/grsuite/app/pages/ -- or, if\n"
         "  the change genuinely needs no documentation,\n"
         "  say so in the pull request body on a line of its own, for example\n"
         "\n"
@@ -75,20 +75,20 @@ def verdict(paths, body):
 #: the two that must fail are the point: a check that cannot go red proves nothing about
 #: the pull requests it passes.
 SELF_TEST = (
-    (["src/wfsuite/app/pages/model.lua"], "",
+    (["src/grsuite/app/pages/model.lua"], "",
      False, "a page changes and nothing is said"),
-    (["src/wfsuite/app/pages/model.lua", "docs/pages/setup/model.md"], "",
+    (["src/grsuite/app/pages/model.lua", "docs/pages/setup/model.md"], "",
      True, "the page and its documentation change together"),
-    (["src/wfsuite/lib/utils.lua"],
+    (["src/grsuite/lib/utils.lua"],
      "Summary\n\nDocumentation: no page -- this only renames a local variable.\n",
      True, "the statement is there, as a line of its own"),
-    (["src/wfsuite/lib/utils.lua"],
+    (["src/grsuite/lib/utils.lua"],
      "- **Documentation.** No page: nothing here is reachable from a menu.\n",
      True, "the statement is there, as a bold bullet"),
-    (["src/wfsuite/lib/utils.lua"],
+    (["src/grsuite/lib/utils.lua"],
      "This is a refactor and we will add documentation later.\n",
      False, "the word appears inside a sentence, which is not a statement"),
-    (["src/wfsuite/lib/utils.lua"], "Documentation:" + "\n",
+    (["src/grsuite/lib/utils.lua"], "Documentation:" + "\n",
      False, "a marker with no reason after it is not a statement"),
     (["README.md", "bin/package/build_package.py", ".github/workflows/pr.yml"], "",
      True, "nothing that reaches the radio changed"),

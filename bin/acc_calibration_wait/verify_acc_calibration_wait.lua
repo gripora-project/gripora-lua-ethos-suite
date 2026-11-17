@@ -44,9 +44,9 @@ local CLEAR = 512         -- an unrelated flag only (0x200)
 -- Loads the real module. The package.loaded guard in the module returns the
 -- cached table, so each case gets a fresh copy from its own loadfile.
 local function loadModule()
-  local chunk, err = loadfile(ROOT .. "/src/wfsuite/lib/acc_calibration_wait.lua")
+  local chunk, err = loadfile(ROOT .. "/src/grsuite/lib/acc_calibration_wait.lua")
   assert(chunk, err)
-  package.loaded["wfsuite.lib.acc_calibration_wait"] = nil
+  package.loaded["grsuite.lib.acc_calibration_wait"] = nil
   return chunk()
 end
 

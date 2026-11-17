@@ -46,7 +46,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 local MSP = SUITE .. "/tasks/msp"
 
 local checks, failures = 0, 0
@@ -95,7 +95,7 @@ os.clock = function()
   return t
 end
 
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   if name == "lib/debug_log.lua" then
     return {
       print = function() end,

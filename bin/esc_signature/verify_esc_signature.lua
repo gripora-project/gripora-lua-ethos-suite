@@ -94,7 +94,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 local VENDOR_PAGE = SUITE .. "/app/pages/esc_forward_vendor.lua"
 
@@ -141,7 +141,7 @@ local realLoadfile = loadfile
 local REPLACE_MATCH, REPLACE_FILE, replaceHits = nil, nil, 0
 
 -- requireModule() calls loadfile() with a path carrying no directory part; on
--- the radio the working directory is src/wfsuite.
+-- the radio the working directory is src/grsuite.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
     if REPLACE_MATCH and REPLACE_FILE and path:match(REPLACE_MATCH) then
@@ -276,7 +276,7 @@ _G.form = {
 local reply = nil
 local replyFails = false
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   publish = function(topic, message)
@@ -306,7 +306,7 @@ package.loaded["wfsuite.lib.bus"] = {
 -- from: buildSingle() receives it as its first argument
 -- (esc_forward_vendor.lua:221), so the harness can reach the very runtime the
 -- page built, dirty it, and save through the pilot's own Save button.
-package.loaded["wfsuite.app.field_layout"] = {
+package.loaded["grsuite.app.field_layout"] = {
   buildSingle = function(runtime)
     obs.fieldsBuilt = obs.fieldsBuilt + 1
     obs.runtime = runtime
@@ -319,13 +319,13 @@ package.loaded["wfsuite.app.field_layout"] = {
   poolStats = function() return {} end,
 }
 
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   open = function() return dialogStub() end,
   SPEED = { DEFAULT = 1, SLOW = 2, VSLOW = 3 },
 }
 
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
@@ -336,7 +336,7 @@ package.loaded["wfsuite.lib.debug_log"] = {
 -- at a confirmation modal. Without it the write path is not reachable at all,
 -- and a check that "no write went out" would prove nothing. It is a real setting
 -- (Settings -> General -> Safety Prompts).
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return false end,
   reloadConfirmEnabled = function() return true end,
   developerModeEnabled = function() return false end,
@@ -344,10 +344,10 @@ package.loaded["wfsuite.lib.settings_store"] = {
   save = function() end,
   DEFAULTS = { general = {}, developer = {} },
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { command = 250, isWrite = true } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
 
 local requireModule = assert(realLoadfile(PREFIX .. "lib/require.lua"))()
 
@@ -358,7 +358,7 @@ local requireModule = assert(realLoadfile(PREFIX .. "lib/require.lua"))()
 local headerBuilds = {}
 
 local function installHeader()
-  package.loaded["wfsuite.app.header"] = nil
+  package.loaded["grsuite.app.header"] = nil
   local header = requireModule("app/header.lua")
   local build = header.build
   header.build = function(title, opts)
@@ -413,13 +413,13 @@ end
 -- (esc_forward_vendor.lua:3-5), which is also what makes the self-test's file
 -- swap take effect.
 local function resetModules()
-  package.loaded["wfsuite.app.pages.esc_forward_vendor"] = nil
-  package.loaded["wfsuite.app.esc_error"] = nil
-  package.loaded["wfsuite.app.close_key"] = nil
-  package.loaded["wfsuite.lib.msp_4wif_esc_fwd_prog"] = nil
+  package.loaded["grsuite.app.pages.esc_forward_vendor"] = nil
+  package.loaded["grsuite.app.esc_error"] = nil
+  package.loaded["grsuite.app.close_key"] = nil
+  package.loaded["grsuite.lib.msp_4wif_esc_fwd_prog"] = nil
   for _, tool in ipairs(TOOLS) do
-    package.loaded["wfsuite.app.pages." .. tool.page] = nil
-    package.loaded["wfsuite.lib.msp_esc_parameters_" .. tool.codec] = nil
+    package.loaded["grsuite.app.pages." .. tool.page] = nil
+    package.loaded["grsuite.lib.msp_esc_parameters_" .. tool.codec] = nil
   end
   installHeader()
 end
@@ -469,7 +469,7 @@ local function drive(tool, staged)
   -- in the editor it opens. Stubbed so the case does not have to step that
   -- page's os.clock() delays.
   local captured
-  package.loaded["wfsuite.app.pages.esc_forward_4way"] = {
+  package.loaded["grsuite.app.pages.esc_forward_4way"] = {
     open = function(_, config) captured = config end,
   }
 
@@ -547,7 +547,7 @@ local function driveReload(tool, stagedReload)
   reply = codecFor(tool.codec)._simulatorResponse
 
   local captured
-  package.loaded["wfsuite.app.pages.esc_forward_4way"] = {
+  package.loaded["grsuite.app.pages.esc_forward_4way"] = {
     open = function(_, config) captured = config end,
   }
 
@@ -817,7 +817,7 @@ local function runChecks()
       if not codecName then
         ungated[#ungated + 1] = page .. " (no codec)"
       else
-        local key = "wfsuite." .. codecName:gsub("/", "."):gsub("%.lua$", "")
+        local key = "grsuite." .. codecName:gsub("/", "."):gsub("%.lua$", "")
         package.loaded[key] = nil
         local codec = requireModule(codecName)
         if tonumber(codec.EXPECTED_SIGNATURE) == nil then

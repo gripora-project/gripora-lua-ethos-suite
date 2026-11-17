@@ -28,7 +28,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -53,9 +53,9 @@ loadfile = function(path, mode, env)
   end
 end
 
--- wfsuite.lib.require is loadfile() against Ethos' path prefixes on a radio.
+-- grsuite.lib.require is loadfile() against Ethos' path prefixes on a radio.
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -65,7 +65,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 -- ---------------------------------------------------------------------------
 -- Ethos stubs
@@ -277,18 +277,18 @@ settingsStore.load = function()
 end
 
 local headerOpts = nil
-local realHeader = package.loaded["wfsuite.app.header"]
-local realCloseKey = package.loaded["wfsuite.app.close_key"]
-package.loaded["wfsuite.app.header"] = {
+local realHeader = package.loaded["grsuite.app.header"]
+local realCloseKey = package.loaded["grsuite.app.close_key"]
+package.loaded["grsuite.app.header"] = {
   build = function(_, opts)
     headerOpts = opts
     return {setSaveEnabled = function() end, focusSave = function() end}
   end,
 }
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return false end}
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return false end}
 local settingsPage = assert(loadfile("app/pages/settings_general.lua"))()
-package.loaded["wfsuite.app.header"] = realHeader
-package.loaded["wfsuite.app.close_key"] = realCloseKey
+package.loaded["grsuite.app.header"] = realHeader
+package.loaded["grsuite.app.close_key"] = realCloseKey
 
 -- Opens the page, sets "Armed warning" and presses Save, confirming the dialog.
 local SETTING_LABEL = "@i18n(app.modules.settings.armed_warning)@"

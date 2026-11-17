@@ -5,7 +5,7 @@
 --     lua5.4 bin/profile_select/verify_profile_select.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/pages/profile_select.lua, the real bus and the real
+--   * The real src/grsuite/app/pages/profile_select.lua, the real bus and the real
 --     lib/msp_select_profile.lua and lib/mspcodec.lua. The status read, the progress
 --     dialog and the header are stubs. The FC's answer to each write is given by the
 --     scenario: processReply() on success, errorHandler() on refusal.
@@ -28,7 +28,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -45,7 +45,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -55,7 +55,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -98,13 +98,13 @@ local headerOpts = nil
 local saveEnabledCalls = {}
 local headerHandle = anything()
 headerHandle.setSaveEnabled = function(v) saveEnabledCalls[#saveEnabledCalls + 1] = v end
-package.loaded["wfsuite.app.header"] = {build = function(_, opts) headerOpts = opts; return headerHandle end}
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return true end}
-package.loaded["wfsuite.app.progress_dialog"] = {open = function() return {value = function() end, close = function() end} end}
+package.loaded["grsuite.app.header"] = {build = function(_, opts) headerOpts = opts; return headerHandle end}
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return true end}
+package.loaded["grsuite.app.progress_dialog"] = {open = function() return {value = function() end, close = function() end} end}
 
 -- The status read: the page takes its state from the reply.
 local statusRead = nil
-package.loaded["wfsuite.lib.msp_status"] = {
+package.loaded["grsuite.lib.msp_status"] = {
   buildReadMessage = function(onOk, onErr)
     statusRead = {
       processReply = function()
@@ -119,13 +119,13 @@ package.loaded["wfsuite.lib.msp_status"] = {
 
 -- The Thrust Vector profile: read with the status, written as the last step of a save.
 local tvRead = nil
-package.loaded["wfsuite.lib.msp_tv_pid"] = {
+package.loaded["grsuite.lib.msp_tv_pid"] = {
   buildReadMessage = function(onOk, onErr)
     tvRead = {processReply = function() onOk({tv_profile_index = 0}) end, errorHandler = onErr}
     return tvRead
   end,
 }
-package.loaded["wfsuite.lib.msp_select_tv_profile"] = {
+package.loaded["grsuite.lib.msp_select_tv_profile"] = {
   buildSelectMessage = function(profile, onOk, onErr)
     return {processReply = function() if onOk then onOk() end end, errorHandler = onErr}
   end,

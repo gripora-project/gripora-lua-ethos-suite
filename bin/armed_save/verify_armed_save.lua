@@ -2,14 +2,14 @@
 -- local-settings page is exempt from the armed save gate.
 --
 -- Ported from rotorflight-lua-ethos-suite PR #2485 (Issue #2303); the only
--- adaptation is the wfsuite/ prefix and the paths.
+-- adaptation is the grsuite/ prefix and the paths.
 --
 -- Run it:
 --     lua5.4 bin/armed_save/verify_armed_save.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/header.lua and the real
---     src/wfsuite/app/page_runtime.lua. The subject is a UI behaviour no build
+--   * The real src/grsuite/app/header.lua and the real
+--     src/grsuite/app/page_runtime.lua. The subject is a UI behaviour no build
 --     and no package step reaches: an EEPROM_WRITE rejected by the FC while
 --     armed used to open a modal form.openDialog() that seized the whole form
 --     until the pilot pressed OK, and #2303 replaces it with a transient
@@ -40,7 +40,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local out = print
@@ -67,7 +67,7 @@ _G.PREFIX = SUITE_PREFIX
 local realLoadfile = loadfile
 
 -- requireModule() calls loadfile() with a path that carries no directory part;
--- on the radio the working directory is src/wfsuite.
+-- on the radio the working directory is src/grsuite.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
     local absolute = path:sub(1, 1) == "/" and path or (SUITE_PREFIX .. path)
@@ -190,7 +190,7 @@ end
 
 -- ── module stubs ───────────────────────────────────────────────────────────
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function(topic, handler)
     if topic == "session.update" then sessionHandlers[#sessionHandlers + 1] = handler end
   end,
@@ -210,22 +210,22 @@ package.loaded["wfsuite.lib.bus"] = {
     end
   end,
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
   enabled = function() return false end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return false end,
   reloadConfirmEnabled = function() return false end,
   load = function() return {} end,
   save = function() end,
 }
-package.loaded["wfsuite.app.close_key"] = { shouldHandleClose = function() return false end }
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.close_key"] = { shouldHandleClose = function() return false end }
+package.loaded["grsuite.app.progress_dialog"] = {
   SPEED = { DEFAULT = 1.0, FAST = 2.0, SLOW = 0.75, VSLOW = 0.5 },
   open = function()
     return {
@@ -234,12 +234,12 @@ package.loaded["wfsuite.app.progress_dialog"] = {
     }
   end,
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function(onWritten, onError)
     return { kind = "eeprom", onData = onWritten, onError = onError }
   end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = {
+package.loaded["grsuite.lib.msp_reboot"] = {
   buildWriteMessage = function(onWritten, onError)
     return { kind = "reboot", onData = onWritten, onError = onError }
   end,
@@ -413,7 +413,7 @@ out("")
 out("part 5: the header banner's own window")
 do
   resetScene()
-  local header = package.loaded["wfsuite.app.header"]
+  local header = package.loaded["grsuite.app.header"]
   local handle = header.build("Banner", { onSave = function() end })
   check("the header handle exposes the banner API",
     type(handle.showBanner) == "function"
@@ -456,7 +456,7 @@ if selfTest then
     'self:openMessageDialog({title="pre-fix", message="pre-fix", ' ..
     'buttons={}, wakeup=function() end, paint=function() end})', 1)
   assert(n == 1, "splice did not apply to page_runtime")
-  package.loaded["wfsuite.app.page_runtime"] = nil
+  package.loaded["grsuite.app.page_runtime"] = nil
   local preFix = assert(load(splicedSource, "@page_runtime_pre_fix"))()
 
   local trace = armedSaveTrace(preFix, { isMspPage = false })
@@ -466,7 +466,7 @@ if selfTest then
   check("the no-modal gate goes red with it",
     trace.openDialogs > 0,
     "the spliced page_runtime opened no dialog")
-  package.loaded["wfsuite.app.page_runtime"] = realPageRuntime
+  package.loaded["grsuite.app.page_runtime"] = realPageRuntime
 
   -- 3: the banner window. Splice BANNER_SECONDS up so the fake clock's +5
   -- jump cannot reach it; the expiry check must then stay painted.
@@ -475,7 +475,7 @@ if selfTest then
   hf:close()
   local hspliced, hn = hsource:gsub("local BANNER_SECONDS = 2%.5", "local BANNER_SECONDS = 9999")
   assert(hn == 1, "splice did not apply to header")
-  package.loaded["wfsuite.app.header"] = nil
+  package.loaded["grsuite.app.header"] = nil
   local preFixHeader = assert(load(hspliced, "@header_pre_fix"))()
   local hhandle = preFixHeader.build("Banner", { onSave = function() end })
   hhandle.showBanner("banner-under-test")

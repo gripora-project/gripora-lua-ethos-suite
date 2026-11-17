@@ -1,13 +1,13 @@
 # Storage Writes
 
-WFSuite owns a small set of files on the radio SD card:
+GRSuite owns a small set of files on the radio SD card:
 
-- `SCRIPTS:/wfsuite.user/settings.ini`, written through `settings_store.save()`.
-- Per-model `.ini` files (`SCRIPTS:/wfsuite.user/models/<mcu-id>.ini`), written through `model_preferences.save()`: battery/smart-fuel configuration, flight statistics, and the name the flight controller reported (`[craft] name`).
-- `LOGS:/wfsuite/telemetry/<mcu-id>/logs.ini`, used by the Logs page to show the model name.
-- `LOGS:/wfsuite/telemetry/<mcu-id>/*.csv`, created by the flight telemetry logger.
+- `SCRIPTS:/grsuite.user/settings.ini`, written through `settings_store.save()`.
+- Per-model `.ini` files (`SCRIPTS:/grsuite.user/models/<mcu-id>.ini`), written through `model_preferences.save()`: battery/smart-fuel configuration, flight statistics, and the name the flight controller reported (`[craft] name`).
+- `LOGS:/grsuite/telemetry/<mcu-id>/logs.ini`, used by the Logs page to show the model name.
+- `LOGS:/grsuite/telemetry/<mcu-id>/*.csv`, created by the flight telemetry logger.
 
-These files are written with `src/wfsuite/lib/atomic_write.lua`. The live path is
+These files are written with `src/grsuite/lib/atomic_write.lua`. The live path is
 not opened with `io.open(path, "w")` during the normal save path, because opening
 that way truncates the file before a byte is written. Instead the suite writes to
 a sibling temp file, flushes and closes it, then swaps it into place with

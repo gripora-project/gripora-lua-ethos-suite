@@ -46,8 +46,8 @@ local function scriptDir()
 end
 
 local ROOT = (scriptDir() .. "/../.."):gsub("\\", "/")
-local MSP = ROOT .. "/src/wfsuite/tasks/msp"
-local TASKS = ROOT .. "/src/wfsuite/tasks"
+local MSP = ROOT .. "/src/grsuite/tasks/msp"
+local TASKS = ROOT .. "/src/grsuite/tasks"
 
 local failures = 0
 local checks = 0
@@ -121,7 +121,7 @@ local debugLog = {
   mspEnabled = function() return false end,
   msp = function() end,
 }
-package.loaded["wfsuite.lib.require"] = function(name)
+package.loaded["grsuite.lib.require"] = function(name)
   if name == "lib/debug_log.lua" then
     return debugLog
   end
@@ -670,7 +670,7 @@ do
     }
     local env = setmetatable({
       system = hasApi and {getInstructionsUsage = function() return usage end} or {},
-      package = {loaded = {["wfsuite.lib.require"] = function(path)
+      package = {loaded = {["grsuite.lib.require"] = function(path)
         assert(path == "widgets/dashboard/context.lua", path)
         return context
       end}},
@@ -680,7 +680,7 @@ do
       end,
       print = function(message) messages[#messages + 1] = message end,
     }, {__index = _G})
-    local engine = assert(loadfile(ROOT .. "/src/wfsuite/widgets/dashboard/engine.lua", "t", env))()
+    local engine = assert(loadfile(ROOT .. "/src/grsuite/widgets/dashboard/engine.lua", "t", env))()
     local config = {scheduler = {spread_scheduling = false}, boxes = {
       {type = "test", id = 1}, {type = "test", id = 2}, {type = "test", id = 3},
     }}

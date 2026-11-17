@@ -132,7 +132,7 @@ end
 local ROOT_ENTRIES = assert(upvalue(tool.create, "ROOT_ENTRIES"), "ROOT_ENTRIES not found")
 local MENUS = assert(upvalue(tool.create, "MENUS"), "MENUS not found")
 
-local bus = package.loaded["wfsuite.lib.bus"]
+local bus = package.loaded["grsuite.lib.bus"]
 local connected = false
 bus.subscribe("session.update", function(s) connected = s and s.connected == true end)
 

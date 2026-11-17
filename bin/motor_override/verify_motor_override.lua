@@ -4,8 +4,8 @@
 --     lua5.4 bin/motor_override/verify_motor_override.lua
 --
 -- What it drives, and why:
---   * The REAL src/wfsuite/app/pages/motor_override.lua and the REAL
---     src/wfsuite/lib/msp_motor_override.lua, loaded from their paths. The
+--   * The REAL src/grsuite/app/pages/motor_override.lua and the REAL
+--     src/grsuite/lib/msp_motor_override.lua, loaded from their paths. The
 --     command ids, the payload shape and the keep-alive interval are all read
 --     out of those files rather than restated here, so a change in either one
 --     that breaks the safety behaviour makes this go red.
@@ -46,7 +46,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local out = print
@@ -80,7 +80,7 @@ _G.PREFIX = SUITE_PREFIX
 local realLoadfile = loadfile
 
 -- requireModule() calls loadfile() with a path that carries no directory part;
--- on the radio the working directory is src/wfsuite.
+-- on the radio the working directory is src/grsuite.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
     local absolute = path:sub(1, 1) == "/" and path or (SUITE_PREFIX .. path)
@@ -344,7 +344,7 @@ end
 -- write in flight and only sends the next when the previous one has come back
 -- or has timed out, so a stub that never answers would measure the give-up path
 -- (one write per second) instead of the keep-alive.
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function(topic, handler)
     if topic == "session.update" then sessionHandlers[#sessionHandlers + 1] = handler end
     return handler
@@ -360,12 +360,12 @@ package.loaded["wfsuite.lib.bus"] = {
     if message.isWrite and message.processReply then message.processReply() end
   end,
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end, format = function() end, msp = function() end,
   enabled = function() return false end, mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.app.header"] = {
+package.loaded["grsuite.app.header"] = {
   build = function(title, opts)
     -- Every header the page builds is recorded, each with the Back callback it
     -- was handed: the page builds one before the load and another once the load
@@ -392,7 +392,7 @@ package.loaded["wfsuite.app.header"] = {
 -- not loaded here: its full field table is irrelevant to this page, and its
 -- answers are what the checks below are about.
 local statusModule = { motor_count = 4 }
-package.loaded["wfsuite.lib.msp_status"] = {
+package.loaded["grsuite.lib.msp_status"] = {
   buildReadMessage = function(onData, onError)
     return {
       command = 101,
@@ -422,8 +422,8 @@ local function openPage(splice)
   resetTrace()
   fieldRegistry = {}
 
-  local savedCodec = package.loaded["wfsuite.lib.msp_motor_override"]
-  package.loaded["wfsuite.lib.msp_motor_override"] = nil
+  local savedCodec = package.loaded["grsuite.lib.msp_motor_override"]
+  package.loaded["grsuite.lib.msp_motor_override"] = nil
 
   local mod
   if splice then
@@ -435,7 +435,7 @@ local function openPage(splice)
   else
     mod = dofile(PAGE_PATH)
   end
-  package.loaded["wfsuite.lib.msp_motor_override"] = savedCodec
+  package.loaded["grsuite.lib.msp_motor_override"] = savedCodec
 
   assert(type(mod) == "table" and type(mod.open) == "function",
     "motor_override.lua did not return an open()")
@@ -540,7 +540,7 @@ local CANCEL = "@i18n(app.btn_cancel)@"
 
 out("part A: the codec speaks the firmware's MSP_MOTOR_OVERRIDE layout")
 do
-  package.loaded["wfsuite.lib.msp_motor_override"] = nil
+  package.loaded["grsuite.lib.msp_motor_override"] = nil
   local codec = dofile(CODEC_PATH)
   check("the write command is MSP_SET_MOTOR_OVERRIDE (195)", codec.WRITE_COMMAND == 195,
     "got " .. tostring(codec.WRITE_COMMAND))

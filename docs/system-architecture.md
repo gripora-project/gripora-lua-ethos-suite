@@ -1,9 +1,9 @@
 # System architecture
 
-WFSuite has three independent subsystems registered by
-[`main.lua`](../src/wfsuite/main.lua): the system tool, dashboard widgets, and the
+GRSuite has three independent subsystems registered by
+[`main.lua`](../src/grsuite/main.lua): the system tool, dashboard widgets, and the
 background task. Each owns its state through closures. They communicate through
-[`lib/bus.lua`](../src/wfsuite/lib/bus.lua), rather than a shared `wfsuite` global.
+[`lib/bus.lua`](../src/grsuite/lib/bus.lua), rather than a shared `grsuite` global.
 
 ## Entry points and shared code
 
@@ -19,7 +19,7 @@ background task. Each owns its state through closures. They communicate through
 | Widgets | `widgets/dashboard.lua`, `widgets/activelook.lua` | Dashboard and glasses integration |
 | Shared utilities | `lib/` | Bus, module loader and other reusable helpers |
 
-Paths in the table are relative to `src/wfsuite/`.
+Paths in the table are relative to `src/grsuite/`.
 
 ## Loading and lifetime
 
@@ -45,7 +45,7 @@ Add its entry directly to `ROOT_ENTRIES` or `MENUS` in `app/tool.lua`, then scaf
 and review its [page documentation](README.md#maintaining-page-documentation).
 There is no module manifest or menu generation step.
 
-New MSP codecs must be checked against Wingflight firmware's actual
+New MSP codecs must be checked against Gripora firmware's actual
 `src/main/msp/msp.c` serializer and write handler. Retained wire positions may be
 zeroed or ignored; Rotorflight field names alone do not establish compatibility.
 

@@ -83,6 +83,6 @@ no motor, one second after the last one.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/motor_override.lua). Menu conditions come from `app/tool.lua`. Firmware behaviour from `src/main/flight/motors.c`, `src/main/flight/motors.h` and `src/main/msp/msp.c`.
+[Page implementation](../../../src/grsuite/app/pages/motor_override.lua). Menu conditions come from `app/tool.lua`. Firmware behaviour from `src/main/flight/motors.c`, `src/main/flight/motors.h` and `src/main/msp/msp.c`.
 
-*Documented against WFSuite Ethos 2.3.1.*
+*Documented against GRSuite Ethos 2.3.1.*

@@ -11,7 +11,7 @@
 --   * lib/msp_mixer_config.lua (42 / 43), which carries the one PWM update rate
 --     that replaced the per-servo rate.
 --
--- The numbers are the firmware's, from wingflight-firmware
+-- The numbers are the firmware's, from gripora-firmware
 -- src/main/msp/msp_protocol.h: MSP_GET_SERVO_CONFIG 125,
 -- MSP_SET_SERVO_CONFIGURATION 212, MSP_SET_SERVO_CENTER 213,
 -- MSP_SET_SERVO_OVERRIDE 193. From MSP API 22.16 a servo index is the same in
@@ -34,16 +34,16 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local LIB = ROOT .. "/src/wfsuite/lib/"
+local LIB = ROOT .. "/src/grsuite/lib/"
 
 -- Modules resolve their requires through lib/require.lua relative to the working
 -- directory. Load the memoizer and the codec from the repo root, so the harness
 -- works from any directory.
 local requireModule = assert(loadfile(LIB .. "require.lua"))()
-package.loaded["wfsuite.lib.require"] = requireModule
-package.loaded["wfsuite.lib.mspcodec"] = assert(loadfile(LIB .. "mspcodec.lua"))()
-package.loaded["wfsuite.lib.bus"] = assert(loadfile(LIB .. "bus.lua"))()
-package.loaded["wfsuite.lib.override_keepalive"] = assert(loadfile(LIB .. "override_keepalive.lua"))()
+package.loaded["grsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.mspcodec"] = assert(loadfile(LIB .. "mspcodec.lua"))()
+package.loaded["grsuite.lib.bus"] = assert(loadfile(LIB .. "bus.lua"))()
+package.loaded["grsuite.lib.override_keepalive"] = assert(loadfile(LIB .. "override_keepalive.lua"))()
 
 local failures = 0
 local checks = 0
@@ -61,7 +61,7 @@ end
 
 -- Loads one module fresh: from its file, or from mutated source text.
 local function loadModule(name, text)
-  package.loaded["wfsuite.lib." .. name] = nil
+  package.loaded["grsuite.lib." .. name] = nil
   local chunk, err
   if text then
     chunk, err = load(text, "@" .. name .. ".lua")
@@ -153,7 +153,7 @@ local function pinCommands(cfg, center, override, mixer)
     fiWrite.command == 212 and fiWrite.payload[1] == 12,
     string.format("command %s, index %s", tostring(fiWrite.command), tostring(fiWrite.payload[1])))
 
-  -- The PWM update rate moved out of the servo record (wingflight-firmware
+  -- The PWM update rate moved out of the servo record (gripora-firmware
   -- msp.c, MSP_MIXER_CONFIG / MSP_SET_MIXER_CONFIG, MSP API 22.16).
   print("Mixer config")
   check("mixer config is read with 42 and written with 43",

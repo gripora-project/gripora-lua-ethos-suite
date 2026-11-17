@@ -166,8 +166,8 @@ def simulator_config() -> tuple[dict, Path, Path, Path]:
     )
     exact = simulators_dir / f"{prefix}@{release}"
     simulator_dir = exact if exact.is_dir() else (candidates[0] if candidates else exact)
-    sensor_dir = simulator_dir / "scripts" / "wfsuite" / "sim" / "sensors"
-    settings_file = simulator_dir / "scripts" / "wfsuite.user" / "settings.ini"
+    sensor_dir = simulator_dir / "scripts" / "grsuite" / "sim" / "sensors"
+    settings_file = simulator_dir / "scripts" / "grsuite.user" / "settings.ini"
     return settings, simulator_dir, sensor_dir, settings_file
 
 

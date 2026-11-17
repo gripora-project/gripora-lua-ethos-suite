@@ -216,7 +216,7 @@ class GoogleCloudTextToSpeechGenerator(BaseGenerator):
 def build(engine, voice, speed, json_file, cache_dir, base_dir, variant,
           only_missing=False, recreate_cache=False):
     # verify required audio path
-    required_audio_path = os.path.join('..', '..', 'src', 'wfsuite', 'audio')
+    required_audio_path = os.path.join('..', '..', 'src', 'grsuite', 'audio')
     if not os.path.exists(required_audio_path):
         print(f"Error: Required audio path not found: {required_audio_path}")
         return 1
@@ -253,7 +253,7 @@ def main():
     parser.add_argument('--voice', help="TTS voice name (e.g., en-US-Wavenet-D); required to build")
     parser.add_argument('--check', action="store_true",
                         help="Reconcile the manifest with the audio tree; offline, no voice needed")
-    parser.add_argument('--audio-root', default=os.path.join('..', '..', 'src', 'wfsuite', 'audio'),
+    parser.add_argument('--audio-root', default=os.path.join('..', '..', 'src', 'grsuite', 'audio'),
                         help="Audio tree to check against (default: the suite's)")
     parser.add_argument('--english-json', help="English manifest to compare with (default: en.json next to --json)")
     parser.add_argument('--cache', help="TTS files cache directory")

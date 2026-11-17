@@ -6,7 +6,7 @@
 --     lua5.3 bin/tool_ui/verify_root_close_key.lua --self-test
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/tool.lua, so the chain under test is the whole
+--   * The real src/grsuite/app/tool.lua, so the chain under test is the whole
 --     one a radio runs: system.registerSystemTool -> create() -> event(), with
 --     the real app/menu_container.lua, app/navigation.lua, app/header.lua,
 --     app/tile_grid.lua and app/close_key.lua behind it. Nothing here reaches
@@ -53,7 +53,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 local failedLabels = {}
@@ -254,11 +254,11 @@ local function runChecks()
   -- and a skipped clear looks exactly like a sabotage that did not work.
   local stale = {}
   for key in pairs(package.loaded) do
-    if type(key) == "string" and key:match("^wfsuite%.") then stale[#stale + 1] = key end
+    if type(key) == "string" and key:match("^grsuite%.") then stale[#stale + 1] = key end
   end
   for _, key in ipairs(stale) do package.loaded[key] = nil end
   if VERBOSE then
-    out(string.format("  cleared %d wfsuite.* entries from package.loaded", #stale))
+    out(string.format("  cleared %d grsuite.* entries from package.loaded", #stale))
   end
   exitCalls = 0
 
@@ -273,7 +273,7 @@ local function runChecks()
   -- The guards are announced over the real bus so that the root tiles are
   -- enabled and the path a pilot actually walks -- root tile, then submenu --
   -- is reachable.
-  local bus = package.loaded["wfsuite.lib.bus"]
+  local bus = package.loaded["grsuite.lib.bus"]
   if bus then
     bus.publish("task.status", {running = true, updatedAt = os.clock()})
     bus.publish("session.update", {connected = true, apiVersionSupported = true})

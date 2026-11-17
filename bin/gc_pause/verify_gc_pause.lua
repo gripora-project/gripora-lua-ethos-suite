@@ -23,7 +23,7 @@
 --      ("setstepmul") without an explicit value. Claim 1 makes that a
 --      foot-gun, and it is the kind of line that comes back.
 --   4. The teardown forced collects this harness knows about stay put: three
---      ESC forward-programming dispose paths and Queue:clear(). (wingflight
+--      ESC forward-programming dispose paths and Queue:clear(). (gripora
 --      also forces one in app/tool.lua, app/page_runtime.lua and
 --      app/pages/ports.lua; this does not claim the list is exhaustive.) The hot path
 --      Queue:_finish() must stay clean -- that behaviour is checked
@@ -47,7 +47,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SRC = ROOT .. "/src/wfsuite"
+local SRC = ROOT .. "/src/grsuite"
 local MAIN = SRC .. "/main.lua"
 
 local realPrint = print
@@ -145,7 +145,7 @@ local function loadMainAndInit(path)
     }
   end
 
-  package.loaded["wfsuite.lib.require"] = function(name)
+  package.loaded["grsuite.lib.require"] = function(name)
     if name == "tasks/background.lua" then return stub("background") end
     if name == "app/tool.lua" then return stub("tool") end
     if name == "widgets/dashboard.lua" then return stub("dashboard") end
@@ -181,7 +181,7 @@ local function loadMainAndInit(path)
 
   _G.print = realPrint
   _G.collectgarbage = realCollectgarbage
-  package.loaded["wfsuite.lib.require"] = nil
+  package.loaded["grsuite.lib.require"] = nil
 
   return { gcCalls = gcCalls, printed = printed, order = order, err = err }
 end
@@ -316,9 +316,9 @@ mainPauseChecks(MAIN)
 banner("src/ never calls the pause/stepmul setters without a value")
 do
   local files = listLuaFiles(SRC)
-  check("could list the Lua sources under src/wfsuite", files ~= nil)
+  check("could list the Lua sources under src/grsuite", files ~= nil)
   local offenders, scanned = scanBareSetters(files)
-  check(string.format("scanned %d .lua files under src/wfsuite", scanned), scanned > 40, scanned)
+  check(string.format("scanned %d .lua files under src/grsuite", scanned), scanned > 40, scanned)
   check("no collectgarbage(\"setpause\") or (\"setstepmul\") without a value",
     #offenders == 0, table.concat(offenders, ", "))
 end

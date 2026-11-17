@@ -5,7 +5,7 @@
 --     lua5.4 bin/logging/verify_log_flush_retry.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/tasks/logging.lua under stubs for the five things it
+--   * The real src/grsuite/tasks/logging.lua under stubs for the five things it
 --     reaches out to (bus, settings store, debug log, ini, atomic write). It is
 --     driven through its own public surface -- setTelemetrySensors(),
 --     setSettings(), wakeup(), and the session.update the bus would deliver --
@@ -35,7 +35,7 @@ local function scriptDir()
 end
 
 local ROOT = (scriptDir() .. "/../.."):gsub("\\", "/")
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 
 local checks, failures = 0, 0
 
@@ -117,7 +117,7 @@ _G.PREFIX = SUITE_PREFIX
 local realLoadfile = loadfile
 
 -- requireModule() calls loadfile() with a path that carries no directory part;
--- on the radio the working directory is src/wfsuite. Same redirect the tool_ui
+-- on the radio the working directory is src/grsuite. Same redirect the tool_ui
 -- harness uses, for the same reason.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
@@ -149,14 +149,14 @@ end
 
 local sessionHandler = nil
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function(topic, handler)
     if topic == "session.update" then sessionHandler = handler end
   end,
   unsubscribe = function() end,
   publish = function() end,
 }
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   loggingEnabled = function() return true end,
   -- 0, so every wakeup() takes a sample and the flush gate is reached by
   -- queue depth alone -- os.clock() is CPU time and barely moves in a loop, so
@@ -167,18 +167,18 @@ package.loaded["wfsuite.lib.settings_store"] = {
   mspLogsEnabled = function() return false end,
   load = function() return {} end,
 }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.debug_log"] = {
   print = function(m) printed[#printed + 1] = tostring(m) end,
   format = function(fmt, ...) printed[#printed + 1] = string.format(fmt, ...) end,
   msp = function() end,
   enabled = function() return true end,
   mspEnabled = function() return false end,
 }
-package.loaded["wfsuite.lib.ini"] = {
+package.loaded["grsuite.lib.ini"] = {
   save_ini_file = function() return true end,
   load_ini_file = function() return {} end,
 }
-package.loaded["wfsuite.lib.atomic_write"] = {
+package.loaded["grsuite.lib.atomic_write"] = {
   -- start() only needs this to succeed; the header it would write is not what
   -- any case here inspects.
   write = function() return true end,
@@ -193,9 +193,9 @@ package.loaded["wfsuite.lib.atomic_write"] = {
 -- as chunk arguments rather than letting it load its own (see the top of
 -- tasks/logging.lua), so it is called the same way here.
 local logging = assert(realLoadfile(SUITE .. "/tasks/logging.lua"))(
-  package.loaded["wfsuite.lib.bus"],
-  package.loaded["wfsuite.lib.settings_store"],
-  package.loaded["wfsuite.lib.debug_log"])
+  package.loaded["grsuite.lib.bus"],
+  package.loaded["grsuite.lib.settings_store"],
+  package.loaded["grsuite.lib.debug_log"])
 
 -- ── driving it ─────────────────────────────────────────────────────────────
 

@@ -15,7 +15,7 @@
 --     and every one of those reads can be staged here by handing the decoder a
 --     short table.
 --   * The reply lengths are not guesses. They are transcribed from
---     wingflight-firmware's handler (src/main/msp/msp.c), which differs from
+--     gripora-firmware's handler (src/main/msp/msp.c), which differs from
 --     rotorflight's here: MSP_BATTERY_CONFIG writes 15 fixed bytes, then
 --     BATTERY_PROFILE_COUNT (6) u16 capacities, then 6 u8 cell counts and 4 x 6
 --     u16 per-profile cell voltages -- 81 in all. The decoder needs the first
@@ -38,7 +38,7 @@ local function scriptDir()
 end
 
 local ROOT = (scriptDir() .. "/../.."):gsub("\\", "/")
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local failures = 0
 local checks = 0
@@ -54,12 +54,12 @@ local function check(label, ok, detail)
   end
 end
 
--- The modules resolve their dependencies through wfsuite.lib.require, which on
+-- The modules resolve their dependencies through grsuite.lib.require, which on
 -- a radio is loadfile() with Ethos' path prefixes. Here it is the real thing
 -- with plain paths: msp_battery.lua's only dependency is mspcodec.lua, and
 -- mspcodec.lua has none.
-package.loaded["wfsuite.lib.require"] = function(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+package.loaded["grsuite.lib.require"] = function(name)
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(SUITE .. "/" .. name)
@@ -70,7 +70,7 @@ package.loaded["wfsuite.lib.require"] = function(name)
   return package.loaded[key]
 end
 
-local requireModule = package.loaded["wfsuite.lib.require"]
+local requireModule = package.loaded["grsuite.lib.require"]
 local mspcodec = requireModule("lib/mspcodec.lua")
 local mspBattery = requireModule("lib/msp_battery.lua")
 
@@ -78,7 +78,7 @@ local mspBattery = requireModule("lib/msp_battery.lua")
 -- Fixtures
 -- ---------------------------------------------------------------------------
 
--- Exactly the bytes wingflight-firmware's MSP_BATTERY_CONFIG handler writes.
+-- Exactly the bytes gripora-firmware's MSP_BATTERY_CONFIG handler writes.
 -- The first 27 carry the simulatorResponse table's values; the per-profile
 -- block appended below is deliberately distinct per profile, so a decoder that
 -- read the wrong index or the wrong field order would be caught.
@@ -207,7 +207,7 @@ if config then
   end
   check("no field is nil", allNumeric)
 
-  -- wingflight's per-profile block, in the firmware's field order.
+  -- gripora's per-profile block, in the firmware's field order.
   local cells = config.profileCells
   check("the full reply fills profileCells", type(cells) == "table")
   if type(cells) == "table" then

@@ -6,7 +6,7 @@
 -- moment before the setup bit, and leaving setup only speaks a mode that
 -- really changed. Pilot mode switches are still announced.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 local ANGLE, PASSTHROUGH = 2 ^ 1, 2 ^ 7
 
 local failures, checks = 0, 0
@@ -22,7 +22,7 @@ local function check(label, ok, detail)
 end
 
 local cache = {}
-package.loaded["wfsuite.lib.require"] = function(path)
+package.loaded["grsuite.lib.require"] = function(path)
   if cache[path] == nil then
     local result = assert(loadfile(ROOT .. path))()
     cache[path] = result == nil and true or result

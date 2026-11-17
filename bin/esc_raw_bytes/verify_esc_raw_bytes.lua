@@ -13,7 +13,7 @@
 --
 --   That is not a display bug, because the flight controller is a pass-through
 --   that hands the ESC exactly what this suite sends:
---     * wingflight-firmware src/main/msp/msp.c:3565-3576, MSP_SET_ESC_PARAMETERS,
+--     * gripora-firmware src/main/msp/msp.c:3565-3576, MSP_SET_ESC_PARAMETERS,
 --       does `sbufReadData(src, escGetParamUpdBuffer(), len)` and then
 --       `escCommitParameters()`. It copies the reply's bytes over the update
 --       buffer and commits that; it merges nothing.
@@ -112,7 +112,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 local BLUEJAY_SRC = SUITE .. "/lib/msp_esc_parameters_bluejay.lua"
 local AM32_SRC = SUITE .. "/lib/msp_esc_parameters_am32.lua"
@@ -160,7 +160,7 @@ local realLoadfile = loadfile
 local REPLACE_MATCH, REPLACE_FILE, replaceHits = nil, nil, 0
 
 -- requireModule() calls loadfile() with a path carrying no directory part; on
--- the radio the working directory is src/wfsuite.
+-- the radio the working directory is src/grsuite.
 _G.loadfile = function(path, ...)
   if type(path) == "string" and path:match("%.lua$") then
     if REPLACE_MATCH and REPLACE_FILE and path:match(REPLACE_MATCH) then
@@ -310,7 +310,7 @@ _G.form = {
   openProgressDialog = function() return dialogStub() end,
 }
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   unsubscribe = function() end,
   publish = function(topic, message)
@@ -330,12 +330,12 @@ package.loaded["wfsuite.lib.bus"] = {
   end,
 }
 
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   open = function() return dialogStub() end,
   SPEED = { DEFAULT = 1, SLOW = 2, VSLOW = 3 },
 }
-package.loaded["wfsuite.lib.memstats"] = { print = function() end }
-package.loaded["wfsuite.lib.debug_log"] = {
+package.loaded["grsuite.lib.memstats"] = { print = function() end }
+package.loaded["grsuite.lib.debug_log"] = {
   print = function() end,
   format = function() end,
   msp = function() end,
@@ -344,7 +344,7 @@ package.loaded["wfsuite.lib.debug_log"] = {
 }
 -- Off, so confirmSave() routes straight into performSave() instead of stopping
 -- at a confirmation modal. Without it the write path is not reachable at all.
-package.loaded["wfsuite.lib.settings_store"] = {
+package.loaded["grsuite.lib.settings_store"] = {
   saveConfirmEnabled = function() return false end,
   reloadConfirmEnabled = function() return true end,
   developerModeEnabled = function() return false end,
@@ -352,10 +352,10 @@ package.loaded["wfsuite.lib.settings_store"] = {
   save = function() end,
   DEFAULTS = { general = {}, developer = {} },
 }
-package.loaded["wfsuite.lib.msp_eeprom"] = {
+package.loaded["grsuite.lib.msp_eeprom"] = {
   buildWriteMessage = function() return { command = 250, isWrite = true } end,
 }
-package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
+package.loaded["grsuite.lib.msp_reboot"] = { reboot = function() end }
 
 -- app/pages/esc_forward_4way.lua only decides WHICH ESC to address: it reads the
 -- motor count, offers a selector and then hands off to the page's own
@@ -372,7 +372,7 @@ package.loaded["wfsuite.lib.msp_reboot"] = { reboot = function() end }
 -- so "which codec does this page hand the editor" is still the question the page
 -- answers.
 local capturedFourWay = nil
-package.loaded["wfsuite.app.pages.esc_forward_4way"] = {
+package.loaded["grsuite.app.pages.esc_forward_4way"] = {
   open = function(_, config) capturedFourWay = config end,
 }
 
@@ -406,8 +406,8 @@ local CODEC_SOURCES = {
   am32 = AM32_SRC,
 }
 local CODEC_KEYS = {
-  bluejay = "wfsuite.lib.msp_esc_parameters_bluejay",
-  am32 = "wfsuite.lib.msp_esc_parameters_am32",
+  bluejay = "grsuite.lib.msp_esc_parameters_bluejay",
+  am32 = "grsuite.lib.msp_esc_parameters_am32",
 }
 local PAGE_FILES = {
   bluejay = "app/pages/esc_forward_bluejay.lua",

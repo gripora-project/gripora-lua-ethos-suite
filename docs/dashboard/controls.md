@@ -1,10 +1,10 @@
 # Dashboard controls
 
-The WFSuite dashboard widget has two overlays on top of whatever theme is
+The GRSuite dashboard widget has two overlays on top of whatever theme is
 showing: a toolbar along the bottom and an info panel from the top. Both are
 hidden until you ask for them, so they never cover the theme on their own.
 
-Source: `src/wfsuite/widgets/dashboard.lua`.
+Source: `src/grsuite/widgets/dashboard.lua`.
 
 ## Toolbar
 
@@ -19,7 +19,7 @@ is dimmed.
 | Erase | Erases the blackbox dataflash after a confirmation. The dialog closes once the flash reports ready (or the board has no dataflash); if that does not happen within four minutes of awake time after the erase is acknowledged, an error is shown. | Not connected, or armed. |
 | Battery | Opens the battery picker (below) to choose the active battery profile. | Not connected, armed, or fewer than two battery profiles are set. |
 | Info | Opens the info panel (below). | Never. |
-| Setup | Opens the WFSuite system tool. | Ethos is older than 26.1. |
+| Setup | Opens the GRSuite system tool. | Ethos is older than 26.1. |
 
 Erase and Battery write to the flight controller, so both are greyed out while the
 model is armed and do nothing when tapped. Arming also closes an open battery picker.

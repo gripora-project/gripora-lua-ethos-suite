@@ -77,7 +77,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 local REAL_PAGE = SUITE .. "/app/pages/esc_forward_4way.lua"
 
@@ -178,7 +178,7 @@ _G.form = {
   getText = function() return "" end,
 }
 
-package.loaded["wfsuite.lib.bus"] = {
+package.loaded["grsuite.lib.bus"] = {
   subscribe = function() end,
   publish = function(topic, message)
     if topic ~= "msp.request" then return end
@@ -189,14 +189,14 @@ package.loaded["wfsuite.lib.bus"] = {
   end,
 }
 
-package.loaded["wfsuite.lib.msp_4wif_esc_fwd_prog"] = {
+package.loaded["grsuite.lib.msp_4wif_esc_fwd_prog"] = {
   buildWriteMessage = function(target, onWritten, onError, opts)
     return {target = target, onWritten = onWritten, onError = onError, opts = opts, clearQueue = false}
   end,
 }
 
 local readError = false
-package.loaded["wfsuite.lib.msp_motor_config"] = {
+package.loaded["grsuite.lib.msp_motor_config"] = {
   buildReadMessage = function(onData, onError)
     return {
       topic = "msp.request",
@@ -211,18 +211,18 @@ package.loaded["wfsuite.lib.msp_motor_config"] = {
   end,
 }
 
-package.loaded["wfsuite.app.progress_dialog"] = {
+package.loaded["grsuite.app.progress_dialog"] = {
   SPEED = {DEFAULT = 1, SLOW = 2, VSLOW = 3},
   open = function() return {value = function() end, close = function() end} end,
 }
-package.loaded["wfsuite.app.esc_error"] = {
+package.loaded["grsuite.app.esc_error"] = {
   addLines = function(reason)
     obs.errorLines = (obs.errorLines or 0) + 1
     obs.lastError = reason
   end,
 }
-package.loaded["wfsuite.app.header"] = nil
-package.loaded["wfsuite.app.close_key"] = nil
+package.loaded["grsuite.app.header"] = nil
+package.loaded["grsuite.app.close_key"] = nil
 
 -- ---------------------------------------------------------------------------
 -- Driving one open of the selector page
@@ -248,7 +248,7 @@ local function driveSelector(pagePath, reply, mode)
   resetObs()
   readError = (mode == "error")
   handlers = {}
-  package.loaded["wfsuite.app.pages.esc_forward_4way"] = nil
+  package.loaded["grsuite.app.pages.esc_forward_4way"] = nil
   local chunk = assert(loadfile(pagePath))
   local page = chunk()
 

@@ -10,7 +10,7 @@
 -- `contains` mark on a reading that also holds a saved flight the FC was not
 -- cleared of, which the aggregate then leaves out.
 
-local ROOT = "src/wfsuite/"
+local ROOT = "src/grsuite/"
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -49,14 +49,14 @@ local cache = {
   },
   ["lib/atomic_write.lua"] = {write = function(path, data) files[path] = data; return true end},
 }
-package.loaded["wfsuite.lib.require"] = function(path)
+package.loaded["grsuite.lib.require"] = function(path)
   if cache[path] == nil then
     local result = assert(loadfile(ROOT .. path))()
     cache[path] = result == nil and true or result
   end
   return cache[path]
 end
-local requireModule = package.loaded["wfsuite.lib.require"]
+local requireModule = package.loaded["grsuite.lib.require"]
 
 local tuneAdvisor = requireModule("lib/msp_tune_advisor.lua")
 local tuneHistory = requireModule("lib/tune_history.lua")
@@ -78,7 +78,7 @@ os.clock = function() return clock end
 os.date = function() return string.format("2026-11-16 %08.1f", clock) end
 
 local MCU = "abc123"
-local HISTORY = "LOGS:/wfsuite/tune/" .. MCU .. "/history.csv"
+local HISTORY = "LOGS:/grsuite/tune/" .. MCU .. "/history.csv"
 
 -- The active profiles every session update reports; false: unknown
 local profiles = {pid = 1, rate = 1}
@@ -186,7 +186,7 @@ do
   local _, rowCommas = r[2]:gsub(",", "")
   check("rows have as many columns as the header", commas == rowCommas, commas .. " vs " .. rowCommas)
   check("the aircraft is named beside its history", #iniWrites == 1
-    and iniWrites[1][1] == "LOGS:/wfsuite/tune/" .. MCU .. "/logs.ini"
+    and iniWrites[1][1] == "LOGS:/grsuite/tune/" .. MCU .. "/logs.ini"
     and iniWrites[1][2].model.name == "Wing")
   check("the page is told", #saved == 1 and saved[1] == MCU)
 
@@ -426,7 +426,7 @@ end
 
 print("The Apply record reads back")
 do
-  local CHANGES = "LOGS:/wfsuite/tune/" .. MCU .. "/changes.csv"
+  local CHANGES = "LOGS:/grsuite/tune/" .. MCU .. "/changes.csv"
   files[CHANGES] = "date,axis,setting,from,to\n"
     .. "2026-10-01 10:00:00,roll,P,50,60\n"
     .. "2026-10-01 10:00:00,pitch,relax,5,6\n"

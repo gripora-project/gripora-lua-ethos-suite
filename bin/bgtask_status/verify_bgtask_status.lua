@@ -31,7 +31,7 @@ local function check(label, ok, detail)
   end
 end
 
-local status = dofile(ROOT .. "/src/wfsuite/lib/bgtask_status.lua")
+local status = dofile(ROOT .. "/src/grsuite/lib/bgtask_status.lua")
 
 local NOW = 100.0
 
@@ -72,7 +72,7 @@ check("a float count is shown as a whole number", status.revivalsText({revivals 
 print("threshold agrees with app/tool.lua")
 
 do
-  local tool = io.open(ROOT .. "/src/wfsuite/app/tool.lua", "rb")
+  local tool = io.open(ROOT .. "/src/grsuite/app/tool.lua", "rb")
   local text = tool and tool:read("*a") or ""
   if tool then tool:close() end
   check("the stale threshold is the tool's TASK_STATUS_TIMEOUT",
@@ -85,10 +85,10 @@ print("info page wiring")
 -- Runs the real page against the real bus, with form and header stubbed, and a
 -- clock the check steps by hand. Everything the harness replaces is put back.
 do
-  local SRC = ROOT .. "/src/wfsuite"
+  local SRC = ROOT .. "/src/grsuite"
   local realClock = os.clock
   local savedForm, savedSystem = form, system
-  local savedRequire = package.loaded["wfsuite.lib.require"]
+  local savedRequire = package.loaded["grsuite.lib.require"]
   local clock = 10.0
   local widgets = {}
   local headerOpts = nil
@@ -114,7 +114,7 @@ do
     end
     return assert(loadfile(SRC .. "/" .. name))()
   end
-  package.loaded["wfsuite.lib.require"] = requireModule
+  package.loaded["grsuite.lib.require"] = requireModule
   local bus = requireModule("lib/bus.lua")
 
   local function value(tag)
@@ -186,7 +186,7 @@ do
 
   os.clock = realClock
   form, system = savedForm, savedSystem
-  package.loaded["wfsuite.lib.require"] = savedRequire
+  package.loaded["grsuite.lib.require"] = savedRequire
 end
 
 print(string.rep("-", 60))

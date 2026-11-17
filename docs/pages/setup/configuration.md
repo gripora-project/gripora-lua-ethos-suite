@@ -38,6 +38,6 @@ Requires a running background task and a flight controller connection.
 
 ## Source
 
-[Page implementation](../../../src/wfsuite/app/pages/configuration.lua). Menu conditions come from `app/tool.lua`.
+[Page implementation](../../../src/grsuite/app/pages/configuration.lua). Menu conditions come from `app/tool.lua`.
 
-*Scaffolded against WFSuite Ethos 2.3.1; content awaiting review.*
+*Scaffolded against GRSuite Ethos 2.3.1; content awaiting review.*

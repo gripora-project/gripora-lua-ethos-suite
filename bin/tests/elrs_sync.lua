@@ -18,7 +18,7 @@ local function field(id,name,options)
   return {0x2B,data}
 end
 local function setup()
-  package.loaded['wfsuite.lib.elrslink_task']=nil
+  package.loaded['grsuite.lib.elrslink_task']=nil
   local handlers,frames,sent,requests={},{},{},{}
   local bus={
     subscribe=function(_,fn) handlers[#handlers+1]=fn; return fn end,
@@ -37,14 +37,14 @@ local function setup()
     },
     ['lib/msp_eeprom.lua']={buildWriteMessage=function(ok,err) return {kind='eeprom',ok=ok,err=err} end},
   }
-  package.loaded['wfsuite.lib.require']=function(path) return assert(modules[path],path) end
+  package.loaded['grsuite.lib.require']=function(path) return assert(modules[path],path) end
   system={getVersion=function() return {simulation=false} end}
   local sensor={
     popFrame=function() local f=table.remove(frames,1); if f then return f[1],f[2] end end,
     pushFrame=function(_,command,data) sent[#sent+1]={command,data} end,
   }
   crsf={getSensor=function() return sensor end}
-  local task=assert(loadfile('src/wfsuite/lib/elrslink_task.lua'))()
+  local task=assert(loadfile('src/grsuite/lib/elrslink_task.lua'))()
   local function session(armed,connected)
     for _,fn in ipairs(handlers) do fn({connected=connected~=false,isArmed=armed,mspTransport='crsf'}) end
   end
@@ -126,7 +126,7 @@ local function pageSetup(armed)
     ['lib/bus.lua']={subscribe=function(_,fn) handler=fn; fn({connected=true,isArmed=armed,mspTransport='crsf'}); return fn end,unsubscribe=function() handler=nil end},
     ['app/close_key.lua']={shouldHandleClose=function() return false end},
     ['app/header.lua']={build=function() return {} end}}
-  package.loaded['wfsuite.lib.require']=function(path) return assert(modules[path]) end
+  package.loaded['grsuite.lib.require']=function(path) return assert(modules[path]) end
   FONT_S,CENTERED,TEXT_LEFT=1,2,3
   form={clear=function() end,addLine=function() return {} end,
     addStaticText=function() return {value=function() end} end,
@@ -139,7 +139,7 @@ local function pageSetup(armed)
       dialog={spec=spec,close=function(self) self.closed=true; spec.close() end}
       lastDialog=dialog; return dialog
     end}
-  assert(loadfile('src/wfsuite/app/pages/diagnostics_elrs_link.lua'))().open({
+  assert(loadfile('src/grsuite/app/pages/diagnostics_elrs_link.lua'))().open({
     setCleanupHandler=function(fn) cleanup=fn end,setWakeupHandler=function(fn) wakeup=fn end})
   return buttons,starts,function() return lastDialog end,function(value) handler({connected=true,isArmed=value,mspTransport='crsf'}) end,function() cleanup() end,mockTask
 end

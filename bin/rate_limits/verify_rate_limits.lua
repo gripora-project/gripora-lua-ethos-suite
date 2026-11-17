@@ -45,17 +45,17 @@ local function loadModule(text)
   if text then
     chunk, err = load(text, "=rate_curve_scale", "t")
   else
-    chunk, err = loadfile(ROOT .. "/src/wfsuite/lib/rate_curve_scale.lua")
+    chunk, err = loadfile(ROOT .. "/src/grsuite/lib/rate_curve_scale.lua")
   end
   assert(chunk, err)
-  package.loaded["wfsuite.lib.rate_curve_scale"] = nil
+  package.loaded["grsuite.lib.rate_curve_scale"] = nil
   return chunk()
 end
 
 -- Module under test: the real file, or a copy with the flat ceiling for --self-test.
 local function moduleUnderTest()
   if not SELF_TEST then return loadModule(nil) end
-  local f = assert(io.open(ROOT .. "/src/wfsuite/lib/rate_curve_scale.lua", "r"))
+  local f = assert(io.open(ROOT .. "/src/grsuite/lib/rate_curve_scale.lua", "r"))
   local text = f:read("a")
   f:close()
   local mutated, n = text:gsub("local RAW_LIMITS = {\n  rcRate = 200,\n  srate = 100,\n  expo = 100,\n}",

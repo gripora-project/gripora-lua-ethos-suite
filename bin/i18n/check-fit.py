@@ -57,7 +57,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 REPO = Path(__file__).resolve().parents[2]
 RESOLVER = REPO / ".vscode" / "scripts" / "resolve_i18n_tags.py"
-SUITE_ROOT = REPO / "src" / "wfsuite"
+SUITE_ROOT = REPO / "src" / "grsuite"
 JSON_ROOT = Path(__file__).resolve().parent / "json"
 GLYPHS = Path(__file__).resolve().parent / "fit" / "x18_glyph_widths.json"
 

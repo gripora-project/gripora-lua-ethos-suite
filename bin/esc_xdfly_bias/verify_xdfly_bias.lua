@@ -3,8 +3,8 @@
 -- Port of rotorflight/rotorflight-lua-ethos-suite#2468, from upstream branch
 -- a5efc245. The mechanism and the harness are unchanged; what was rewritten is
 -- everything name-shaped, because this repository is not a fork of upstream:
--- the suite lives under src/wfsuite/ and its package.loaded namespace is
--- "wfsuite.*" (lib/require.lua:63), and the EdgeTX sibling is a separate
+-- the suite lives under src/grsuite/ and its package.loaded namespace is
+-- "grsuite.*" (lib/require.lua:63), and the EdgeTX sibling is a separate
 -- repository with a different layout and, as it happens, the same missing clamp.
 -- The provenance of each claim below is cited to whichever tree it was measured
 -- in, so a reader can tell which half is inherited and which half was re-checked
@@ -27,7 +27,7 @@
 --
 --   0xFFFF is not an arbitrary number here. It is what the ESC answers a write it
 --   refused, and the firmware says so in so many words:
---   wingflight-firmware src/main/sensors/esc_sensor.c:3819 -- "when setting a
+--   gripora-firmware src/main/sensors/esc_sensor.c:3819 -- "when setting a
 --   param and the ESC responds with 0xFFFF, setting the param was not
 --   successful". Upstream's EdgeTX suite carries the same rule as code
 --   (rotorflight-lua-edgetx-suite .../msp/api/esc_parameters_xdfly.lua:146-153,
@@ -36,7 +36,7 @@
 --   with `if v < 0 then v = 0 end`).
 --
 --   WORTH SAYING PLAINLY: this repository's own EdgeTX sibling has the same bias
---   table and no clamp either -- src/SCRIPTS/WF/MSP/mspEscXdfly.lua:151-152
+--   table and no clamp either -- src/SCRIPTS/GR/MSP/mspEscXdfly.lua:151-152
 --   writes `data.gov_p.value - 1` directly, and its writeU16 masks with
 --   bit32.band (MSP/mspHelper.lua:37-41). So this is a fix on both sides rather
 --   than a divergence from the sibling, and the EdgeTX half is NOT ported by
@@ -93,7 +93,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = (ROOT .. "/src/wfsuite"):gsub("\\", "/")
+local SUITE = (ROOT .. "/src/grsuite"):gsub("\\", "/")
 local PREFIX = SUITE .. "/"
 
 local CODEC_SRC = PREFIX .. "lib/msp_esc_parameters_xdfly.lua"
@@ -167,7 +167,7 @@ end
 -- ---------------------------------------------------------------------------
 
 -- lib/require.lua loadfiles paths that carry no directory part; on the radio the
--- working directory is src/wfsuite. The redirect is for the codec's OWN
+-- working directory is src/grsuite. The redirect is for the codec's OWN
 -- `requireModule("lib/mspcodec.lua")` call -- the codec file itself is loaded
 -- with realLoadfile below, because the redirect prepends the suite prefix to
 -- anything ending in .lua, which is right for "lib/..." and wrong for this path.
@@ -209,7 +209,7 @@ local REFUSAL_WORD = 0xFFFF
 --
 --   * The key to clear is the one INSIDE the file, not one invented here.
 --     msp_esc_parameters_xdfly.lua opens with its own self-cache guard keyed
---     "wfsuite.lib.msp_esc_parameters_xdfly", so loading the sabotaged copy
+--     "grsuite.lib.msp_esc_parameters_xdfly", so loading the sabotaged copy
 --     under a different key cleared nothing: the guard found the FIXED codec
 --     already in package.loaded and returned it. Pass 2 then ran the fixed codec
 --     twice and every gate stayed green. The self-test's own "the sabotaged codec
@@ -218,7 +218,7 @@ local REFUSAL_WORD = 0xFFFF
 --     prefix to anything ending in .lua, which is right for requireModule()'s
 --     bare "lib/..." paths and wrong for this absolute one. The file's OWN
 --     loadfile() calls still go through the redirect, so its codec loads as usual.
-local XDFLY_KEY = "wfsuite.lib.msp_esc_parameters_xdfly"
+local XDFLY_KEY = "grsuite.lib.msp_esc_parameters_xdfly"
 
 local function loadCodec(file, key)
   package.loaded[XDFLY_KEY] = nil
@@ -227,7 +227,7 @@ local function loadCodec(file, key)
 end
 
 local codec = loadCodec(CODEC_SRC)
-local mspcodec = package.loaded["wfsuite.lib.mspcodec"]
+local mspcodec = package.loaded["grsuite.lib.mspcodec"]
 assert(mspcodec, "the codec did not load mspcodec -- the redirect is not working")
 
 -- ---------------------------------------------------------------------------
@@ -465,8 +465,8 @@ do
   -- Both requireModule() the XDFLY codec and delegate buildWriteMessage to it.
   -- A clamp that landed in only the XDFLY file would leave these two broken, so
   -- they are driven rather than assumed.
-  for _, v in ipairs({{"OMP", OMP_SRC, "wfsuite.lib.msp_esc_parameters_omp", 208},
-                      {"ZTW", ZTW_SRC, "wfsuite.lib.msp_esc_parameters_ztw", 221}}) do
+  for _, v in ipairs({{"OMP", OMP_SRC, "grsuite.lib.msp_esc_parameters_omp", 208},
+                      {"ZTW", ZTW_SRC, "grsuite.lib.msp_esc_parameters_ztw", 221}}) do
     local label, file, key, signature = v[1], v[2], v[3], v[4]
     local m = loadCodec(file, key)
     check(string.format("%s loads and inherits the base module", label),
@@ -555,7 +555,7 @@ if SELF_TEST then
 
   -- Verification step 1: the temp file must LOAD. A cut that broke the module is
   -- caught here, not three layers down.
-  local pre = loadCodec(path, "wfsuite.lib.msp_esc_parameters_xdfly_prefix")
+  local pre = loadCodec(path, "grsuite.lib.msp_esc_parameters_xdfly_prefix")
   check("the sabotaged codec loads", type(pre) == "table" and type(pre.EDIT_FIELDS) == "table")
 
   -- Verification step 2: the clamp must actually be GONE, and
@@ -699,8 +699,8 @@ if SELF_TEST then
     -- measured against the repaired base. So the key is SEEDED with `pre` and the
     -- vendor file is loaded directly, which is the only order in which
     -- requireModule() can find the sabotaged base.
-    for _, v in ipairs({{"OMP", OMP_SRC, "wfsuite.lib.msp_esc_parameters_omp", 208},
-                        {"ZTW", ZTW_SRC, "wfsuite.lib.msp_esc_parameters_ztw", 221}}) do
+    for _, v in ipairs({{"OMP", OMP_SRC, "grsuite.lib.msp_esc_parameters_omp", 208},
+                        {"ZTW", ZTW_SRC, "grsuite.lib.msp_esc_parameters_ztw", 221}}) do
       local label, file, key, signature = v[1], v[2], v[3], v[4]
       package.loaded[key] = nil
       package.loaded[XDFLY_KEY] = pre
@@ -760,7 +760,7 @@ if SELF_TEST then
     string.format("%d stayed green: %s", #stayedGreen, table.concat(greenNames, " | ")))
 
   codec = saved
-  package.loaded["wfsuite.lib.msp_esc_parameters_xdfly"] = saved
+  package.loaded["grsuite.lib.msp_esc_parameters_xdfly"] = saved
   os.remove(path)
 else
   out("")

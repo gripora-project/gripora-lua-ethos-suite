@@ -33,7 +33,7 @@ local function check(label, ok, detail)
   end
 end
 
-local budget = dofile(ROOT .. "/src/wfsuite/lib/telemetry_slot_budget.lua")
+local budget = dofile(ROOT .. "/src/grsuite/lib/telemetry_slot_budget.lua")
 local LIMIT = 40
 
 print("save check")
@@ -76,7 +76,7 @@ end
 print("both call sites use the shared budget")
 
 do
-  local f = io.open(ROOT .. "/src/wfsuite/app/pages/telemetry.lua", "rb")
+  local f = io.open(ROOT .. "/src/grsuite/app/pages/telemetry.lua", "rb")
   local text = f and f:read("*a") or ""
   if f then f:close() end
   check("the page loads lib/telemetry_slot_budget.lua",
@@ -98,9 +98,9 @@ print("page behaviour, toggle and save together")
 -- so the check can tap a switch exactly as the pilot does. The save is not run:
 -- the refusal at the tap is the decision under test.
 do
-  local SRC = ROOT .. "/src/wfsuite"
+  local SRC = ROOT .. "/src/grsuite"
   local savedForm = form
-  local savedRequire = package.loaded["wfsuite.lib.require"]
+  local savedRequire = package.loaded["grsuite.lib.require"]
   local catalog = dofile(SRC .. "/lib/telemetry_sensor_catalog.lua")
 
   -- Sensors that take part in no conflict, so a tap changes nothing else.
@@ -154,7 +154,7 @@ do
       },
     }
     form = setmetatable({}, {__index = stubs.form})
-    package.loaded["wfsuite.lib.require"] = function(name)
+    package.loaded["grsuite.lib.require"] = function(name)
       if name == "app/page_runtime.lua" then
         return {new = function(s)
           spec = s
@@ -236,7 +236,7 @@ do
   check("CUSTOM mode: the tags exist but stay empty", customText == 0, "non-empty=" .. customText)
 
   form = savedForm
-  package.loaded["wfsuite.lib.require"] = savedRequire
+  package.loaded["grsuite.lib.require"] = savedRequire
 end
 
 print(string.rep("-", 60))

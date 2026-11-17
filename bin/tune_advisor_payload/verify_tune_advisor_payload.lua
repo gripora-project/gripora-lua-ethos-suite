@@ -4,7 +4,7 @@
 -- Run it:
 --     lua5.4 bin/tune_advisor_payload/verify_tune_advisor_payload.lua
 --
--- What it drives: the real src/wfsuite/lib/msp_tune_advisor.lua, through the message
+-- What it drives: the real src/grsuite/lib/msp_tune_advisor.lua, through the message
 -- its read builder returns, so the reply goes through processReply exactly as the
 -- transport hands it over. The replies are the simulator's own 48-byte reply (payload
 -- version 2), replies packed here with string.pack from the firmware's layouts (msp.c,
@@ -28,7 +28,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -45,7 +45,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -55,7 +55,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)

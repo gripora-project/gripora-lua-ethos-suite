@@ -5,16 +5,16 @@ on:
     paths:
       - 'docs/**'
       - 'bin/docs/**'
-      - 'src/wfsuite/app/**'
-      - 'src/wfsuite/i18n/en.json'
+      - 'src/grsuite/app/**'
+      - 'src/grsuite/i18n/en.json'
       - '.github/workflows/docs.yml'
   push:
     branches: [master]
     paths:
       - 'docs/**'
       - 'bin/docs/**'
-      - 'src/wfsuite/app/**'
-      - 'src/wfsuite/i18n/en.json'
+      - 'src/grsuite/app/**'
+      - 'src/grsuite/i18n/en.json'
       - '.github/workflows/docs.yml'
 
 permissions:

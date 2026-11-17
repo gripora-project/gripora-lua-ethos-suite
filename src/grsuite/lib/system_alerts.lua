@@ -1,0 +1,254 @@
+-- FC status alerts: which conditions in the decoded system_status /
+-- system_config telemetry words (lib/system_status.lua, published by
+-- tasks/session.lua) get a dashboard footer banner and/or a callout.
+--
+-- One table of rules so the dashboard (widgets/dashboard.lua's
+-- drawFooterAlert()) and the callouts (tasks/audio_events.lua's
+-- announceSystemAlerts()) always agree on what counts as a problem.
+--
+-- Rule fields:
+--   id         unique key (audio edge state is tracked per id)
+--   level      LEVEL.CRITICAL (red banner) or LEVEL.WARNING (amber banner)
+--   text       banner text, or nil for a callout-only rule
+--   active     function(status, config) -> bool; both are always tables
+--              (an empty one for a word the FC is not sending)
+--   setting    events.<setting> switch for the callouts
+--   enterSound / exitSound  events/alerts/<file> played when the
+--              condition starts / clears (nil = silent)
+--   group      rules sharing a group play their exitSound once, and only
+--              when no rule in the group is still active (nil = no group)
+--   debounce   seconds a change must hold before it is announced, so a
+--              flickering link doesn't chatter
+--
+-- Rules are in priority order: the banner shows the first active one, plus
+-- a count of the others. Paint-path helpers below allocate nothing.
+
+if package.loaded["grsuite.lib.system_alerts"] then
+  return package.loaded["grsuite.lib.system_alerts"]
+end
+
+local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
+local codec = requireModule("lib/system_status.lua")
+
+local FAILSAFE = codec.FAILSAFE
+local NAV_BLOCKED = codec.NAV_BLOCKED
+local BATTERY = codec.BATTERY
+local TRIM = codec.TRIM
+
+local LEVEL = {
+  CRITICAL = 1,
+  WARNING = 2,
+}
+
+local EMPTY = {}
+
+local RULES = {
+  -- Critical
+  {
+    id = "rx_backup_active",
+    level = LEVEL.CRITICAL,
+    text = "@i18n(widgets.dashboard.alert_rx_backup_active)@",
+    active = function(s) return s.rxBackupInControl == true end,
+    setting = "status_rx_backup",
+    enterSound = "rxbackup.wav",
+    exitSound = "rxmain.wav",
+    debounce = 0.5,
+  },
+  {
+    -- Rarely reaches the radio (telemetry rides the main link), but when a
+    -- backup RX keeps telemetry alive it is worth showing. The spoken
+    -- "failsafe" already comes from the flight-mode callout.
+    id = "failsafe",
+    level = LEVEL.CRITICAL,
+    text = "@i18n(widgets.dashboard.alert_failsafe)@",
+    active = function(s)
+      local phase = s.failsafePhase
+      return phase ~= nil and phase ~= FAILSAFE.IDLE and phase ~= FAILSAFE.RX_LOSS_RECOVERED
+    end,
+  },
+  {
+    -- Spoken by the existing low-voltage callout; banner only.
+    id = "battery_critical",
+    level = LEVEL.CRITICAL,
+    text = "@i18n(widgets.dashboard.alert_battery_critical)@",
+    active = function(s) return s.batteryState == BATTERY.CRITICAL end,
+  },
+  {
+    id = "gyro_overflow",
+    level = LEVEL.CRITICAL,
+    text = "@i18n(widgets.dashboard.alert_gyro_overflow)@",
+    active = function(s) return s.gyroOverflow == true end,
+    setting = "status_gyro",
+    enterSound = "gyrooverflow.wav",
+  },
+
+  -- Warnings
+  {
+    id = "rx_backup_down",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_rx_backup_down)@",
+    active = function(s, c) return c.rxBackupConfigured == true and s.rxBackupLinkUp == false end,
+    setting = "status_rx_backup",
+    enterSound = "rxbackuplost.wav",
+    exitSound = "rxbackupok.wav",
+    debounce = 1.0,
+  },
+  {
+    -- Spoken by the flight-mode callout ("RTH unavailable"); banner only.
+    id = "rth_unavailable",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_rth_unavailable)@",
+    active = function(s) return s.navBlocked == NAV_BLOCKED.RTH end,
+  },
+  {
+    id = "loiter_unavailable",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_loiter_unavailable)@",
+    active = function(s) return s.navBlocked == NAV_BLOCKED.LOITER end,
+  },
+  {
+    -- gpsCommsLost is latched by tasks/session.lua: the GPS was talking to
+    -- the FC earlier this connection and has stopped.
+    id = "gps_lost",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_gps_lost)@",
+    active = function(s) return s.gpsCommsLost == true end,
+    setting = "status_gps",
+    enterSound = "gpsfail.wav",
+    debounce = 1.0,
+  },
+  {
+    -- A setup problem, not an in-flight event: the FC refuses GPS nav on
+    -- NMEA/FBUS/CRSF GPS, so LOITER/RTH/GPS rescue would never engage.
+    -- Banner only.
+    id = "gps_nav_unsupported",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_gps_nav_unsupported)@",
+    active = function(_, c) return c.gpsNavUnsupported == true end,
+  },
+  {
+    id = "acc_uncalibrated",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_acc_uncalibrated)@",
+    active = function(s) return s.accNotCalibrated == true end,
+  },
+  {
+    id = "override",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_override)@",
+    active = function(s) return s.overrideActive == true end,
+  },
+  {
+    id = "reboot_required",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_reboot_required)@",
+    active = function(_, c) return c.rebootRequired == true end,
+  },
+  {
+    id = "blackbox_full",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_blackbox_full)@",
+    active = function(_, c) return c.blackboxFull == true end,
+    setting = "status_blackbox",
+    enterSound = "bbfull.wav",
+  },
+
+  -- Out of trim: the gyro's I-term is holding a steady surface deflection in
+  -- hands-off rate flight, so Manual/Passthrough would fly off line. Kept by
+  -- the FC after landing until the next arm. "Trim OK" once every axis is in
+  -- trim.
+  {
+    id = "trim_pitch_up",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_trim_nose_up)@",
+    active = function(_, c) return c.trimPitch == TRIM.RIGHT_UP end,
+    setting = "status_trim",
+    group = "trim",
+    enterSound = "trimnoseup.wav",
+    exitSound = "trimok.wav",
+  },
+  {
+    id = "trim_pitch_down",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_trim_nose_down)@",
+    active = function(_, c) return c.trimPitch == TRIM.LEFT_DOWN end,
+    setting = "status_trim",
+    group = "trim",
+    enterSound = "trimnosedown.wav",
+    exitSound = "trimok.wav",
+  },
+  {
+    id = "trim_roll_right",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_trim_roll_right)@",
+    active = function(_, c) return c.trimRoll == TRIM.RIGHT_UP end,
+    setting = "status_trim",
+    group = "trim",
+    enterSound = "trimrollright.wav",
+    exitSound = "trimok.wav",
+  },
+  {
+    id = "trim_roll_left",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_trim_roll_left)@",
+    active = function(_, c) return c.trimRoll == TRIM.LEFT_DOWN end,
+    setting = "status_trim",
+    group = "trim",
+    enterSound = "trimrollleft.wav",
+    exitSound = "trimok.wav",
+  },
+  {
+    id = "trim_yaw_right",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_trim_yaw_right)@",
+    active = function(_, c) return c.trimYaw == TRIM.RIGHT_UP end,
+    setting = "status_trim",
+    group = "trim",
+    enterSound = "trimyawright.wav",
+    exitSound = "trimok.wav",
+  },
+  {
+    id = "trim_yaw_left",
+    level = LEVEL.WARNING,
+    text = "@i18n(widgets.dashboard.alert_trim_yaw_left)@",
+    active = function(_, c) return c.trimYaw == TRIM.LEFT_DOWN end,
+    setting = "status_trim",
+    group = "trim",
+    enterSound = "trimyawleft.wav",
+    exitSound = "trimok.wav",
+  },
+}
+
+local systemAlerts = {
+  LEVEL = LEVEL,
+  RULES = RULES,
+}
+
+-- The two words are separate sensors and a model may select only one, so
+-- each rule is evaluated against whichever words are present: the
+-- system_config rules (reboot required, Blackbox full) still fire without
+-- system_status, and the other way round.
+function systemAlerts.isActive(rule, status, config)
+  if status == nil and config == nil then return false end
+  return rule.active(status or EMPTY, config or EMPTY) == true
+end
+
+-- Highest-priority active banner rule, and how many banner rules are active
+-- in total. Returns nil, 0 when there is nothing to show.
+function systemAlerts.topBanner(status, config)
+  if status == nil and config == nil then return nil, 0 end
+  status = status or EMPTY
+  config = config or EMPTY
+  local top, count = nil, 0
+  for i = 1, #RULES do
+    local rule = RULES[i]
+    if rule.text and rule.active(status, config) == true then
+      count = count + 1
+      if top == nil then top = rule end
+    end
+  end
+  return top, count
+end
+
+package.loaded["grsuite.lib.system_alerts"] = systemAlerts
+return systemAlerts

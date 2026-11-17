@@ -5,7 +5,7 @@
 --     lua5.4 bin/copy_profiles_confirm/verify_copy_profiles_confirm.lua
 --
 -- What it drives, and why:
---   * The real src/wfsuite/app/pages/copy_profiles.lua, with the real bus. The header, the form, the
+--   * The real src/grsuite/app/pages/copy_profiles.lua, with the real bus. The header, the form, the
 --     progress dialog and the MSP modules are stand-ins.
 --   * The three choices are set the way the pilot sets them (profile type, source, destination), then
 --     Save is pressed. The dialog that opens is checked for its title and its text.
@@ -21,7 +21,7 @@ local function scriptDir()
 end
 
 local ROOT = scriptDir() .. "/../.."
-local SUITE = ROOT .. "/src/wfsuite"
+local SUITE = ROOT .. "/src/grsuite"
 
 local function resolvePath(name)
   local f = io.open(name, "r")
@@ -38,7 +38,7 @@ loadfile = function(path, mode, env)
 end
 
 local function requireModule(name)
-  local key = "wfsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
+  local key = "grsuite." .. name:gsub("%.lua$", ""):gsub("/", ".")
   local cached = package.loaded[key]
   if cached ~= nil then return cached end
   local chunk, err = loadfile(resolvePath(name))
@@ -48,7 +48,7 @@ local function requireModule(name)
   package.loaded[key] = (result == nil) and true or result
   return package.loaded[key]
 end
-package.loaded["wfsuite.lib.require"] = requireModule
+package.loaded["grsuite.lib.require"] = requireModule
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -120,14 +120,14 @@ form = {
 }
 
 local headerOpts
-package.loaded["wfsuite.app.header"] = {build = function(_, opts)
+package.loaded["grsuite.app.header"] = {build = function(_, opts)
   headerOpts = opts
   return {setSaveEnabled = noop, setReloadEnabled = noop, focusSave = noop, focusReload = noop}
 end}
-package.loaded["wfsuite.app.close_key"] = {shouldHandleClose = function() return false end}
-package.loaded["wfsuite.app.progress_dialog"] = {open = function() return {close = noop, value = noop} end, SPEED = {}}
-package.loaded["wfsuite.lib.msp_copy_profile"] = {buildWriteMessage = function() return {} end}
-package.loaded["wfsuite.lib.msp_eeprom"] = {buildWriteMessage = function() return {} end}
+package.loaded["grsuite.app.close_key"] = {shouldHandleClose = function() return false end}
+package.loaded["grsuite.app.progress_dialog"] = {open = function() return {close = noop, value = noop} end, SPEED = {}}
+package.loaded["grsuite.lib.msp_copy_profile"] = {buildWriteMessage = function() return {} end}
+package.loaded["grsuite.lib.msp_eeprom"] = {buildWriteMessage = function() return {} end}
 
 local bus = requireModule("lib/bus.lua")
 local page = requireModule("app/pages/copy_profiles.lua")
