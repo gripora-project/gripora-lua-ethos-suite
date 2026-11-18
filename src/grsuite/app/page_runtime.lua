@@ -901,7 +901,7 @@ function PageRuntime:beginRebootWait()
     startedAt = os.clock(),
     sawDisconnect = false,
   }
-  self:log("reboot: waiting for the flight controller to drop")
+  self:log("reboot: waiting for the controller to drop")
 end
 
 -- Drives the reconnect wait from the page's own wakeup tick. Two edges are
@@ -922,13 +922,13 @@ function PageRuntime:updateRebootWait()
   if not wait.sawDisconnect then
     if self.connected == false then
       wait.sawDisconnect = true
-      self:log("reboot: link dropped; waiting for the flight controller to come back")
+      self:log("reboot: link dropped; waiting for the controller to come back")
     elseif self.connected == true and self.handshakeApiVersion == false then
       -- The drop edge was missed (the background task polls the link every
       -- 0.05 s, the reset can be shorter), but the handshake was cleared: the
       -- suite did process the disconnect, so the board did go down.
       wait.sawDisconnect = true
-      self:log("reboot: handshake reset observed; waiting for the flight controller to come back")
+      self:log("reboot: handshake reset observed; waiting for the controller to come back")
     end
   end
 
@@ -938,7 +938,7 @@ function PageRuntime:updateRebootWait()
   end
 
   if (os.clock() - wait.startedAt) >= REBOOT_TIMEOUT_SECONDS then
-    self:log("reboot: timed out waiting for the flight controller to come back")
+    self:log("reboot: timed out waiting for the controller to come back")
     self:finishRebootWait(false)
   end
 end
@@ -953,7 +953,7 @@ function PageRuntime:finishRebootWait(ok)
   self.pendingReboot = false
   if self.disposed then return end
   if ok then
-    self:log("reboot: flight controller is back; reloading")
+    self:log("reboot: controller is back; reloading")
   else
     debugLog.print("[" .. (self.logTag or "page") .. "] reboot: giving up waiting; reloading")
   end
