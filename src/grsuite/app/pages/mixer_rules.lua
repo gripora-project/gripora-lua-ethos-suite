@@ -271,14 +271,31 @@ end
 local CURVE_OPTIONS = curveSlotLabels.optionsTable(8)
 
 -- role: descriptive tag only (mixerRuleRole_e, pg/mixer.h) -- the
--- mixer evaluator never reads it. Lets a pilot (or this suite) recognize
--- "the" rule serving a known role, e.g. flap-to-elevator compensation,
--- regardless of which slot it lives in.
-local ROLE_OPTIONS = {
-  {"@i18n(app.modules.mixer_rules.role_none)@", 0},
+-- mixer evaluator never reads it. Both roles (flap compensation,
+-- differential thrust steering) are aircraft mixes, so a car is only
+-- offered None; a role a loaded rule already carries stays listed, so it
+-- shows by name and can be cleared (the Configurator's RuleTable.svelte
+-- roleOptions). The enum values are the firmware's and stay as they are.
+local ROLE_NONE = {"@i18n(app.modules.mixer_rules.role_none)@", 0}
+local AIRCRAFT_ROLES = {
   {"@i18n(app.modules.mixer_rules.role_flap_compensation)@", 1},
   {"@i18n(app.modules.mixer_rules.role_differential_thrust_yaw)@", 2},
 }
+
+-- The role choices for the editor: None, plus each aircraft role some rule
+-- in `pool` carries. Built when the editor opens, not per wakeup.
+local function roleOptions(pool)
+  local options = {ROLE_NONE}
+  for _, role in ipairs(AIRCRAFT_ROLES) do
+    for _, rule in ipairs(pool or {}) do
+      if rule.role == role[2] then
+        options[#options + 1] = role
+        break
+      end
+    end
+  end
+  return options
+end
 
 local function ruleTitle(n)
   return string.format("@i18n(app.modules.mixer_rules.tile_rule_fmt)@", n)
@@ -411,7 +428,7 @@ local function openEditor(opts, listState, index)
   fieldLayout.buildSingle(runtime, "@i18n(app.modules.mixer_rules.speed)@", {key = "speed"})
   fieldLayout.buildSingle(runtime, "@i18n(app.modules.mixer_rules.curve)@", {key = "curve", choices = CURVE_OPTIONS})
   fieldLayout.buildSingle(runtime, "@i18n(app.modules.mixer_rules.condition)@", {key = "condition", choices = CONDITION_OPTIONS})
-  fieldLayout.buildSingle(runtime, "@i18n(app.modules.mixer_rules.role)@", {key = "role", choices = ROLE_OPTIONS})
+  fieldLayout.buildSingle(runtime, "@i18n(app.modules.mixer_rules.role)@", {key = "role", choices = roleOptions(listState.pool)})
 
   runtime:loadInitial()
 end
