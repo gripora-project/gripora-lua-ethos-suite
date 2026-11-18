@@ -140,7 +140,7 @@ do
   check("with every handshake step done the count reaches eight of eight",
     details.body(complete):find("Handshake: 8 of 8 steps", 1, true) ~= nil, details.body(complete))
   check("the body names the craft, the firmware and the API the session holds",
-    body:find("Craft: Heli", 1, true) ~= nil and body:find("Firmware: 4.6.0", 1, true) ~= nil
+    body:find("Car: Heli", 1, true) ~= nil and body:find("Firmware: 4.6.0", 1, true) ~= nil
       and body:find("API: 12.10", 1, true) ~= nil, body)
 end
 
@@ -150,7 +150,7 @@ do
   check("a link that is down says it is not connected", body:find("Link: not connected", 1, true) ~= nil, body)
   check("with no handshake step done it reads 0 of 8", body:find("Handshake: 0 of 8 steps", 1, true) ~= nil, body)
   check("a name and versions the session does not hold read as a dash",
-    body:find("Craft: -", 1, true) ~= nil and body:find("Firmware: -", 1, true) ~= nil, body)
+    body:find("Car: -", 1, true) ~= nil and body:find("Firmware: -", 1, true) ~= nil, body)
 end
 
 do
@@ -173,7 +173,7 @@ do
     check("the message is the body for the latest session.update", d.message == details.body(snapshot))
     check("the dialog shows the link, the handshake, the craft, the firmware and the API from the session",
       d.message:find("Link: connected", 1, true) ~= nil and d.message:find("Handshake: 3 of 8 steps", 1, true) ~= nil
-        and d.message:find("Craft: Heli", 1, true) ~= nil and d.message:find("Firmware: 4.6.0", 1, true) ~= nil
+        and d.message:find("Car: Heli", 1, true) ~= nil and d.message:find("Firmware: 4.6.0", 1, true) ~= nil
         and d.message:find("API: 12.10", 1, true) ~= nil, d.message)
     check("the dialog has one OK button", #d.buttons == 1)
   end

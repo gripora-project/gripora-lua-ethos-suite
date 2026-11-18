@@ -299,10 +299,10 @@
       "translation": "STAY"
     },
     "connection_body_fmt": {
-      "english": "Link: %s\nHandshake: %s\nCraft: %s\nFirmware: %s\nAPI: %s",
-      "max_length": 53,
+      "english": "Link: %s\nHandshake: %s\nCar: %s\nFirmware: %s\nAPI: %s",
+      "max_length": 51,
       "needs_translation": false,
-      "translation": "Link: %s\nHandshake: %s\nCraft: %s\nFirmware: %s\nAPI: %s"
+      "translation": "Link: %s\nHandshake: %s\nCar: %s\nFirmware: %s\nAPI: %s"
     },
     "connection_handshake_fmt": {
       "english": "%d of %d steps",
@@ -891,10 +891,10 @@
           "translation": "RX lost"
         },
         "field_rx_lost_landing": {
-          "english": "RX lost landing",
-          "max_length": 15,
+          "english": "RX lost while armed",
+          "max_length": 19,
           "needs_translation": false,
-          "translation": "RX lost landing"
+          "translation": "RX lost while armed"
         },
         "field_rx_set": {
           "english": "RX set",
@@ -1279,10 +1279,10 @@
           "translation": "ARM_WIGGLE"
         },
         "craft_name": {
-          "english": "Craft name",
-          "max_length": 10,
+          "english": "Car name",
+          "max_length": 8,
           "needs_translation": false,
-          "translation": "Craft name"
+          "translation": "Car name"
         },
         "feature_led_strip": {
           "english": "LED_STRIP",
@@ -1341,10 +1341,10 @@
           "translation": "Choose the source and destinations and save to copy the profile."
         },
         "msgbox_copy_fmt": {
-          "english": "Copy %s Profile %d to Profile %d? This permanently overwrites Profile %d in the flight controller.",
-          "max_length": 98,
+          "english": "Copy %s Profile %d to Profile %d? This permanently overwrites Profile %d in the controller.",
+          "max_length": 91,
           "needs_translation": false,
-          "translation": "Copy %s Profile %d to Profile %d? This permanently overwrites Profile %d in the flight controller."
+          "translation": "Copy %s Profile %d to Profile %d? This permanently overwrites Profile %d in the controller."
         },
         "msgbox_copy_title": {
           "english": "Copy profile?",
@@ -1353,10 +1353,10 @@
           "translation": "Copy profile?"
         },
         "msgbox_msg": {
-          "english": "Save current page to flight controller?",
-          "max_length": 39,
+          "english": "Save current page to controller?",
+          "max_length": 32,
           "needs_translation": false,
-          "translation": "Save current page to flight controller?"
+          "translation": "Save current page to controller?"
         },
         "msgbox_save": {
           "english": "Save settings",
@@ -1453,10 +1453,10 @@
           "translation": "Configuration State"
         },
         "craft_name": {
-          "english": "Craft Name",
-          "max_length": 10,
+          "english": "Car Name",
+          "max_length": 8,
           "needs_translation": false,
-          "translation": "Craft Name"
+          "translation": "Car Name"
         },
         "lua_memory": {
           "english": "Lua Memory",
@@ -1699,10 +1699,10 @@
           "translation": "Probe only"
         },
         "confirm_prompt": {
-          "english": "Apply packet rate and telemetry ratio changes to the RF module / Flight Controller?",
-          "max_length": 83,
+          "english": "Apply packet rate and telemetry ratio changes to the RF module / controller?",
+          "max_length": 76,
           "needs_translation": false,
-          "translation": "Apply packet rate and telemetry ratio changes to the RF module / Flight Controller?"
+          "translation": "Apply packet rate and telemetry ratio changes to the RF module / controller?"
         },
         "confirm_title": {
           "english": "Confirm ELRS Link Sync",
@@ -2007,10 +2007,10 @@
           "translation": "Disable motor override"
         },
         "motor_override_disable_msg": {
-          "english": "Return control of the motor to the flight controller.",
-          "max_length": 53,
+          "english": "Return control of the motor to the controller.",
+          "max_length": 46,
           "needs_translation": false,
-          "translation": "Return control of the motor to the flight controller."
+          "translation": "Return control of the motor to the controller."
         },
         "motor_override_disconnected": {
           "english": "Link lost. Override released.",
@@ -2025,10 +2025,10 @@
           "translation": "Enable motor override"
         },
         "motor_override_enable_msg": {
-          "english": "The flight controller drives the motor directly. Lift the wheels off the ground, secure the car and stand clear.",
-          "max_length": 112,
+          "english": "The controller drives the motor directly. Lift the wheels off the ground, secure the car and stand clear.",
+          "max_length": 105,
           "needs_translation": false,
-          "translation": "The flight controller drives the motor directly. Lift the wheels off the ground, secure the car and stand clear."
+          "translation": "The controller drives the motor directly. Lift the wheels off the ground, secure the car and stand clear."
         },
         "motor_override_note": {
           "english": "Wheels off the ground and the car secured.",
@@ -5027,10 +5027,10 @@
           "translation": "RC Command Throttle"
         },
         "input_rccmd_yaw": {
-          "english": "RC Command Yaw",
-          "max_length": 14,
+          "english": "RC Command Steering",
+          "max_length": 19,
           "needs_translation": false,
-          "translation": "RC Command Yaw"
+          "translation": "RC Command Steering"
         },
         "input_role_aux_fmt": {
           "english": "AUX %d",
@@ -5063,16 +5063,16 @@
           "translation": "Throttle"
         },
         "input_stab_pitch": {
-          "english": "Stabilized Pitch",
-          "max_length": 16,
+          "english": "Stabilized Pitch (unused)",
+          "max_length": 25,
           "needs_translation": false,
-          "translation": "Stabilized Pitch"
+          "translation": "Stabilized Pitch (unused)"
         },
         "input_stab_roll": {
-          "english": "Stabilized Roll",
-          "max_length": 15,
+          "english": "Stabilized Roll (unused)",
+          "max_length": 24,
           "needs_translation": false,
-          "translation": "Stabilized Roll"
+          "translation": "Stabilized Roll (unused)"
         },
         "input_stab_throttle": {
           "english": "Stabilized Throttle",
@@ -5081,10 +5081,10 @@
           "translation": "Stabilized Throttle"
         },
         "input_stab_yaw": {
-          "english": "Stabilized Yaw",
-          "max_length": 14,
+          "english": "Stabilized Steering",
+          "max_length": 19,
           "needs_translation": false,
-          "translation": "Stabilized Yaw"
+          "translation": "Stabilized Steering"
         },
         "move_down": {
           "english": "Move Down",
@@ -5171,10 +5171,10 @@
           "translation": "Role"
         },
         "role_differential_thrust_yaw": {
-          "english": "Differential Thrust Yaw",
-          "max_length": 23,
+          "english": "Diff. Thrust Steering",
+          "max_length": 21,
           "needs_translation": false,
-          "translation": "Differential Thrust Yaw"
+          "translation": "Diff. Thrust Steering"
         },
         "role_flap_compensation": {
           "english": "Flap Compensation",
@@ -6499,10 +6499,10 @@
           "translation": "Disable servo override"
         },
         "disable_servo_override_msg": {
-          "english": "Return control of the servos to the flight controller.",
-          "max_length": 54,
+          "english": "Return control of the servos to the controller.",
+          "max_length": 47,
           "needs_translation": false,
-          "translation": "Return control of the servos to the flight controller."
+          "translation": "Return control of the servos to the controller."
         },
         "enable_servo_override": {
           "english": "Enable servo override",
@@ -7775,10 +7775,10 @@
           "translation": "Servo %d (%s) is wiggling now, %d of %d. Did it move the wrong way?"
         },
         "dir_intro": {
-          "english": "Hands off the radio. The wizard turns the steering itself, and your sticks do nothing. Watch the wheels and say whether they move the way the picture shows.",
-          "max_length": 156,
+          "english": "Hands off the radio. The wizard turns the steering itself, and the wheel and trigger do nothing. Watch the wheels and say whether they move the way the picture shows.",
+          "max_length": 166,
           "needs_translation": false,
-          "translation": "Hands off the radio. The wizard turns the steering itself, and your sticks do nothing. Watch the wheels and say whether they move the way the picture shows."
+          "translation": "Hands off the radio. The wizard turns the steering itself, and the wheel and trigger do nothing. Watch the wheels and say whether they move the way the picture shows."
         },
         "dir_intro_title": {
           "english": "Steering direction",
@@ -8573,16 +8573,16 @@
           "translation": "Centred"
         },
         "mot_neutral_check": {
-          "english": "With the throttle stick at centre the wheels must not turn. The car only arms with the throttle at neutral.",
-          "max_length": 107,
+          "english": "With the throttle trigger at centre the wheels must not turn. The car only arms with the throttle at neutral.",
+          "max_length": 109,
           "needs_translation": false,
-          "translation": "With the throttle stick at centre the wheels must not turn. The car only arms with the throttle at neutral."
+          "translation": "With the throttle trigger at centre the wheels must not turn. The car only arms with the throttle at neutral."
         },
         "mot_neutral_intro_fmt": {
-          "english": "The controller sends neutral to the ESC as %d us. Calibrate the ESC with its neutral there (its throttle calibration, with the throttle stick centred), or the car creeps or brakes with the stick at centre.",
-          "max_length": 205,
+          "english": "The controller sends neutral to the ESC as %d us. Calibrate the ESC with its neutral there (its throttle calibration, with the throttle trigger centred), or the car creeps or brakes with the trigger at centre.",
+          "max_length": 209,
           "needs_translation": false,
-          "translation": "The controller sends neutral to the ESC as %d us. Calibrate the ESC with its neutral there (its throttle calibration, with the throttle stick centred), or the car creeps or brakes with the stick at centre."
+          "translation": "The controller sends neutral to the ESC as %d us. Calibrate the ESC with its neutral there (its throttle calibration, with the throttle trigger centred), or the car creeps or brakes with the trigger at centre."
         },
         "mot_neutral_no_signal": {
           "english": "No signal from the radio",
@@ -8597,10 +8597,10 @@
           "translation": "%d us (centre %d us)"
         },
         "mot_neutral_stick": {
-          "english": "Throttle stick",
-          "max_length": 14,
+          "english": "Throttle trigger",
+          "max_length": 16,
           "needs_translation": false,
-          "translation": "Throttle stick"
+          "translation": "Throttle trigger"
         },
         "mot_neutral_title": {
           "english": "Check neutral",
@@ -9475,10 +9475,10 @@
           "translation": "Reload local run stats from the model file?"
         },
         "save_prompt": {
-          "english": "Save local run stats and sync them to the flight controller?",
-          "max_length": 60,
+          "english": "Save local run stats and sync them to the controller?",
+          "max_length": 53,
           "needs_translation": false,
-          "translation": "Save local run stats and sync them to the flight controller?"
+          "translation": "Save local run stats and sync them to the controller?"
         },
         "totalflighttime": {
           "english": "Total Run Time",
@@ -9589,10 +9589,10 @@
           "translation": "Col. trim %"
         },
         "disable_mixer_message": {
-          "english": "Return control of the servos to the flight controller.",
-          "max_length": 54,
+          "english": "Return control of the servos to the controller.",
+          "max_length": 47,
           "needs_translation": false,
-          "translation": "Return control of the servos to the flight controller."
+          "translation": "Return control of the servos to the controller."
         },
         "disable_mixer_override": {
           "english": "Disable mixer override",
@@ -9651,10 +9651,10 @@
       "translation": "Background task not running"
     },
     "msg_load_failed_body": {
-      "english": "Data could not be read from the flight controller. Please reload.",
-      "max_length": 65,
+      "english": "Data could not be read from the controller. Please reload.",
+      "max_length": 58,
       "needs_translation": false,
-      "translation": "Data could not be read from the flight controller. Please reload."
+      "translation": "Data could not be read from the controller. Please reload."
     },
     "msg_load_failed_title": {
       "english": "Loading failed",
@@ -9669,10 +9669,10 @@
       "translation": "Loading..."
     },
     "msg_loading_from_fbl": {
-      "english": "Loading data from flight controller...",
-      "max_length": 38,
+      "english": "Loading data from controller...",
+      "max_length": 31,
       "needs_translation": false,
-      "translation": "Loading data from flight controller..."
+      "translation": "Loading data from controller..."
     },
     "msg_main_power_lost_banner": {
       "english": "MAIN POWER LOST",
@@ -9681,16 +9681,16 @@
       "translation": "MAIN POWER LOST"
     },
     "msg_please_disarm_to_save_warning": {
-      "english": "The flight controller rejected the save while armed. Your changes are safe and will be written to flash when you disarm.",
-      "max_length": 120,
+      "english": "The controller rejected the save while armed. Your changes are safe and will be written to flash when you disarm.",
+      "max_length": 113,
       "needs_translation": false,
-      "translation": "The flight controller rejected the save while armed. Your changes are safe and will be written to flash when you disarm."
+      "translation": "The controller rejected the save while armed. Your changes are safe and will be written to flash when you disarm."
     },
     "msg_reload_settings": {
-      "english": "Reload data from flight controller?",
-      "max_length": 35,
+      "english": "Reload data from controller?",
+      "max_length": 28,
       "needs_translation": false,
-      "translation": "Reload data from flight controller?"
+      "translation": "Reload data from controller?"
     },
     "msg_restarting": {
       "english": "Restarting...",
@@ -9699,22 +9699,22 @@
       "translation": "Restarting..."
     },
     "msg_restarting_fc": {
-      "english": "Restarting flight controller...",
-      "max_length": 31,
+      "english": "Restarting controller...",
+      "max_length": 24,
       "needs_translation": false,
-      "translation": "Restarting flight controller..."
+      "translation": "Restarting controller..."
     },
     "msg_save_current_page": {
-      "english": "Save current page to flight controller?",
-      "max_length": 39,
+      "english": "Save current page to controller?",
+      "max_length": 32,
       "needs_translation": false,
-      "translation": "Save current page to flight controller?"
+      "translation": "Save current page to controller?"
     },
     "msg_save_failed_body": {
-      "english": "Settings were not saved to the flight controller. Please try again.",
-      "max_length": 67,
+      "english": "Settings were not saved to the controller. Please try again.",
+      "max_length": 60,
       "needs_translation": false,
-      "translation": "Settings were not saved to the flight controller. Please try again."
+      "translation": "Settings were not saved to the controller. Please try again."
     },
     "msg_save_failed_local_body": {
       "english": "Settings were not saved to the radio. Please try again.",
@@ -10231,10 +10231,10 @@
       "translation": "ESC Voltage"
     },
     "sensor_flight_mode": {
-      "english": "Flight Mode",
-      "max_length": 11,
+      "english": "Drive Mode",
+      "max_length": 10,
       "needs_translation": false,
-      "translation": "Flight Mode"
+      "translation": "Drive Mode"
     },
     "sensor_gps_altitude": {
       "english": "GPS Altitude",
@@ -10453,10 +10453,10 @@
       "translation": "Yaw Attitude"
     },
     "sensor_yaw_control": {
-      "english": "Yaw Control",
-      "max_length": 11,
+      "english": "Steering Control",
+      "max_length": 16,
       "needs_translation": false,
-      "translation": "Yaw Control"
+      "translation": "Steering Control"
     }
   },
   "widgets": {

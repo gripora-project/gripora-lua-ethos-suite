@@ -23,7 +23,7 @@ Requires a running background task and a flight controller connection.
 
 | Setting | What it does |
 | --- | --- |
-| Craft name | TODO: explain behaviour, displayed units, range and conditions. |
+| Car name | TODO: explain behaviour, displayed units, range and conditions. |
 | PID loop speed | TODO: explain behaviour, displayed units, range and conditions. |
 | LED_STRIP | TODO: explain behaviour, displayed units, range and conditions. |
 | THRUST_VECTORING | TODO: explain behaviour, displayed units, range and conditions. |

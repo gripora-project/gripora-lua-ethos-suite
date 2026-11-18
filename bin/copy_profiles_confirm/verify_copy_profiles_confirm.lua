@@ -155,7 +155,7 @@ check("a dialog opens for the copy", dialog ~= nil)
 if dialog then
   check("the title says a profile is copied", resolve(dialog.title) == "Copy profile?",
     "title=" .. tostring(resolve(dialog.title)))
-  local expected = "Copy Rate Profile 3 to Profile 1? This permanently overwrites Profile 1 in the flight controller."
+  local expected = "Copy Rate Profile 3 to Profile 1? This permanently overwrites Profile 1 in the controller."
   check("the text names the type, the source and the destination it overwrites",
     dialog.message == expected, "message=" .. tostring(dialog.message))
 end
@@ -163,7 +163,7 @@ end
 print("PID copy")
 local pidDialog = confirmAfter(0, 0, 4)
 check("a PID copy names the PID profile, source 1 and destination 5",
-  pidDialog and pidDialog.message == "Copy PID Profile 1 to Profile 5? This permanently overwrites Profile 5 in the flight controller.",
+  pidDialog and pidDialog.message == "Copy PID Profile 1 to Profile 5? This permanently overwrites Profile 5 in the controller.",
   pidDialog and pidDialog.message or "no dialog")
 
 print(string.format("\n%d checks, %d failed", checks, failures))
