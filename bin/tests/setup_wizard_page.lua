@@ -493,7 +493,7 @@ local release = writesOf(0x5F1B, before + 1)
 check("leaving releases the setup state", #release == 1 and bytes(release[1].payload) == "0,0,0")
 check("leaving frees the wizard's own modules but keeps the override ones",
   package.loaded["grsuite.lib.msp_mixer_rules"] == nil and package.loaded["grsuite.app.setup_wizard_ui"] == nil
-  and package.loaded["grsuite.app.plane3d"] == nil
+  and package.loaded["grsuite.app.car3d"] == nil
   and package.loaded["grsuite.lib.msp_servo_config"] == nil and package.loaded["grsuite.lib.msp_mixer_override"] ~= nil)
 check("nothing is held after leaving", not requireModule("lib/override_keepalive.lua").isActive("mode_override"))
 

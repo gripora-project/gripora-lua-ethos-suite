@@ -2,7 +2,7 @@
 --
 -- Stateless renderer for app/pages/alignment.lua. It keeps the original
 -- module's important behavior: live attitude text, configured offset text,
--- nose-direction cue, and a 3D car (app/plane3d.lua, shared with the
+-- nose-direction cue, and a 3D car (app/car3d.lua, shared with the
 -- Setup Wizard) whose orientation follows MSP_ATTITUDE plus any *unsaved*
 -- edits to the board offset fields (see state.baseline in
 -- app/pages/alignment.lua -- the offsets already saved on the FC are
@@ -13,7 +13,7 @@ if package.loaded["grsuite.app.alignment_visual"] then
 end
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
-local plane3d = requireModule("app/plane3d.lua")
+local car3d = requireModule("app/car3d.lua")
 
 local floor = math.floor
 local max = math.max
@@ -27,7 +27,7 @@ end
 local alignment_visual = {}
 
 -- The 3D car's background work: call from the page's wakeup.
-alignment_visual.service = plane3d.service
+alignment_visual.service = car3d.service
 
 function alignment_visual.recenterYaw(state)
   local baseline = state.baseline or {}
@@ -108,7 +108,7 @@ function alignment_visual.draw(state)
     lcd.color(mainColor)
     lcd.drawText(miniX + 4, miniY + 2, "@i18n(app.modules.alignment.nose_direction)@", LEFT)
 
-    local ux, uy = plane3d.noseDirection(roll, pitch, yaw)
+    local ux, uy = car3d.noseDirection(roll, pitch, yaw)
     if ux then
       local htxt, vtxt = "center", "center"
       if ux > 0.35 then htxt = "left" elseif ux < -0.35 then htxt = "right" end
@@ -131,7 +131,7 @@ function alignment_visual.draw(state)
     end
   end
 
-  plane3d.draw(gx0, gy0, gw0, gh0, roll, pitch, yaw)
+  car3d.draw(gx0, gy0, gw0, gh0, roll, pitch, yaw)
 end
 
 package.loaded["grsuite.app.alignment_visual"] = alignment_visual

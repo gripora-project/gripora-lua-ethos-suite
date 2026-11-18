@@ -1,6 +1,6 @@
 -- The 3D model: a low-poly car drawn at a given attitude inside a box. Used
 -- by the Alignment page (app/alignment_visual.lua) and the Setup Wizard's
--- Sensors step. (The file keeps the name it had when it drew aircraft.)
+-- Sensors step.
 --
 -- The car is the Configurator's preview car (gripora-configurator
 -- src/js/car_model.js) in low poly: orange body, dark cabin, four six-sided
@@ -8,9 +8,9 @@
 -- numbers are that file's, in the same glTF-style axes (x = width, y = up,
 -- z = aft, nose at -z).
 --
---   plane3d.draw(x, y, w, h, roll, pitch, yaw[, zoom])   -- from paint
---   plane3d.service()          -- from wakeup, on every page that draws it
---   local ux, uy = plane3d.noseDirection(roll, pitch, yaw)
+--   car3d.draw(x, y, w, h, roll, pitch, yaw[, zoom])   -- from paint
+--   car3d.service()          -- from wakeup, on every page that draws it
+--   local ux, uy = car3d.noseDirection(roll, pitch, yaw)
 --
 -- Ethos stops any callback that runs 20000 Lua instructions, so neither the
 -- mesh build nor a frame happens in paint: service() does one step per wakeup
@@ -38,8 +38,8 @@
 -- plane, so the top of a level car stays visible. No tables are allocated
 -- per paint or frame; shaded colours are built once per theme, the mesh once.
 
-if package.loaded["grsuite.app.plane3d"] then
-  return package.loaded["grsuite.app.plane3d"]
+if package.loaded["grsuite.app.car3d"] then
+  return package.loaded["grsuite.app.car3d"]
 end
 
 local cos = math.cos
@@ -448,7 +448,7 @@ local function frameWanted()
     or listZoom ~= wantZoom or listDark ~= wantDark)
 end
 
-local plane3d = {}
+local car3d = {}
 
 -- Ask for the model at (roll, pitch, yaw) inside the box, and draw the last
 -- finished frame if it was made for this box (its attitude may be a step
@@ -457,7 +457,7 @@ local plane3d = {}
 -- perspective can push a tip pointing at the camera slightly further, which
 -- the clip catches. A caller whose model only tilts a little can zoom in
 -- and let the clip take the rare overflow.
-function plane3d.draw(x, y, w, h, roll, pitch, yaw, zoom)
+function car3d.draw(x, y, w, h, roll, pitch, yaw, zoom)
   if w < 8 or h < 8 then return end
   wantX, wantY, wantW, wantH = x, y, w, h
   wantRoll, wantPitch, wantYaw, wantZoom = roll or 0, pitch or 0, yaw or 0, zoom or 1
@@ -478,7 +478,7 @@ end
 -- Call it from wakeup on any page that draws the car.
 -- Returns true when it did something; invalidates the screen when a frame
 -- is finished.
-function plane3d.service()
+function car3d.service()
   if buildStage > 0 then
     STAGES[buildStage]()
     if buildStage < #STAGES then
@@ -506,7 +506,7 @@ end
 
 -- Where the nose points on screen, as a unit vector (x right, y up), or
 -- nil when it points straight at or away from the viewer.
-function plane3d.noseDirection(roll, pitch, yaw)
+function car3d.noseDirection(roll, pitch, yaw)
   local pitchR, yawR, rollR = toRadians(roll, pitch, yaw)
   local nx, ny, nz = rotatePoint(2.2, 0.0, 0.0, pitchR, yawR, rollR)
   local tx, ty, tz = rotatePoint(-2.2, 0.0, 0.0, pitchR, yawR, rollR)
@@ -519,5 +519,5 @@ function plane3d.noseDirection(roll, pitch, yaw)
   return dx / mag, dy / mag
 end
 
-package.loaded["grsuite.app.plane3d"] = plane3d
-return plane3d
+package.loaded["grsuite.app.car3d"] = car3d
+return car3d

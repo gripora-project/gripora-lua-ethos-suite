@@ -10,7 +10,7 @@
 --           the FC to clear ARMING_DISABLED_CALIBRATING, lib/acc_calibration_wait.lua)
 --   align   MSP2_GRIPORA_BOARD_AUTO_ALIGN: flat, Start, lift the rear 20 deg;
 --           the result is written as the board alignment. A side view of
---           the car (app/plane3d.lua) shows the rear lift.
+--           the car (app/car3d.lua) shows the rear lift.
 --   check   the live attitude (MSP_ATTITUDE) on the 3D car, seen from
 --           behind: tilting the car must move the picture the same way.
 --           The firmware applies an auto-align result at once, so this
@@ -35,7 +35,7 @@ local autoAlign = requireModule("lib/msp_board_auto_align.lua")
 local boardAlignment = requireModule("lib/msp_board_alignment_config.lua")
 local mountTrim = requireModule("lib/msp_board_mount_trim.lua")
 local attitude = requireModule("lib/msp_attitude.lua")
-local plane3d = requireModule("app/plane3d.lua")
+local car3d = requireModule("app/car3d.lua")
 
 local T = {
   title = "@i18n(app.modules.setup_wizard.sen_title)@",
@@ -87,7 +87,7 @@ local ATTITUDE_TIMEOUT = 3.0
 local SIDE_YAW = -65
 local TAIL_LIFT = 20
 -- The pictures tilt only a little: a little bigger
--- than plane3d's fit-any-attitude size (it clips what overflows).
+-- than car3d's fit-any-attitude size (it clips what overflows).
 local LIFT_ZOOM = 1.3
 local LIVE_ZOOM = 1.25
 local PARTS = 4
@@ -131,23 +131,23 @@ local function new(wiz)
   end
 
   -- The 3D car.
-  local function plane(x, y, w, h, roll, pitch, yaw, zoom)
-    plane3d.draw(x, y, w, h, roll, pitch, yaw, zoom)
+  local function drawCar(x, y, w, h, roll, pitch, yaw, zoom)
+    car3d.draw(x, y, w, h, roll, pitch, yaw, zoom)
   end
 
   -- The car level: the intro, the calibration and the level screens.
   local function drawLevel(x, y, w, h)
-    plane(x, y, w, h, 0, 0, SIDE_YAW, LIFT_ZOOM)
+    drawCar(x, y, w, h, 0, 0, SIDE_YAW, LIFT_ZOOM)
   end
 
   -- The car from the side, its rear lifted while auto align waits for it.
   local function drawLift(x, y, w, h)
-    plane(x, y, w, h, 0, (autoKind == "align") and TAIL_LIFT or 0, SIDE_YAW, LIFT_ZOOM)
+    drawCar(x, y, w, h, 0, (autoKind == "align") and TAIL_LIFT or 0, SIDE_YAW, LIFT_ZOOM)
   end
 
   -- The car from behind at the live attitude (the numbers are rows).
   local function drawLive(x, y, w, h)
-    plane(x, y, w, h, live.roll, live.pitch, 0, LIVE_ZOOM)
+    drawCar(x, y, w, h, live.roll, live.pitch, 0, LIVE_ZOOM)
   end
 
   local function onAttitude(values)

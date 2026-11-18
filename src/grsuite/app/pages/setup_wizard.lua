@@ -53,7 +53,7 @@ local SHELL_MODULES = {
   "grsuite.lib.msp_servo_names", "grsuite.lib.servo_names",
   "grsuite.lib.msp_rc_channels",
   "grsuite.lib.setup_wizard_surfaces", "grsuite.app.setup_wizard_ui", "grsuite.app.setup_wizard_art",
-  "grsuite.app.plane3d",
+  "grsuite.app.car3d",
 }
 local shellOwned = {}
 for i = 1, #SHELL_MODULES do
@@ -1225,7 +1225,7 @@ local function open(opts)
   local function wakeup()
     if disposed then return end
     -- The 3D pictures are built and drawn into a list a step at a time
-    -- here, never in paint (app/plane3d.lua).
+    -- here, never in paint (app/car3d.lua).
     art.service()
 
     if loadFailed then

@@ -213,7 +213,7 @@ local function open(opts)
     rebootAfterSave = true,
     unloadPackageKeys = {
       "grsuite.app.alignment_visual",
-      "grsuite.app.plane3d",
+      "grsuite.app.car3d",
       "grsuite.lib.msp_attitude",
       "grsuite.lib.msp_board_alignment_config",
       "grsuite.lib.msp_sensor_alignment",
