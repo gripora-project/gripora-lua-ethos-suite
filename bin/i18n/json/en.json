@@ -7736,7 +7736,7 @@
           "english": "Turns ABS, traction and launch control off: throttle and brake go straight to the ESC. The gyro still steers.",
           "translation": "Turns ABS, traction and launch control off: throttle and brake go straight to the ESC. The gyro still steers.",
           "needs_translation": false,
-          "max_length": 84
+          "max_length": 109
         },
         "mod_help_launch": {
           "english": "Stages a launch for launch control: turn it on at the line, and the first pull of the trigger launches the car. Set it up under Tuning, Launch.",
