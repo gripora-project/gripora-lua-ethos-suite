@@ -26,7 +26,7 @@ end
 
 local alignment_visual = {}
 
--- The 3D plane's background work: call from the page's wakeup.
+-- The 3D car's background work: call from the page's wakeup.
 alignment_visual.service = plane3d.service
 
 function alignment_visual.recenterYaw(state)
@@ -131,8 +131,6 @@ function alignment_visual.draw(state)
     end
   end
 
-  plane3d.setup(nil)
-  plane3d.pose(nil)
   plane3d.draw(gx0, gy0, gw0, gh0, roll, pitch, yaw)
 end
 
