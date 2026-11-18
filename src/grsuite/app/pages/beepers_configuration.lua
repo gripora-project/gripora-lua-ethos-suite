@@ -4,7 +4,7 @@ local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("
 local beepersPage = requireModule("app/pages/beepers_page.lua")
 
 local page = beepersPage.new({
-  title = "@i18n(app.modules.beepers.name)@ / @i18n(app.modules.beepers.menu_configuration)@",
+  title = "@i18n(app.modules.beepers.menu_configuration)@",
   fields = {
     {bit = 0, maskField = "beeper_off_flags", label = "@i18n(app.modules.beepers.field_gyro_calibrated)@"},
     {bit = 1, maskField = "beeper_off_flags", label = "@i18n(app.modules.beepers.field_rx_lost)@"},

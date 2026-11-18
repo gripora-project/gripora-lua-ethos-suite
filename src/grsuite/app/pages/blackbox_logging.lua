@@ -5,7 +5,7 @@ local blackboxPage = requireModule("app/pages/blackbox_edit_page.lua")
 
 return blackboxPage.new({
   kind = "logging",
-  title = "@i18n(app.modules.blackbox.name)@ / @i18n(app.modules.blackbox.menu_logging)@",
+  title = "@i18n(app.modules.blackbox.menu_logging)@",
   fields = {
     {label = "@i18n(app.modules.blackbox.log_command)@", bit = 0},
     {label = "@i18n(app.modules.blackbox.log_setpoint)@", bit = 1},

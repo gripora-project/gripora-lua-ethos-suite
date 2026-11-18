@@ -41,7 +41,7 @@ The three rows at the bottom show the health of the background task, which owns 
 | *Heartbeat* | The age of the last heartbeat in seconds. A value that keeps growing means the task has stopped. |
 | *Revivals* | How often the suite has rebuilt the task's message queue and scheduler after a stalled tick. A number that rises during a flight means the watchdog is catching a fault. |
 
-The Lua heap and free RAM are on *Diagnostics / Status*.
+The Lua heap and free RAM are on *Status* (under *Diagnostics*).
 
 ## Source
 

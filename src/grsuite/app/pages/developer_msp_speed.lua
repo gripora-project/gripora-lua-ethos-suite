@@ -7,7 +7,7 @@ local header = requireModule("app/header.lua")
 local batteryConfig = requireModule("lib/msp_battery_config.lua")
 local rcConfig = requireModule("lib/msp_rc_config.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.txt_developer)@ / @i18n(app.modules.msp_speed.name)@"
+local PAGE_TITLE = "@i18n(app.modules.msp_speed.name)@"
 local TESTING_TITLE = "@i18n(app.modules.msp_speed.testing)@"
 local TESTING_BODY = "@i18n(app.modules.msp_speed.testing_performance)@"
 

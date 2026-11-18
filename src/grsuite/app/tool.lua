@@ -248,14 +248,14 @@ local MENUS = {
     },
   },
   settings_dashboard_menu = {
-    title = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.dashboard)@",
+    title = "@i18n(app.modules.settings.dashboard)@",
     entries = {
       {title = "@i18n(app.modules.settings.dashboard_theme)@", icon = lcd.loadMask("app/gfx/settings_dashboard_theme.png"), script = "app/pages/settings_dashboard_theme.lua", offline = true},
       {title = "@i18n(app.modules.settings.dashboard_settings)@", icon = lcd.loadMask("app/gfx/settings_dashboard_settings.png"), script = "app/pages/settings_dashboard_settings.lua", offline = true},
     },
   },
   settings_activelook_menu = {
-    title = "@i18n(app.modules.settings.name)@ / ActiveLook",
+    title = "ActiveLook",
     entries = {
       {title = "@i18n(app.modules.settings.activelook_settings)@", icon = lcd.loadMask("app/gfx/settings_activelook_settings.png"), script = "app/pages/settings_activelook_settings.lua", offline = true},
       {title = "@i18n(app.modules.settings.activelook_preflight)@", icon = lcd.loadMask("app/gfx/settings_activelook_preflight.png"), script = "app/pages/settings_activelook_preflight.lua", offline = true},
@@ -264,7 +264,7 @@ local MENUS = {
     },
   },
   settings_audio_menu = {
-    title = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.audio)@",
+    title = "@i18n(app.modules.settings.audio)@",
     entries = {
       {title = "@i18n(app.modules.settings.txt_audio_events)@", icon = lcd.loadMask("app/gfx/settings_audio_events.png"), menuId = "settings_audio_events_menu", offline = true},
       {title = "@i18n(app.modules.settings.txt_audio_switches)@", icon = lcd.loadMask("app/gfx/settings_audio_switches.png"), script = "app/pages/settings_audio_switches.lua", offline = true},
@@ -288,7 +288,7 @@ local MENUS = {
   -- no MSP read, which is why it was reachable without a flight controller before
   -- and must stay reachable now.
   settings_audio_events_menu = {
-    title = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.audio)@ / @i18n(app.modules.settings.txt_audio_events)@",
+    title = "@i18n(app.modules.settings.txt_audio_events)@",
     entries = {
       {title = "@i18n(app.modules.settings.voltage)@", icon = lcd.loadMask("app/gfx/power_battery.png"), script = "app/pages/settings_audio_events_voltage.lua", offline = true},
       {title = "@i18n(app.modules.settings.esc_temperature)@", icon = lcd.loadMask("app/gfx/esc_motors.png"), script = "app/pages/settings_audio_events_esc.lua", offline = true},
@@ -318,8 +318,11 @@ local MENUS = {
       -- Driving Feel (Master Gain, I-term Decay, I-term Relax) is where
       -- tuning starts (see app/pages/master_gains.lua's own header).
       {title = "@i18n(app.modules.master_gains.name)@", icon = lcd.loadMask("app/gfx/master_gains.png"), script = "app/pages/master_gains.lua", group = "@i18n(app.menu_section_steering)@"},
-      -- Drive aids: ABS and traction control on one page.
-      {title = "@i18n(app.modules.drive_aids.name)@", icon = lcd.loadMask("app/gfx/esc_motors_throttle.png"), script = "app/pages/drive_aids_abs.lua", group = "@i18n(app.menu_section_drive_aids)@"},
+      -- Drive aids: one page per aid. Both edit the same MSP message
+      -- (MSP2_GRIPORA_DRIVE_AIDS_CONFIG); each builds only its own fields. The
+      -- Traction Control tile is titled "Traction" to fit the X18's tiles.
+      {title = "@i18n(app.modules.drive_aids.abs_name)@", icon = lcd.loadMask("app/gfx/esc_motors.png"), script = "app/pages/drive_aids_abs.lua", group = "@i18n(app.menu_section_drive_aids)@"},
+      {title = "@i18n(app.modules.drive_aids.tc_tile)@", icon = lcd.loadMask("app/gfx/esc_motors_throttle.png"), script = "app/pages/drive_aids_tc.lua", group = "@i18n(app.menu_section_drive_aids)@"},
       {title = "@i18n(app.modules.filters.name)@", icon = lcd.loadMask("app/gfx/filters.png"), script = "app/pages/filters.lua", group = "@i18n(app.menu_section_advanced)@"},
       {title = "@i18n(app.modules.pid_controller.name)@", icon = lcd.loadMask("app/gfx/pid_controller.png"), script = "app/pages/pid_controller.lua", group = "@i18n(app.menu_section_advanced)@"},
       {title = "@i18n(app.modules.pid_bandwidth.name)@", icon = lcd.loadMask("app/gfx/pid_bandwidth.png"), script = "app/pages/pid_bandwidth.lua", group = "@i18n(app.menu_section_advanced)@"},

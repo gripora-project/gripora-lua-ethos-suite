@@ -32,12 +32,13 @@
 -- rebuild keeps the useful per-resolution profiles, chosen only from
 -- the current screen size so every menu on a given radio is consistent.
 --
--- The *first* group is the exception: rather than a generic screen title
--- ("Gripora") immediately followed by a same-looking group line
--- right below it, the first group's name becomes the header's own title
--- -- one line, not two. Only the second and later groups get their own
--- separate label line. A screen whose first entry has no group falls
--- back to the plain screen title, unchanged.
+-- On the root menu the *first* group is the exception: rather than the
+-- generic screen title ("Gripora", already in Ethos's own title bar)
+-- immediately followed by a same-looking group line right below it, the
+-- first group's name becomes the header's own title -- one line, not two.
+-- A submenu always shows its own title (Tuning, Setup, ...) in the header,
+-- so the pilot can see where they are, and every one of its groups gets a
+-- label line, the first included.
 --
 -- Every screen this renders installs its own physical-Back-key handler
 -- via `setEventHandler` (see app/close_key.lua and app/tool.lua,
@@ -225,7 +226,7 @@ local function openScreen(nav, menus, rootEntries, screen, setEventHandler, setW
   end
 
   local firstGroup = nil
-  for i = 1, #entries do
+  for i = 1, (screen == nil) and #entries or 0 do
     if isEntryVisible(entries[i]) then
       firstGroup = entries[i].group
       break

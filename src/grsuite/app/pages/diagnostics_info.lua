@@ -5,7 +5,7 @@ local common = requireModule("app/diagnostics_common.lua")
 local buildInfo = requireModule("lib/build_info.lua")
 local bgtaskStatus = requireModule("lib/bgtask_status.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.diagnostics.name)@ / @i18n(app.modules.info.name)@"
+local PAGE_TITLE = "@i18n(app.modules.info.name)@"
 local SUPPORTED_MSP = "33.0+"
 local REFRESH_INTERVAL = 1.0
 local STATE_TEXT = {

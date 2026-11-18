@@ -16,7 +16,7 @@
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local common = requireModule("app/pages/settings_audio_events_common.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.audio)@ / @i18n(app.modules.settings.audio_event_state)@"
+local PAGE_TITLE = "@i18n(app.modules.settings.audio_event_state)@"
 
 local function open(opts)
   common.openPage(PAGE_TITLE, opts, function(ctx)

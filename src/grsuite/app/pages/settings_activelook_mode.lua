@@ -8,7 +8,7 @@ local activeConfig = requireModule("lib/activelook_config.lua")
 local modePage = {}
 
 local function openMode(modeKey, label, opts)
-  local title = "@i18n(app.modules.settings.name)@ / ActiveLook / " .. label
+  local title = label
   pageCommon.openPage(title, opts, function(settings, updateSaveEnabled)
     settings.activelook = activeConfig.withDefaults(settings.activelook)
     bus.publish("activelook.control", {previewMode = modeKey})

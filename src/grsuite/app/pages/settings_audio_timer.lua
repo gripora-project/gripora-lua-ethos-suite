@@ -8,7 +8,7 @@ local settingsStore = requireModule("lib/settings_store.lua")
 local settingsSave = requireModule("app/settings_save.lua")
 local leaveConfirm = requireModule("app/leave_confirm.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.audio)@ / @i18n(app.modules.settings.txt_audio_timer)@"
+local PAGE_TITLE = "@i18n(app.modules.settings.txt_audio_timer)@"
 local BTN_OK = "@i18n(app.btn_ok)@"
 local BTN_CANCEL = "@i18n(app.btn_cancel)@"
 local MSG_SAVE_TITLE = "@i18n(app.msg_save_settings)@"

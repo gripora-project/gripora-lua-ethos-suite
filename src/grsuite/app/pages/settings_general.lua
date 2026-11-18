@@ -8,7 +8,7 @@ local settingsStore = requireModule("lib/settings_store.lua")
 local settingsSave = requireModule("app/settings_save.lua")
 local leaveConfirm = requireModule("app/leave_confirm.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.txt_general)@"
+local PAGE_TITLE = "@i18n(app.modules.settings.txt_general)@"
 
 local TXBATT_CHOICES = {
   {"@i18n(app.modules.settings.tx_battery_default)@", 0},

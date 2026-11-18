@@ -11,7 +11,7 @@ local tableClone = requireModule("lib/table_clone.lua")
 local leaveConfirm = requireModule("app/leave_confirm.lua")
 local dashboardThemes = requireModule("lib/dashboard_themes.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.dashboard)@ / @i18n(app.modules.settings.dashboard_theme)@"
+local PAGE_TITLE = "@i18n(app.modules.settings.dashboard_theme)@"
 local BTN_OK = "@i18n(app.btn_ok)@"
 local BTN_CANCEL = "@i18n(app.btn_cancel)@"
 local MSG_SAVE_TITLE = "@i18n(app.msg_save_settings)@"

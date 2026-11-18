@@ -11,7 +11,7 @@
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local common = requireModule("app/pages/settings_audio_events_common.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.audio)@ / @i18n(app.modules.settings.voltage)@"
+local PAGE_TITLE = "@i18n(app.modules.settings.voltage)@"
 
 -- What the low-voltage callout speaks once it fires. Values are stored as
 -- numbers because the store holds scalars; 0 keeps the alert-only tone the

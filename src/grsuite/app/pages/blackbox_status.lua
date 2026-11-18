@@ -9,7 +9,7 @@ local dataflashSummary = requireModule("lib/msp_dataflash_summary.lua")
 local sdcardSummary = requireModule("lib/msp_sdcard_summary.lua")
 local dataflashErase = requireModule("lib/msp_dataflash_erase.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.blackbox.name)@ / @i18n(app.modules.blackbox.menu_status)@"
+local PAGE_TITLE = "@i18n(app.modules.blackbox.menu_status)@"
 local BTN_OK = "@i18n(app.btn_ok)@"
 local BTN_CANCEL = "@i18n(app.btn_cancel)@"
 local SDCARD_NOT_PRESENT = 0

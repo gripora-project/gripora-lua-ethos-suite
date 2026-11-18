@@ -7,7 +7,7 @@ local mspStatus = requireModule("lib/msp_status.lua")
 local dataflashSummary = requireModule("lib/msp_dataflash_summary.lua")
 local armingFlags = requireModule("lib/arming_flags.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.diagnostics.name)@ / @i18n(app.modules.fblstatus.name)@"
+local PAGE_TITLE = "@i18n(app.modules.fblstatus.name)@"
 
 -- Heading above the per-reason rows, which are indented under it.
 local ARMING_DETAIL_HEADING = "@i18n(app.modules.fblstatus.arming_flags_active_list)@"

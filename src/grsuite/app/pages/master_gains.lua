@@ -5,11 +5,9 @@
 -- 94/95, see lib/msp_pid_profile.lua) as app/pages/pid_controller.lua --
 -- a second page sharing one codec, same as every field that page itself
 -- doesn't build a widget for already round-trips unchanged on every save
--- (see that file's own header comment). Rows Steering/Throttle/Speed,
--- matching gripora-configurator's Driving Feel table: Gain (master_gain_2,
--- fw_tpa_gain on Throttle, fw_spa_gain on Speed), Decay
--- (iterm_decay_time_2) and Relax (bounceback_2). Throttle and Speed have
--- only a Gain. Only yaw is stabilised, so the roll and pitch rows
+-- (see that file's own header comment). Steering Gain (master_gain_2),
+-- Decay (iterm_decay_time_2), Relax (bounceback_2), Throttle Gain
+-- (fw_tpa_gain) and Speed Gain (fw_spa_gain), one per line. Only yaw is stabilised, so the roll and pitch rows
 -- (master_gain_0/1, iterm_decay_time_0/1, bounceback_0/1) are not shown;
 -- they are written back unchanged.
 --
@@ -26,15 +24,18 @@ local pidProfile = requireModule("lib/msp_pid_profile.lua")
 
 local PAGE_TITLE = "@i18n(app.modules.master_gains.name)@"
 
--- Gain, Decay, Relax column widths (see field_layout.tableSlots); Relax
--- gets a little more room. Curves are assigned on app/pages/gain_curves.lua.
-local COLUMN_WEIGHTS = {1, 1, 1.3}
-local COLUMN_START = 0.45 -- fraction of the row width where the first column starts
-
-local AXES = {
-  {label = "@i18n(app.modules.pids.steering)@", gainKey = "master_gain_2", decayKey = "iterm_decay_time_2", bouncebackKey = "bounceback_2"},
-  {label = "@i18n(app.modules.master_gains.axis_throttle)@", gainKey = "fw_tpa_gain"},
-  {label = "@i18n(app.modules.master_gains.axis_speed)@", gainKey = "fw_spa_gain"},
+-- One setting per line. The Configurator shows these as a Steering/Throttle/
+-- Speed table, but on the radio a table whose Throttle and Speed rows have only
+-- one of three cells reads worse than plain lines. I-term Decay is the other
+-- half of how "locked" the steering feels: Gain sets how hard it pushes back,
+-- Decay how long it remembers the disturbance. Relax is a 1-10 score (higher =
+-- more relax, less bounce-back). Curves are assigned on app/pages/gain_curves.lua.
+local FIELDS = {
+  {label = "@i18n(app.modules.master_gains.steering_gain)@", key = "master_gain_2"},
+  {label = "@i18n(app.modules.master_gains.lock)@", key = "iterm_decay_time_2"},
+  {label = "@i18n(app.modules.master_gains.bounceback)@", key = "bounceback_2"},
+  {label = "@i18n(app.modules.master_gains.throttle_gain)@", key = "fw_tpa_gain"},
+  {label = "@i18n(app.modules.master_gains.speed_gain)@", key = "fw_spa_gain"},
 }
 
 -- opts.onBack: called to return to the menu (the header's Menu button or
@@ -51,29 +52,8 @@ local function open(opts)
   form.clear()
   runtime:buildChrome()
 
-  -- Header row + per-axis rows, mirroring app/pages/mixer_config.lua's
-  -- own Roll/Pitch/Yaw table (Gain/Invert columns there) -- a header row
-  -- naming the columns once reads better than field_layout.buildGroup's
-  -- usual per-row inline mini-labels repeated on every row.
-  local headerLine = form.addLine(" ")
-  local headerSlots = fieldLayout.tableSlots(headerLine, COLUMN_WEIGHTS, COLUMN_START)
-  form.addStaticText(headerLine, headerSlots[1], "@i18n(app.modules.master_gains.gain)@", RIGHT)
-  form.addStaticText(headerLine, headerSlots[2], "@i18n(app.modules.master_gains.lock)@", RIGHT)
-  form.addStaticText(headerLine, headerSlots[3], "@i18n(app.modules.master_gains.bounceback)@", RIGHT)
-
-  -- I-term Decay is the other half of how "locked" each axis
-  -- feels: Master Gain sets how hard it pushes back, Decay how long it remembers
-  -- the disturbance. I-term Relax is a 1-10 score (higher = more relax, less
-  -- bounce-back). Throttle and Speed have neither, so their last two slots
-  -- stay empty.
-  for _, axis in ipairs(AXES) do
-    local line = form.addLine(axis.label)
-    local slots = fieldLayout.tableSlots(line, COLUMN_WEIGHTS, COLUMN_START)
-    fieldLayout.buildField(runtime, line, slots[1], {key = axis.gainKey})
-    if axis.decayKey then
-      fieldLayout.buildField(runtime, line, slots[2], {key = axis.decayKey})
-      fieldLayout.buildField(runtime, line, slots[3], {key = axis.bouncebackKey})
-    end
+  for _, field in ipairs(FIELDS) do
+    fieldLayout.buildSingle(runtime, field.label, {key = field.key})
   end
 
   runtime:loadInitial()

@@ -9,7 +9,7 @@ local settingsSave = requireModule("app/settings_save.lua")
 local mspExp = requireModule("lib/msp_experimental.lua")
 local eeprom = requireModule("lib/msp_eeprom.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.txt_developer)@ / @i18n(app.modules.msp_exp.name)@"
+local PAGE_TITLE = "@i18n(app.modules.msp_exp.name)@"
 local MSG_LOADING = "@i18n(app.msg_loading)@"
 local MSG_SAVING = "@i18n(app.msg_saving)@"
 local DEFAULT_BYTES = 8

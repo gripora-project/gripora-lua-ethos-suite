@@ -14,7 +14,7 @@ local settingsSave = requireModule("app/settings_save.lua")
 local dashboardContext = requireModule("widgets/dashboard/context.lua")
 local dashboardThemes = requireModule("lib/dashboard_themes.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.name)@ / @i18n(app.modules.settings.dashboard)@ / @i18n(app.modules.settings.dashboard_settings)@"
+local PAGE_TITLE = "@i18n(app.modules.settings.dashboard_settings)@"
 local NO_THEMES = "@i18n(app.modules.settings.no_themes_available_to_configure)@"
 
 local THEME_DEFS = {

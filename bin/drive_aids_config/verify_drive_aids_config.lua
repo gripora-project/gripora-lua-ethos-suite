@@ -185,31 +185,41 @@ check("8-byte reply is reported through onError as refused", err and refused == 
 -- ---------------------------------------------------------------------------
 print("case 6: the page and its menu row")
 
-local page = readFile(SUITE .. "/app/pages/drive_aids_abs.lua")
-check("page file readable", page ~= nil)
-if page then
-  check("page uses this codec", page:find("lib/msp_drive_aids_config.lua", 1, true) ~= nil)
-  check("page is an MSP page (save refused while armed)", page:find("isMspPage%s*=%s*true") ~= nil)
-  check("page does not reboot after save", page:find("rebootAfterSave") == nil)
+local function checkPage(file, title, keys)
+  local page = readFile(SUITE .. "/app/pages/" .. file)
+  check(file .. " readable", page ~= nil)
+  if not page then return end
+  check(file .. " uses this codec", page:find("lib/msp_drive_aids_config.lua", 1, true) ~= nil)
+  check(file .. " is an MSP page (save refused while armed)", page:find("isMspPage%s*=%s*true") ~= nil)
+  check(file .. " does not reboot after save", page:find("rebootAfterSave") == nil)
   -- Stored per PID profile; the message reads/writes the current one, so the page
   -- keeps page_runtime's default profile scope (title "#n", reload on change).
-  check("page is PID-profile scoped (no profileField override)", page:find("profileField%s*=") == nil)
-  for i = 1, #ORDER do
-    check("page builds " .. ORDER[i], page:find('key = "' .. ORDER[i] .. '"', 1, true) ~= nil)
+  check(file .. " is PID-profile scoped (no profileField override)", page:find("profileField%s*=") == nil)
+  for i = 1, #keys do
+    check(file .. " builds " .. keys[i], page:find('key = "' .. keys[i] .. '"', 1, true) ~= nil)
   end
-  check("page builds tc_mode", page:find('key = "tc_mode"', 1, true) ~= nil)
-  check("page builds tc_ramp_time", page:find('key = "tc_ramp_time"', 1, true) ~= nil)
-  check("page title is Drive Aids", page:find('PAGE_TITLE = "@i18n(app.modules.drive_aids.name)@"', 1, true) ~= nil)
+  check(file .. " title is " .. title, page:find('PAGE_TITLE = "@i18n(app.modules.drive_aids.' .. title .. ')@"', 1, true) ~= nil)
 end
 
+-- ABS and traction control are one page each, sharing the codec: between them
+-- they build every field.
+checkPage("drive_aids_abs.lua", "abs_name", ORDER)
+checkPage("drive_aids_tc.lua", "tc_name", {"tc_mode", "tc_ramp_time"})
+
 local tool = readFile(SUITE .. "/app/tool.lua")
-local row = tool and tool:match("[^\n]*app/pages/drive_aids_abs%.lua[^\n]*")
-check("menu row present in app/tool.lua", row ~= nil)
-if row then
-  local icon = row:match('lcd%.loadMask%("([^"]+)"%)')
-  check("menu row icon exists", icon ~= nil and readFile(SUITE .. "/" .. icon) ~= nil, icon)
-  check("menu row is in the Drive Aids group", row:find("app.menu_section_drive_aids", 1, true) ~= nil)
-  check("menu tile is titled Drive Aids", row:find("app.modules.drive_aids.name", 1, true) ~= nil)
+local function menuRow(pattern)
+  return tool and tool:match("[^\n]*" .. pattern .. "[^\n]*")
+end
+for _, file in ipairs({"drive_aids_abs.lua", "drive_aids_tc.lua"}) do
+  local row = menuRow("app/pages/" .. file:gsub("%.", "%%."))
+  check("menu row present for " .. file, row ~= nil)
+  if row then
+    local icon = row:match('lcd%.loadMask%("([^"]+)"%)')
+    check(file .. " menu row icon exists", icon ~= nil and readFile(SUITE .. "/" .. icon) ~= nil, icon)
+    local tuningAt = tool:find("tuning_menu = {", 1, true)
+    check(file .. " is in the Tuning menu", tuningAt ~= nil and tool:find(row, 1, true) > tuningAt)
+    check(file .. " is in the Drive Aids group", row:find("app.menu_section_drive_aids", 1, true) ~= nil)
+  end
 end
 
 -- ---------------------------------------------------------------------------

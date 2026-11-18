@@ -7917,13 +7917,6 @@
           "max_length": 12,
           "reverse_text": false
         },
-        "gain": {
-          "english": "Gain",
-          "translation": "Gain",
-          "needs_translation": false,
-          "max_length": 4,
-          "reverse_text": false
-        },
         "lock": {
           "english": "Decay",
           "translation": "Decay",
@@ -7958,6 +7951,27 @@
           "needs_translation": true,
           "reverse_text": false,
           "max_length": 5
+        },
+        "steering_gain": {
+          "english": "Steering Gain",
+          "translation": "Steering Gain",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 13
+        },
+        "throttle_gain": {
+          "english": "Throttle Gain",
+          "translation": "Throttle Gain",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 13
+        },
+        "speed_gain": {
+          "english": "Speed Gain",
+          "translation": "Speed Gain",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 10
         }
       },
       "gain_curves": {
@@ -10837,13 +10851,6 @@
           "reverse_text": false,
           "max_length": 7
         },
-        "abs_freq": {
-          "english": "Pulse Rate",
-          "translation": "Pulse Rate",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 10
-        },
         "abs_floor": {
           "english": "Release Floor",
           "translation": "Release Floor",
@@ -10857,34 +10864,6 @@
           "needs_translation": true,
           "reverse_text": false,
           "max_length": 4
-        },
-        "abs_dyn_freq": {
-          "english": "Full Brake Rate",
-          "translation": "Full Brake Rate",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 15
-        },
-        "abs_dyn_hold": {
-          "english": "Full Brake Hold",
-          "translation": "Full Brake Hold",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 15
-        },
-        "abs_corner_freq": {
-          "english": "Rate Added at Lock",
-          "translation": "Rate Added at Lock",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "abs_corner_hold": {
-          "english": "Hold at Lock",
-          "translation": "Hold at Lock",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 12
         },
         "name": {
           "english": "Drive Aids",
@@ -10913,6 +10892,41 @@
           "needs_translation": true,
           "reverse_text": false,
           "max_length": 9
+        },
+        "pulse": {
+          "english": "Pulse",
+          "translation": "Pulse",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 5
+        },
+        "full_brake": {
+          "english": "Full Brake",
+          "translation": "Full Brake",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 10
+        },
+        "at_lock": {
+          "english": "At Full Lock",
+          "translation": "At Full Lock",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 12
+        },
+        "rate": {
+          "english": "Rate",
+          "translation": "Rate",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 4
+        },
+        "tc_tile": {
+          "english": "Traction",
+          "translation": "Traction",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 8
         }
       },
       "drive": {

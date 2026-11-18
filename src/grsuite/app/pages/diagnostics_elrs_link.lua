@@ -20,7 +20,7 @@ local closeKey = requireModule("app/close_key.lua")
 local header = requireModule("app/header.lua")
 local elrsTask = requireModule("lib/elrslink_task.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.diagnostics.name)@ / @i18n(app.modules.elrs_telemetry.name)@"
+local PAGE_TITLE = "@i18n(app.modules.elrs_telemetry.name)@"
 local BTN_OK = "@i18n(app.btn_ok)@"
 local BTN_CANCEL = "@i18n(app.btn_cancel)@"
 

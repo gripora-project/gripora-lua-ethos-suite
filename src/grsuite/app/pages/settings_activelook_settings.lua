@@ -4,7 +4,7 @@ local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("
 local pageCommon = requireModule("app/pages/settings_activelook_common.lua")
 local activeConfig = requireModule("lib/activelook_config.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.name)@ / ActiveLook / @i18n(app.modules.settings.activelook_settings)@"
+local PAGE_TITLE = "@i18n(app.modules.settings.activelook_settings)@"
 
 local function switchFromConfig(value)
   if type(value) ~= "string" then return nil end

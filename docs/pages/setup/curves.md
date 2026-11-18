@@ -30,7 +30,7 @@ Requires a running background task and a flight controller connection.
 
 Save writes the selected curve and commits to EEPROM. Curves are not scoped to the selected PID profile, and this page does not request a reboot.
 
-[Mixer Rules](mixer_rules.md) selects Mixer curve slots. [Master Gains](../flight_tuning/master_gains.md) selects Gain curve slots. Servo curves apply to their corresponding servo without a separate slot assignment.
+[Mixer Rules](mixer_rules.md) selects Mixer curve slots. [Gain Curves](../tuning/gain_curves.md) selects Gain curve slots. Servo curves apply to their corresponding servo without a separate slot assignment.
 
 ## Source
 

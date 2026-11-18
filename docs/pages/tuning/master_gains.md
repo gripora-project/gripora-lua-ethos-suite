@@ -24,15 +24,16 @@ The values belong to the current PID profile: the page title shows the profile i
 
 | Setting | What it does |
 | --- | --- |
-| Gain (Steering) | Master gain, 0-200 % (default 100): how hard the car fights unwanted yaw. Raise it if the car wanders or feels soft; lower it if the steering wobbles or buzzes. Scales P, I, D and F together; 0 % turns the gyro correction off. |
-| Decay (Steering) | I-term decay time, 0.01-1.00 s (default 0.60): how long the car holds its line after a bump. Longer feels more locked in; shorter feels freer and suits drifting. |
-| Relax (Steering) | I-term Relax, 1-10 (default 5): how firmly it stops at the end of a fast turn or slide. Raise it if the car kicks back; lower it if long turns lose rate. |
-| Gain (Throttle) | Throttle attenuation, 25-200 % (default 100): changes the steering gain with throttle, for example to reduce it at high throttle if the steering wobbles at speed. Optionally shaped by a Throttle curve on *Gain Curves*. GYRO OFF is not affected. |
-| Gain (Speed) | GPS speed attenuation, 25-200 % (default 100): lowers gain as GPS speed rises, so a tune that is right at low speed does not wobble on a fast straight. Does nothing on its own: assign a Speed curve and set its speed range on *Gain Curves*. Needs a GPS with a fix. Throttle and Speed together never go below 25 %. |
+| Steering Gain | Master gain, 0-200 % (default 100): how hard the car fights unwanted yaw. Raise it if the car wanders or feels soft; lower it if the steering wobbles or buzzes. Scales P, I and D (not F); 0 % turns the gyro correction off. |
+| Decay | I-term decay time, 0.01-1.00 s (default 0.60): how long the car holds its line after a bump. Longer feels more locked in; shorter feels freer and suits drifting. |
+| Relax | I-term Relax, 1-10 (default 5): how firmly it stops at the end of a fast turn or slide. Raise it if the car kicks back; lower it if long turns lose rate. |
+| Throttle Gain | Throttle attenuation, 25-200 % (default 100): changes the steering gain with throttle, for example to reduce it at high throttle if the steering wobbles at speed. Optionally shaped by a Throttle curve on *Gain Curves*. GYRO OFF is not affected. |
+| Speed Gain | GPS speed attenuation, 25-200 % (default 100): lowers gain as GPS speed rises, so a tune that is right at low speed does not wobble on a fast straight. Does nothing on its own: assign a Speed curve and set its speed range on *Gain Curves*. Needs a GPS with a fix. Throttle and Speed together never go below 25 %. |
 
 ## Notes
 
-- The roll and pitch rows are not shown; the page writes them back unchanged.
+- Each setting has its own line.
+- The roll and pitch values are not shown; the page writes them back unchanged.
 - Saving writes the PID profile to the flight controller EEPROM. No reboot.
 
 

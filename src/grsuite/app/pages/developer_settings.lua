@@ -9,7 +9,7 @@ local settingsSave = requireModule("app/settings_save.lua")
 local mspApiVersion = requireModule("lib/msp_api_version.lua")
 local leaveConfirm = requireModule("app/leave_confirm.lua")
 
-local PAGE_TITLE = "@i18n(app.modules.settings.txt_developer)@ / @i18n(app.modules.settings.developer_settings)@"
+local PAGE_TITLE = "@i18n(app.modules.settings.txt_developer)@"
 
 -- Simulator-only (see tasks/session.lua's runHandshake() and
 -- lib/msp_api_version.lua): index 0 is the "wrong firmware family" case,
