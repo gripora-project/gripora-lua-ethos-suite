@@ -7168,47 +7168,11 @@
           "needs_translation": false,
           "max_length": 18
         },
-        "surface_aileron": {
-          "english": "Aileron",
-          "translation": "Aileron",
-          "needs_translation": false,
-          "max_length": 7
-        },
-        "surface_flaperon": {
-          "english": "Flaperon",
-          "translation": "Flaperon",
-          "needs_translation": false,
-          "max_length": 8
-        },
-        "surface_elevator": {
-          "english": "Elevator",
-          "translation": "Elevator",
-          "needs_translation": false,
-          "max_length": 8
-        },
-        "surface_rudder": {
+        "surface_steering": {
           "english": "Steering",
           "translation": "Steering",
           "needs_translation": false,
           "max_length": 8
-        },
-        "surface_elevon": {
-          "english": "Elevon",
-          "translation": "Elevon",
-          "needs_translation": false,
-          "max_length": 6
-        },
-        "surface_ruddervator": {
-          "english": "V-tail",
-          "translation": "V-tail",
-          "needs_translation": false,
-          "max_length": 6
-        },
-        "surface_flap": {
-          "english": "Flap",
-          "translation": "Flap",
-          "needs_translation": false,
-          "max_length": 4
         },
         "surface_mixed": {
           "english": "Mixed",
@@ -8146,12 +8110,6 @@
           "needs_translation": false,
           "max_length": 85
         },
-        "cen_flap": {
-          "english": "Flaps are held at flaps up: set them in line with the wing.",
-          "translation": "Flaps are held at flaps up: set them in line with the wing.",
-          "needs_translation": false,
-          "max_length": 59
-        },
         "cen_done_title": {
           "english": "Center set",
           "translation": "Center set",
@@ -8211,12 +8169,6 @@
           "translation": "Back off one step",
           "needs_translation": false,
           "max_length": 17
-        },
-        "lim_flap": {
-          "english": "These are the flap end points: Max is full flap. The wizard sets the flap travel to land on them.",
-          "translation": "These are the flap end points: Max is full flap. The wizard sets the flap travel to land on them.",
-          "needs_translation": false,
-          "max_length": 97
         },
         "lim_set": {
           "english": "Set",

@@ -8963,13 +8963,6 @@
           "reverse_text": false,
           "translation": "Far from the servo's normal center. Move the horn instead, or this side loses travel."
         },
-        "cen_flap": {
-          "english": "Flaps are held at flaps up: set them in line with the wing.",
-          "max_length": 59,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Flaps are held at flaps up: set them in line with the wing."
-        },
         "cen_identify": {
           "english": "Identify",
           "max_length": 8,
@@ -9634,13 +9627,6 @@
           "needs_translation": true,
           "reverse_text": false,
           "translation": "Limits set"
-        },
-        "lim_flap": {
-          "english": "These are the flap end points: Max is full flap. The wizard sets the flap travel to land on them.",
-          "max_length": 97,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "These are the flap end points: Max is full flap. The wizard sets the flap travel to land on them."
         },
         "lim_head_fmt": {
           "english": "%s: %s",
@@ -10790,41 +10776,6 @@
           "reverse_text": false,
           "translation": "Beginners, scale cars and first runs."
         },
-        "surface_aileron": {
-          "english": "Aileron",
-          "max_length": 7,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Aileron"
-        },
-        "surface_elevator": {
-          "english": "Elevator",
-          "max_length": 8,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Elevator"
-        },
-        "surface_elevon": {
-          "english": "Elevon",
-          "max_length": 6,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Elevon"
-        },
-        "surface_flap": {
-          "english": "Flap",
-          "max_length": 4,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Flap"
-        },
-        "surface_flaperon": {
-          "english": "Flaperon",
-          "max_length": 8,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Flaperon"
-        },
         "surface_mixed": {
           "english": "Mixed",
           "max_length": 5,
@@ -10832,19 +10783,12 @@
           "reverse_text": false,
           "translation": "Mixed"
         },
-        "surface_rudder": {
+        "surface_steering": {
           "english": "Steering",
           "max_length": 8,
           "needs_translation": true,
           "reverse_text": false,
           "translation": "Steering"
-        },
-        "surface_ruddervator": {
-          "english": "V-tail",
-          "max_length": 6,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "V-tail"
         },
         "tg_auto_note": {
           "english": "No trim channel: the wizard sets up no steering trim. A radio trim left on the steering is read as a steering input, which the stabilizer holds against.",

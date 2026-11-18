@@ -1,9 +1,9 @@
 -- Setup Wizard step: Centre. Opened by app/pages/setup_wizard.lua.
 --
 -- The radio's copy of gripora-configurator's StepCentre.svelte. Every
--- surface servo is held at override 0, which puts it exactly at its Mid with
--- nothing from the mixer on top (gyro, offsets, flaps). One screen per
--- surface: nudge its Mid by -10/-1/+1/+10 us until the surface is neutral.
+-- steering servo is held at override 0, which puts it exactly at its Mid with
+-- nothing from the mixer on top (gyro, offsets). One screen per servo: nudge
+-- its Mid by -10/-1/+1/+10 us until the wheels point straight ahead.
 -- More than MID_WARN_US from the normal centre, 1500 us on every servo
 -- (narrow-band 760 us servos are not supported), is flagged: the horn should
 -- be moved instead, or that side loses travel.
@@ -16,7 +16,6 @@ local T = {
   intro = "@i18n(app.modules.setup_wizard.cen_intro)@",
   value = "@i18n(app.modules.setup_wizard.cen_value_fmt)@",
   far = "@i18n(app.modules.setup_wizard.cen_far)@",
-  flap = "@i18n(app.modules.setup_wizard.cen_flap)@",
   progress = "@i18n(app.modules.setup_wizard.progress_fmt)@",
   doneTitle = "@i18n(app.modules.setup_wizard.cen_done_title)@",
   done = "@i18n(app.modules.setup_wizard.cen_done)@",
@@ -114,12 +113,12 @@ local function new(wiz)
     end
     local config = wiz.configs[surface.servo]
     local offset = config.mid - CENTRE
-    local accent = math.abs(offset) > MID_WARN_US and T.far or (surface.kind == "flap" and T.flap or nil)
+    local accent = math.abs(offset) > MID_WARN_US and T.far or nil
     scr:text(wiz.surfaceName(surface),
       T.intro .. " " .. string.format(T.value, config.mid, (offset >= 0 and "+" or "") .. offset), accent,
       string.format(T.progress, index, #surfaces))
-    -- The surface on the plane, the centre gauge beside the words.
-    scr:picture(art.surfaceLayout(surfaces, surface.kind))
+    -- The car with its steering lit, the centre gauge beside the words.
+    scr:picture(art.surfaceLayout(surfaces))
     scr:live(drawGauge, 2)
     local specs = {}
     for _, d in ipairs(NUDGES) do

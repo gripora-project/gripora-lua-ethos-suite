@@ -152,10 +152,9 @@ memory.restartSaved = memory.restartSaved or {}
 local SERVO_SLOTS = 24
 
 -- Mixer inputs the wizard holds: the stabilized axes (only steering moves on
--- a car; roll and pitch are held at zero) and the flap channel, as the
--- configurator's HELD_INPUTS.
-local HELD_INPUTS = {1, 2, 3, surfacesLib.FLAP_INPUT}
-local AXIS_INPUT = {roll = 1, pitch = 2, yaw = 3, flap = surfacesLib.FLAP_INPUT}
+-- a car; roll and pitch are held at zero).
+local HELD_INPUTS = {1, 2, 3}
+local AXIS_INPUT = {roll = 1, pitch = 2, yaw = 3}
 
 -- Live values, while a step shows them: one read at a time, and a read that
 -- has not answered within a second is given up.
@@ -445,22 +444,18 @@ local function open(opts)
     if lcd.invalidate then lcd.invalidate() end
   end
 
-  -- values: {roll =, pitch =, yaw =, flap =} as fractions of full input
-  -- (+-1). The flap channel only when asked for: other steps leave it on
-  -- the pilot's switch.
+  -- values: {roll =, pitch =, yaw =} as fractions of full input (+-1); an
+  -- axis left out is held at 0.
   function wiz.holdAxes(values)
     if not canMove() then return false end
     for axis, input in pairs(AXIS_INPUT) do
-      local value = values[axis]
-      if value ~= nil or axis ~= "flap" then
-        heldInputs[input] = true
-        mixerOverride.hold(input, math.floor((value or 0) * 1000 + 0.5))
-      end
+      heldInputs[input] = true
+      mixerOverride.hold(input, math.floor((values[axis] or 0) * 1000 + 0.5))
     end
     return true
   end
 
-  -- One axis only (or "flap"), for a step that has already held the rest
+  -- One axis only, for a step that has already held the rest
   -- with holdAxes() and now moves one back and forth: one write per move
   -- instead of four, which a telemetry link has room for.
   function wiz.holdAxis(axis, value)
@@ -684,14 +679,7 @@ local function open(opts)
   end
 
   local KIND_NAMES = {
-    aileron = "@i18n(app.modules.setup_wizard.surface_aileron)@",
-    flaperon = "@i18n(app.modules.setup_wizard.surface_flaperon)@",
-    elevator = "@i18n(app.modules.setup_wizard.surface_elevator)@",
-    -- A servo on yaw alone is a car's steering.
-    rudder = "@i18n(app.modules.setup_wizard.surface_rudder)@",
-    elevon = "@i18n(app.modules.setup_wizard.surface_elevon)@",
-    ruddervator = "@i18n(app.modules.setup_wizard.surface_ruddervator)@",
-    flap = "@i18n(app.modules.setup_wizard.surface_flap)@",
+    steering = "@i18n(app.modules.setup_wizard.surface_steering)@",
     mixed = "@i18n(app.modules.setup_wizard.surface_mixed)@",
   }
 

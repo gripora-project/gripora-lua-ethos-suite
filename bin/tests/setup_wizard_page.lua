@@ -370,9 +370,9 @@ openPage(CURRENT)
 local modeWrites = writesOf(0x5F1B)
 check("opening holds the setup state, nothing forced, 10 s timeout",
   #modeWrites == 1 and bytes(modeWrites[1].payload) == "16,39,0", modeWrites[1] and bytes(modeWrites[1].payload))
-check("opening clears mixer overrides on roll, pitch, yaw and flap",
+check("opening clears mixer overrides on roll, pitch and yaw, and leaves the AUX channels alone",
   lastMixer(1, 1).value == 2501 and lastMixer(1, 2).value == 2501 and lastMixer(1, 3).value == 2501
-  and lastMixer(1, 13).value == 2501)
+  and lastMixer(1, 13) == nil)
 check("opening clears every servo override", #writesOf(196) == 1 and bytes(writesOf(196)[1].payload) == "209,7")
 check("the title names the step", headers[#headers].title == T("name") .. " / 9. " .. T("step_direction"),
   headers[#headers].title)
@@ -383,7 +383,7 @@ do
   check("and that icon is in the suite", icon ~= nil)
   if icon then icon:close() end
 end
-check("it opens on the intro, which moves nothing", shows("dir_intro") and #writesOf(191) == 4)
+check("it opens on the intro, which moves nothing", shows("dir_intro") and #writesOf(191) == 3)
 local start = button(T("dir_start"))
 check("the intro's only answer is Start, and it has the focus", start and start.focused)
 
@@ -394,7 +394,7 @@ check("Start opens the steering check", shows("dir_check_yaw") and shows("dir_q_
 check("the check being done stands out in the accent colour, with its progress",
   drawnColor[T("dir_check_yaw")] == 255 and drawnColor[T("progress_fmt")] ~= 255
   and drawnColor[T("progress_fmt")] ~= nil)
-check("the check holds roll and pitch at centre, timed, and leaves the flap channel alone",
+check("the check holds roll and pitch at centre, timed, and leaves the AUX channels alone",
   lastMixer(before + 1, 1).value == 0 and lastMixer(before + 1, 1).timed
   and lastMixer(before + 1, 2).value == 0 and lastMixer(before + 1, 13) == nil)
 for _ = 1, 4 do tick(0.9) end
@@ -714,7 +714,7 @@ check("model: the model type is car, and nothing else is written with it",
   #cfgWrites == 1 and bytes(cfgWrites[1].payload) == "0,0", cfgWrites[1] and bytes(cfgWrites[1].payload))
 check("model: the throttle input already keeps its reverse half, so it is not written",
   #writesOf(174, before + 1) == 0)
-check("model: the outputs are listed", shows("air_applied") and shows("surface_rudder") and shows("air_esc_fmt"))
+check("model: the outputs are listed", shows("air_applied") and shows("surface_steering") and shows("air_esc_fmt"))
 -- Servo names (lib/servo_names.lua): the codec's simulator reply names S1
 -- STEER. The car with rear steering names its two steering servos F STEER
 -- and R STEER and writes nothing for the unnamed servos it does not drive.
