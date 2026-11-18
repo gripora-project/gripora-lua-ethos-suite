@@ -34,8 +34,9 @@ import urllib.request
 
 # Pinned so a firmware that adds an appId shows up as a deliberate change here
 # rather than as a silent frame-walk abort on someone's radio.
-# gripora-firmware has no release tags yet, so this is a master commit.
-DEFAULT_FIRMWARE_REF = "706bd4bdbb6d256179ae8afc6b41644dcb205754"
+# gripora-firmware has no release tags yet, so this is a master commit (the one
+# with the drive status and speed sensors, 0x1205/0x1206).
+DEFAULT_FIRMWARE_REF = "eae67c7e79d3e5551e41fceee9b6d4894d76c31a"
 RAW_URL = "https://raw.githubusercontent.com/gripora-project/gripora-firmware/{ref}/src/main/telemetry/crsf.c"
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

@@ -214,6 +214,13 @@ check("a theme's colour for GYRO OFF", text == ds.TEXT.gyro_off and color == uti
 text, color = tile("widgets/dashboard/objects/text/driveaids.lua", SPEED | 2048,
   {thresholds = {{value = ds.TEXT.aids_off, textcolor = "blue"}}})
 check("a theme's threshold wins", text == ds.TEXT.aids_off and color == utils.resolveColor("blue"))
+lcd.darkMode = function() return false end
+text, color = tile("widgets/dashboard/objects/text/driveaids.lua", SPEED | 1 | 32 | 1024)
+check("launch staged on a light theme: dark amber, not yellow",
+  text == ds.TEXT.launch_staged and color == utils.resolveColor({150, 100, 0}), tostring(color))
+lcd.darkMode = function() return true end
+text, color = tile("widgets/dashboard/objects/text/driveaids.lua", SPEED | 1 | 32 | 1024)
+check("launch staged on a dark theme: yellow", color == utils.resolveColor("yellow"), tostring(color))
 local _, _, render, box = tile("widgets/dashboard/objects/text/driveaids.lua", SPEED | 1 | 8)
 render.dirty(box)
 context.setWidget({connected = true, driveStatus = SPEED | 1 | 8 | 16})

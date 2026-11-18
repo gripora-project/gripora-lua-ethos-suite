@@ -22,7 +22,7 @@
     thresholds          : table                     -- (Optional) {value = <text>, textcolor = ...} entries; a match overrides the colours below
     offcolor            : color                     -- (Optional) GYRO OFF and AIDS OFF (default: red)
     activecolor         : color                     -- (Optional) An aid acting right now (default: orange)
-    stagedcolor         : color                     -- (Optional) Launch staged (default: yellow)
+    stagedcolor         : color                     -- (Optional) Launch staged (default: yellow; dark amber on a light theme)
     modecolor           : color                     -- (Optional) DRIFT (default: blue)
     oncolor             : color                     -- (Optional) Aids running (default: green)
     textcolor           : color                     -- (Optional) OFF, and the no-value text (theme fallback if nil)
@@ -36,6 +36,12 @@ local TEXT = driveStatus.TEXT
 local LEVEL = driveStatus.LEVEL
 
 local render = {}
+
+-- Bright yellow does not read on a light background: dark amber there (about 5:1 on white).
+local function STAGED_DEFAULT()
+    if type(lcd.darkMode) == "function" and lcd.darkMode() == false then return {150, 100, 0} end
+    return "yellow"
+end
 
 local utils = grsuite.widgets.dashboard.utils
 local getParam = utils.getParam
@@ -100,7 +106,7 @@ local function ensureCfg(box)
         cfg.levelColor = {
             off = resolveThemeColor("offcolor", getParam(box, "offcolor") or "red"),
             active = resolveThemeColor("activecolor", getParam(box, "activecolor") or "orange"),
-            staged = resolveThemeColor("stagedcolor", getParam(box, "stagedcolor") or "yellow"),
+            staged = resolveThemeColor("stagedcolor", getParam(box, "stagedcolor") or STAGED_DEFAULT()),
             mode = resolveThemeColor("modecolor", getParam(box, "modecolor") or "blue"),
             on = resolveThemeColor("oncolor", getParam(box, "oncolor") or "green"),
             idle = cfg.defaultTextColor,
