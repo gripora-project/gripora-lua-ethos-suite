@@ -16,8 +16,8 @@ never releases below 10% brake, so a brake-then-reverse ESC never sees neutral i
 middle of a stop and does not drop into reverse.
 
 The drive aids shape the throttle and brake you give before they reach the ESC. A switch
-assigned to the *DRIVE AIDS OFF* mode on the Modes page turns ABS and traction control
-off; they are also off while disarmed and in failsafe. The ESC's mixer rule must take the
+assigned to the *DRIVE AIDS OFF* mode on the Modes page turns ABS, traction control and
+launch control off; they are also off while disarmed and in failsafe. The ESC's mixer rule must take the
 stabilized throttle, as the car mixer preset does; a rule fed straight from the RC
 throttle bypasses them.
 
@@ -51,8 +51,9 @@ edits (for example *ABS #1*), and the page reloads when the profile changes.
 - Save is refused while the model is armed.
 - Each PID profile has its own drive aids settings. Copying a profile copies them, and
   resetting the current PID profile resets them to the defaults.
-- ABS and traction control are one MSP message (MSP2_GRIPORA_DRIVE_AIDS_CONFIG): saving
-  either page writes the other page's settings back as they were read.
+- ABS, traction control and launch control are one MSP message
+  (MSP2_GRIPORA_DRIVE_AIDS_CONFIG): saving any of the three pages writes the other
+  pages' settings back as they were read.
 - Firmware without the message refuses the read, and the page shows a failed load. The
   firmware refuses the whole save if any value is out of range.
 - Each rate and its hold share a line: *Pulse*, *Full Brake* and *At Full Lock*.

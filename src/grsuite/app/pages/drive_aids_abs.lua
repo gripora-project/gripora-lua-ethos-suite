@@ -1,8 +1,9 @@
 -- Tuning -> ABS (Drive Aids group): the timed ABS of the current PID profile
 -- (MSP2_GRIPORA_DRIVE_AIDS_CONFIG, lib/msp_drive_aids_config.lua), the ABS
--- section of gripora-configurator's Drive aids panel. Traction control, in the
--- same MSP message, is on app/pages/drive_aids_tc.lua; this page does not build
--- its fields, and the codec writes them back as read. Firmware without the
+-- section of gripora-configurator's Drive aids panel. Traction control and
+-- launch control, in the same MSP message, are on app/pages/drive_aids_tc.lua
+-- and app/pages/drive_aids_lc.lua; this page does not build their fields, and
+-- the codec writes them back as read. Firmware without the
 -- message refuses the read, which the runtime shows as a failed load. The
 -- firmware reads these settings live, so saving needs no reboot.
 --

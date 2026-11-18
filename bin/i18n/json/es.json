@@ -9981,6 +9981,13 @@
           "max_length": 84,
           "reverse_text": false
         },
+        "mod_help_launch": {
+          "english": "Stages a launch for launch control: turn it on at the line, and the first pull of the trigger launches the car. Set it up under Tuning, Launch.",
+          "translation": "Stages a launch for launch control: turn it on at the line, and the first pull of the trigger launches the car. Set it up under Tuning, Launch.",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 143
+        },
         "sty_title": {
           "english": "Driving style",
           "translation": "Driving style",
@@ -10927,6 +10934,41 @@
           "needs_translation": true,
           "reverse_text": false,
           "max_length": 8
+        },
+        "lc_name": {
+          "english": "Launch Control",
+          "translation": "Launch Control",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 14
+        },
+        "lc_tile": {
+          "english": "Launch",
+          "translation": "Launch",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 6
+        },
+        "lc_mode": {
+          "english": "Mode",
+          "translation": "Mode",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 4
+        },
+        "lc_throttle": {
+          "english": "Start Throttle",
+          "translation": "Start Throttle",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 14
+        },
+        "lc_ramp_time": {
+          "english": "Ramp Time",
+          "translation": "Ramp Time",
+          "needs_translation": true,
+          "reverse_text": false,
+          "max_length": 9
         }
       },
       "drive": {
@@ -12165,6 +12207,13 @@
         "needs_translation": true,
         "reverse_text": false,
         "max_length": 4
+      },
+      "tbl_switch": {
+        "english": "Switch",
+        "translation": "Switch",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 6
       }
     }
   },

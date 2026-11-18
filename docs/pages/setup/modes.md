@@ -36,7 +36,7 @@ Requires a running background task and a flight controller connection.
 ## Notes
 
 - The mode list holds only what the flight controller reports, in gripora-configurator's
-  order: ARM, PREARM and FAILSAFE, then the driving modes GYRO OFF and DRIVE AIDS OFF, then
+  order: ARM, PREARM and FAILSAFE, then the driving modes GYRO OFF, DRIVE AIDS OFF and LAUNCH, then
   GPS, beeper and lights, logging, camera and user outputs.
 
 TODO: Verify persistence, reboot behaviour, profile scope and any restrictions in
