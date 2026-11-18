@@ -1,10 +1,11 @@
--- Setup Wizard step: Flying style. Opened by app/pages/setup_wizard.lua.
+-- Setup Wizard step: Driving style. Opened by app/pages/setup_wizard.lua.
 --
--- The radio's copy of gripora-configurator's StepStyle.svelte: Trainer,
--- Sport or 3D, each a set of rates (deg/s at full stick, expo) and I-term
--- relax for roll, pitch and yaw (lib/setup_wizard_styles.lua). Applied to the
--- current rate and PID profiles: MSP_SET_RC_TUNING and MSP_SET_PID_PROFILE
--- with the whole records read back, only the style's fields changed.
+-- The radio's copy of gripora-configurator's StepStyle.svelte: Beginner,
+-- Sport or Drift, each a steering rate (deg/s at full steering, expo) and
+-- I-term relax for steering (yaw; lib/setup_wizard_styles.lua). Roll and
+-- pitch are left as they are. Applied to the current rate and PID profiles:
+-- MSP_SET_RC_TUNING and MSP_SET_PID_PROFILE with the whole records read back,
+-- only the style's fields changed.
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local bus = requireModule("lib/bus.lua")
@@ -28,6 +29,12 @@ local NAMES = {
   trainer = "@i18n(app.modules.setup_wizard.sty_trainer)@",
   sport = "@i18n(app.modules.setup_wizard.sty_sport)@",
   ["3d"] = "@i18n(app.modules.setup_wizard.sty_3d)@",
+}
+
+local HELP = {
+  trainer = "@i18n(app.modules.setup_wizard.sty_trainer_help)@",
+  sport = "@i18n(app.modules.setup_wizard.sty_sport_help)@",
+  ["3d"] = "@i18n(app.modules.setup_wizard.sty_3d_help)@",
 }
 
 local function copy(t)
@@ -73,7 +80,7 @@ local function new(wiz)
     local specs = {}
     for _, s in ipairs(styles.STYLES) do
       specs[#specs + 1] = {text = NAMES[s.key], current = current == s, press = function() apply(s) end,
-        help = string.format(T.rates, s.rate.roll, s.rate.pitch, s.rate.yaw, s.expo)}
+        help = string.format(T.rates, s.rate.yaw, s.expo) .. " " .. HELP[s.key]}
     end
     -- The list first: the encoder visits fields in the order they are made.
     local focus = scr:choices(specs)

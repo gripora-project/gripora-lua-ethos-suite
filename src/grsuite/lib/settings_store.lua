@@ -54,7 +54,6 @@ local DEFAULTS = {
   },
   events = {
     armflags = true,
-    governor = true,
     flight_mode = true,
     voltage = true,
     voltage_repeat_interval = 10,
@@ -74,12 +73,11 @@ local DEFAULTS = {
     -- The telemetry link going away and coming back. Gated by the model having
     -- been armed at the moment the link went -- see tasks/audio_events.lua's
     -- announceTelemetryLost(). The armed gate is what keeps bench work and
-    -- a bench power-down silent, so what is left is a link loss with the rotors
-    -- turning -- the one event here a pilot must not have to notice himself.
+    -- a bench power-down silent, so what is left is a link loss with the car
+    -- armed -- the one event here a pilot must not have to notice himself.
     telemetry_lost = true,
     pid_profile = true,
     rate_profile = true,
-    tv_profile = true,
     battery_profile = true,
     gps_fix = true,
     -- FC status callouts (lib/system_alerts.lua, tasks/audio_events.lua).
@@ -87,9 +85,7 @@ local DEFAULTS = {
     status_gyro = true,
     status_gps = true,
     status_blackbox = true,
-    status_autotrim = true,
-    status_trim = true,
-    -- Off by default: "control limit" can be chatty on 3D models.
+    -- Off by default: "control limit" can be chatty.
     status_saturation = false,
     smartfuel = true,
     smartfuelcallout = 0,
@@ -189,7 +185,6 @@ local function normalizeEvents(values)
   values = type(values) == "table" and values or {}
   for key, value in pairs(values) do events[key] = value end
   events.armflags = coerceBool(events.armflags, DEFAULTS.events.armflags)
-  events.governor = coerceBool(events.governor, DEFAULTS.events.governor)
   events.flight_mode = coerceBool(events.flight_mode, DEFAULTS.events.flight_mode)
   events.voltage = coerceBool(events.voltage, DEFAULTS.events.voltage)
   events.voltage_repeat_interval = clampNumber(events.voltage_repeat_interval, DEFAULTS.events.voltage_repeat_interval, 5, 120)
@@ -199,15 +194,12 @@ local function normalizeEvents(values)
   events.telemetry_lost = coerceBool(events.telemetry_lost, DEFAULTS.events.telemetry_lost)
   events.pid_profile = coerceBool(events.pid_profile, DEFAULTS.events.pid_profile)
   events.rate_profile = coerceBool(events.rate_profile, DEFAULTS.events.rate_profile)
-  events.tv_profile = coerceBool(events.tv_profile, DEFAULTS.events.tv_profile)
   events.battery_profile = coerceBool(events.battery_profile, DEFAULTS.events.battery_profile)
   events.gps_fix = coerceBool(events.gps_fix, DEFAULTS.events.gps_fix)
   events.status_rx_backup = coerceBool(events.status_rx_backup, DEFAULTS.events.status_rx_backup)
   events.status_gyro = coerceBool(events.status_gyro, DEFAULTS.events.status_gyro)
   events.status_gps = coerceBool(events.status_gps, DEFAULTS.events.status_gps)
   events.status_blackbox = coerceBool(events.status_blackbox, DEFAULTS.events.status_blackbox)
-  events.status_autotrim = coerceBool(events.status_autotrim, DEFAULTS.events.status_autotrim)
-  events.status_trim = coerceBool(events.status_trim, DEFAULTS.events.status_trim)
   events.status_saturation = coerceBool(events.status_saturation, DEFAULTS.events.status_saturation)
   events.smartfuel = coerceBool(events.smartfuel, DEFAULTS.events.smartfuel)
   events.smartfuelcallout = clampNumber(events.smartfuelcallout, DEFAULTS.events.smartfuelcallout, 0, 50)

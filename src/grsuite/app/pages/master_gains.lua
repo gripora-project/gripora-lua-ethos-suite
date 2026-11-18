@@ -1,15 +1,17 @@
--- Flight Feel page (file name kept from its Master Gains origin). Loaded on
--- demand from Flight Tuning -> Flight Feel.
+-- Driving Feel page (file name kept from its Master Gains origin). Loaded on
+-- demand from Tuning -> Driving Feel.
 --
 -- Edits the same MSP_PID_PROFILE / MSP_SET_PID_PROFILE command (cmd
 -- 94/95, see lib/msp_pid_profile.lua) as app/pages/pid_controller.lua --
 -- a second page sharing one codec, same as every field that page itself
 -- doesn't build a widget for already round-trips unchanged on every save
--- (see that file's own header comment). One row per axis
--- (Roll/Pitch/Yaw/Throttle/Speed), matching gripora-configurator's Flight
--- Feel table: Gain (master_gain_0-2, fw_tpa_gain on Throttle, fw_spa_gain
--- on Speed), Decay (iterm_decay_time_0-2) and Relax (bounceback_0-2).
--- Throttle and Speed have only a Gain.
+-- (see that file's own header comment). Rows Steering/Throttle/Speed,
+-- matching gripora-configurator's Driving Feel table: Gain (master_gain_2,
+-- fw_tpa_gain on Throttle, fw_spa_gain on Speed), Decay
+-- (iterm_decay_time_2) and Relax (bounceback_2). Throttle and Speed have
+-- only a Gain. Only yaw is stabilised, so the roll and pitch rows
+-- (master_gain_0/1, iterm_decay_time_0/1, bounceback_0/1) are not shown;
+-- they are written back unchanged.
 --
 -- Gain curves (gain_curve_0-2/fw_tpa_curve/fw_spa_curve) are assigned on
 -- app/pages/gain_curves.lua under Advanced, since they are an advanced
@@ -30,9 +32,7 @@ local COLUMN_WEIGHTS = {1, 1, 1.3}
 local COLUMN_START = 0.45 -- fraction of the row width where the first column starts
 
 local AXES = {
-  {label = "@i18n(app.modules.master_gains.axis_roll)@", gainKey = "master_gain_0", decayKey = "iterm_decay_time_0", bouncebackKey = "bounceback_0"},
-  {label = "@i18n(app.modules.master_gains.axis_pitch)@", gainKey = "master_gain_1", decayKey = "iterm_decay_time_1", bouncebackKey = "bounceback_1"},
-  {label = "@i18n(app.modules.master_gains.axis_yaw)@", gainKey = "master_gain_2", decayKey = "iterm_decay_time_2", bouncebackKey = "bounceback_2"},
+  {label = "@i18n(app.modules.pids.steering)@", gainKey = "master_gain_2", decayKey = "iterm_decay_time_2", bouncebackKey = "bounceback_2"},
   {label = "@i18n(app.modules.master_gains.axis_throttle)@", gainKey = "fw_tpa_gain"},
   {label = "@i18n(app.modules.master_gains.axis_speed)@", gainKey = "fw_spa_gain"},
 }
@@ -54,7 +54,7 @@ local function open(opts)
   -- Header row + per-axis rows, mirroring app/pages/mixer_config.lua's
   -- own Roll/Pitch/Yaw table (Gain/Invert columns there) -- a header row
   -- naming the columns once reads better than field_layout.buildGroup's
-  -- usual per-row inline mini-labels repeated on all four rows.
+  -- usual per-row inline mini-labels repeated on every row.
   local headerLine = form.addLine(" ")
   local headerSlots = fieldLayout.tableSlots(headerLine, COLUMN_WEIGHTS, COLUMN_START)
   form.addStaticText(headerLine, headerSlots[1], "@i18n(app.modules.master_gains.gain)@", RIGHT)

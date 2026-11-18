@@ -1,11 +1,10 @@
 -- Rates profile editor page. Loaded on demand (plain loadfile) only when
--- the user opens Flight Tuning -> Rates -- see app/tool.lua. Top-level
--- Flight Tuning entry (order 2, between PIDs and Governor in the
--- manifest), not part of the Advanced submenu.
+-- the user opens Tuning -> Rates -- see app/tool.lua. Top-level Tuning
+-- entry, not part of the Advanced group.
 --
 -- First page against MSP_RC_TUNING (cmd 111/204, see
 -- lib/msp_rc_tuning.lua). Exposes the 9 "curve shape" fields
--- (rcRates_N/rcExpo_N/rates_N per axis, roll/pitch/yaw only) the original
+-- (rcRates_N/rcExpo_N/rates_N per axis; only yaw is shown) the original
 -- suite's own app/modules/rates/rates.lua page shows. The rest of
 -- MSP_RC_TUNING (response_time/accel_limit/setpoint_boost/yaw_dynamic)
 -- matches the original's own Advanced -> Rates Advanced submenu instead
@@ -50,10 +49,11 @@ local COLUMNS = {
   {title = "@i18n(app.modules.rates.rate)@", role = "srate"},
   {title = "@i18n(app.modules.rates.rc_expo)@", role = "expo"},
 }
+-- Only yaw is stabilised (steering), so only the steering row is shown, as on
+-- gripora-configurator's Rates tab. The roll and pitch rates are written back
+-- unchanged (lib/msp_rc_tuning.lua encodes every field).
 local ROWS = {
-  {label = "@i18n(app.modules.rates.roll)@", axis = 1, axisClass = "main"},
-  {label = "@i18n(app.modules.rates.pitch)@", axis = 2, axisClass = "main"},
-  {label = "@i18n(app.modules.rates.yaw)@", axis = 3, axisClass = "main"},
+  {label = "@i18n(app.modules.pids.steering)@", axis = 3, axisClass = "main"},
 }
 
 local function fieldKeyFor(role, axis)

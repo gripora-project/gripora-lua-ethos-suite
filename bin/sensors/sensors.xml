@@ -1,21 +1,8 @@
 <Sensors>
 
-    <Group name="Flight Control">
+    <Group name="Drive Control">
         <Sensor name="armflags" label="Arm"  type="bool" default="0"  multiplier="1" unit="" />
-        <Sensor name="governor" label="Governor" type="select">
-            <Option value="0" label="OFF" />
-            <Option value="1" label="IDLE" />
-            <Option value="2" label="SPOOLUP" />
-            <Option value="3" label="RECOVERY" />
-            <Option value="4" label="ACTIVE" />
-            <Option value="5" label="THROTTLE-OFF" />
-            <Option value="6" label="LOST RPM" />
-            <Option value="7" label="AUTOROTATION" />
-            <Option value="8" label="BAILOUT" />
-            <Option value="100" label="DISABLED" />
-            <Option value="101" label="DISAMED" />
-        </Sensor>
-        <Sensor name="rpm" label="Governor RPM" round="true" type="range" default="1800" min="0" max="2000" rand="10" multiplier="1" unit="rpm" />
+        <Sensor name="rpm" label="Motor RPM" round="true" type="range" default="1800" min="0" max="2000" rand="10" multiplier="1" unit="rpm" />
     </Group>
 
     <Group name="Power System">
@@ -26,7 +13,7 @@
         <Sensor name="fuel" label="Fuel" round="true" type="range" default="0" min="0" max="100" rand="0" multiplier="1" unit="%" />
     </Group>
 
-    <Group name="Flight Profiles">
+    <Group name="Profiles">
 
         <Sensor name="pid_profile" label="PID Profile" type="select">
             <Option value="1" label="1" />
@@ -57,7 +44,7 @@
     <Group name="Other Sensors">
         <Sensor name="temp_esc" label="ESC Temp" round="true" type="range" rand="5" min="10" max="80" default="50" unit="°C" />
         <Sensor name="temp_mcu" label="MCU Temp" round="true" type="range" rand="5" min="10" max="80" default="30" unit="°C" />
-        <Sensor name="throttle_percent" label="Throttle %" rand="5" round="true" type="range" min="0" max="100" unit="%" default="80" />
+        <Sensor name="throttle_percent" label="Throttle %" rand="5" round="true" type="range" min="-100" max="100" unit="%" default="0" />
         <Sensor name="altitude" label="Altitude" rand="5" round="true" type="range" min="0" max="30" unit="m" default="25" />   
         <Sensor name="cell_count" label="Cell Count" round="true" type="range" min="1" max="12" unit="" default="6" /> 
     </Group>
@@ -67,7 +54,7 @@
         <Sensor name="adj_v" round="true" label="Adjust Value" type="number" default="0" min="0" max="2000"/>
     </Group>  
 
-    <Group name="Flight Dynamics">
+    <Group name="Attitude and Speed">
         <Sensor name="attpitch" round="true" rand="20" label="Pitch" type="number" default="0" min="-360" max="360" multiplier="10"/>
         <Sensor name="attroll" round="true" rand="20" label="Roll" type="number" default="0" min="-360" max="360" multiplier="10"/>
         <Sensor name="attyaw" round="true" rand="20" label="Yaw" type="number" default="0" min="-360" max="360" multiplier="10"/>

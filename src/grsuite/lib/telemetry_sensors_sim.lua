@@ -49,9 +49,6 @@ return {
   system_config = {
     {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5032},
   },
-  governor = {
-    {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5009},
-  },
   flight_mode = {
     {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5028},
   },

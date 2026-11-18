@@ -11,7 +11,7 @@ Usage:
     python bin/docs/generate_menu_docs.py --scaffold-all
     python bin/docs/generate_menu_docs.py --check
     python bin/docs/generate_menu_docs.py --update-index
-    python bin/docs/generate_menu_docs.py --page flight_tuning/pids.md
+    python bin/docs/generate_menu_docs.py --page tuning/pids.md
 """
 
 import argparse

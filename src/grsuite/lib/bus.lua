@@ -17,14 +17,13 @@
 --
 -- Only selected topics are retained and replayed to new subscribers.
 -- "session.update" is retained because late-opening widgets/pages need the
--- current connection/profile snapshot even if the aircraft is idle.
+-- current connection/profile snapshot even if the car is idle.
 -- "task.status" is retained so the app can tell whether the background task
 -- has ever run before it lets pilots open MSP-backed pages. "app.state" is
 -- retained so a dashboard widget instantiated (or reloaded) while the
 -- full-screen app/tool already happens to be open still learns that
 -- immediately, instead of defaulting to "not running" until the next
--- open/close toggle. "tune_history.state" is retained so a Tune Advisor page
--- opened while a flight is still being read knows to wait for it. Transient command topics such as "msp.request" must
+-- open/close toggle. Transient command topics such as "msp.request" must
 -- NOT be retained: those payloads carry
 -- per-page callback closures, and retaining the last one would keep a closed
 -- page alive after navigation.
@@ -42,7 +41,6 @@ local retainedTopics = {
   ["session.update"] = true,
   ["task.status"] = true,
   ["app.state"] = true,
-  ["tune_history.state"] = true,
 }
 
 -- Re-entrancy accounting for publish(). Ported from

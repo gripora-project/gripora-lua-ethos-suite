@@ -500,19 +500,6 @@ local function closestDashboardWidth(width)
   return bestWidth
 end
 
-local GOVERNOR_LABELS = {
-  [0] = "OFF",
-  [1] = "IDLE",
-  [2] = "SPOOLUP",
-  [3] = "RECOVERY",
-  [4] = "ACTIVE",
-  [5] = "THR OFF",
-  [6] = "LOST HS",
-  [7] = "AUTOROT",
-  [8] = "BAILOUT",
-  [100] = "DISABLED",
-  [101] = "DISARMED",
-}
 
 
 local function temperatureUnit()
@@ -2008,22 +1995,16 @@ function utils.getPulsingDots()
   return "..."
 end
 
-function context.utils.getGovernorState(value)
-  value = tonumber(value)
-
+-- Arm state as text: the first arming-disable reason when there is one, else
+-- "ARMED" / "DISARMED", or "UNKNOWN" before the FC has said. (Replaces the
+-- inherited governor-state text; Gripora has no governor.)
+function context.utils.getArmStateText()
   local telemetry = context.tasks.telemetry
   local armflags = telemetry and telemetry.getSensor and telemetry.getSensor("armflags")
   local isArmed = context.utils.armFlagsToIsArmed(armflags)
 
-  local returnvalue
-  if value == nil and isArmed ~= nil then
-    -- No governor telemetry sensor at all (feature disabled/unsupported on this
-    -- craft) -- fall back to basic arm state instead of leaving this blank.
-    returnvalue = isArmed and "ARMED" or "DISARMED"
-  else
-    if isArmed == false then value = 101 end
-    returnvalue = GOVERNOR_LABELS[value] or "UNKNOWN"
-  end
+  local returnvalue = "UNKNOWN"
+  if isArmed ~= nil then returnvalue = isArmed and "ARMED" or "DISARMED" end
 
   local disableflags = telemetry and telemetry.getSensor and telemetry.getSensor("armdisableflags")
   if disableflags ~= nil then

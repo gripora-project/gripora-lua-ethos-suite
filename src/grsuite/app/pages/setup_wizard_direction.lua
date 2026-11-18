@@ -1,35 +1,31 @@
--- Setup Wizard step: Direction. Opened by app/pages/setup_wizard.lua.
+-- Setup Wizard step: Steering direction. Opened by app/pages/setup_wizard.lua.
 --
--- Checks that every control surface moves the right way. It asks the same
--- question as the Configurator's src/tabs/setup_wizard/StepDirection.svelte
--- and fixes things by the same rules, but as a guided sequence for a radio
--- screen: one question per screen, a picture of the model seen from behind
--- (app/setup_wizard_art.lua) with arrows for how the surfaces should move,
--- and two big answer buttons. The wizard moves the surfaces itself: it flicks
--- the checked axis between centre and the test movement, so the direction is
--- easy to see.
+-- Checks that the steering turns the right way. It asks the same question
+-- as the Configurator's src/tabs/setup_wizard/StepDirection.svelte and fixes
+-- things by the same rules, but as a guided sequence for a radio screen: one
+-- question per screen, a picture of the car seen from above
+-- (app/setup_wizard_art.lua) with the wheels turned the way they should go,
+-- and two big answer buttons. The wizard moves the steering itself: it flicks
+-- it between centre and the test movement, so the direction is easy to see.
+-- Only steering (stabilized yaw) is checked on a car.
 --
 -- Screens:
 --   intro    what is about to happen, Start
 --   check    one axis: picture, "Like this" / "Not like this"
 --   all      several surfaces and one was wrong: all of them, or only some?
 --   identify only some: each surface's servo wiggles in turn, "this one?"
---   cantfix  a wrong surface that also works another axis cannot simply be
+--   cantfix  a wrong servo that also works another axis cannot simply be
 --            reversed: say so
 --   done     what the wizard changed; check again, or save and go on
 --
--- The fixes, as in the Configurator: a wrong surface on its own axis has its
--- servo reversed; an axis on which every surface is wrong is inverted
--- (its Axis Throw negated), which also keeps surfaces that work another axis
--- right; the flap channel has no axis to invert, so each flap servo is
--- reversed. A wrong surface that also works another axis is left alone, with
--- a pointer to Mixer Rules. After a fix the same check runs again.
+-- The fixes, as in the Configurator: a wrong servo on steering alone has
+-- its servo reversed; when every steering servo is wrong the steering is
+-- inverted (its Axis Throw negated). A wrong servo that also works another
+-- axis is left alone, with a pointer to Mixer Rules. After a fix the same
+-- check runs again.
 --
--- Signs follow the stabilized inputs: roll + is right roll, pitch + is stick
--- forward (nose down), and yaw + is yaw left, since RC yaw is negated once in
--- the firmware's setpoint.c. The flap check moves the flap channel, positive
--- being flaps down. It comes first: flaps that follow the ailerons get their
--- roll direction from their flap direction.
+-- Yaw + is a left turn, since RC yaw is negated once in the firmware's
+-- setpoint.c, so steering right is -1.
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local surfacesLib = requireModule("lib/setup_wizard_surfaces.lua")
@@ -37,27 +33,19 @@ local art = requireModule("app/setup_wizard_art.lua")
 local ui = requireModule("app/setup_wizard_ui.lua")
 
 local CHECKS = {
-  {axis = "flap", sign = 1,
-    title = "@i18n(app.modules.setup_wizard.dir_check_flap)@",
-    expect = "@i18n(app.modules.setup_wizard.dir_expect_flap)@"},
-  {axis = "pitch", sign = -1,
-    title = "@i18n(app.modules.setup_wizard.dir_check_pitch)@",
-    expect = "@i18n(app.modules.setup_wizard.dir_expect_pitch)@"},
-  {axis = "roll", sign = 1,
-    title = "@i18n(app.modules.setup_wizard.dir_check_roll)@",
-    expect = "@i18n(app.modules.setup_wizard.dir_expect_roll)@"},
   {axis = "yaw", sign = -1,
     title = "@i18n(app.modules.setup_wizard.dir_check_yaw)@",
     expect = "@i18n(app.modules.setup_wizard.dir_expect_yaw)@"},
 }
 
 local AXIS_NAMES = {
-  pitch = "@i18n(app.modules.setup_wizard.dir_axis_pitch)@",
-  roll = "@i18n(app.modules.setup_wizard.dir_axis_roll)@",
   yaw = "@i18n(app.modules.setup_wizard.dir_axis_yaw)@",
 }
 
--- Test movement, percent of full stick: the Move button steps through these.
+local FROM_ABOVE = "@i18n(app.modules.setup_wizard.dir_from_above)@"
+
+-- Test movement, percent of full steering: the Move button steps through
+-- these (the configurator's Small, Medium, Large and Half stick).
 local DEFLECTIONS = {25, 35, 50, 15}
 
 -- The checked axis flicks between centre and the test movement.
@@ -66,12 +54,8 @@ local FLICK_INTERVAL = 0.8
 local WIGGLE_RAW = 300
 local WIGGLE_INTERVAL = 0.3
 
--- Whether this check moves the surface. The flap check leaves out pitch
--- surfaces carrying a Flap Compensation rule: that mix is tuned, not checked.
+-- Whether this check moves the servo.
 local function movedBy(surface, check)
-  if check.axis == "flap" then
-    return surface.kind == "flap" or surface.kind == "flaperon"
-  end
   return surface.axes[check.axis] ~= nil
 end
 
@@ -106,7 +90,6 @@ local function new(wiz)
   local cantFix = {}
   local reversed = {}          -- servo -> true when reversed an odd number of times
   local inverted = {}          -- axis -> true when inverted an odd number of times
-  local flapReversed = false
 
   local scr = ui.new(wiz)
 
@@ -124,9 +107,9 @@ local function new(wiz)
 
   local function startAxisMotion()
     stopMotion()
-    -- Every other axis at centre and the flaps up, so a mix does not hide
-    -- the one being checked; then only the checked one moves.
-    if wiz.holdAxes({roll = 0, pitch = 0, yaw = 0, flap = 0}) then
+    -- Every other axis at centre, so a mix does not hide the one being
+    -- checked; then only the checked one moves.
+    if wiz.holdAxes({roll = 0, pitch = 0, yaw = 0}) then
       motion, phase, nextMoveAt = "axis", false, 0
     end
   end
@@ -149,7 +132,6 @@ local function new(wiz)
       config.flags = (config.flags or 0) ~ surfacesLib.SERVO_FLAG_REVERSE
     end)
     reversed[surface.servo] = not reversed[surface.servo] or nil
-    if surface.kind == "flap" then flapReversed = true end
   end
 
   local function go(name)
@@ -188,10 +170,6 @@ local function new(wiz)
   end
 
   local function allWrong()
-    if check().axis == "flap" then
-      fix(moved)
-      return
-    end
     wiz.invertAxis(check().axis)
     inverted[check().axis] = not inverted[check().axis] or nil
     status = "@i18n(app.modules.setup_wizard.dir_status_inverted)@"
@@ -250,7 +228,7 @@ local function new(wiz)
       startAxisMotion()
       scr:text(c.title, c.expect .. " " .. "@i18n(app.modules.setup_wizard.dir_q_match)@", status,
         string.format("@i18n(app.modules.setup_wizard.progress_fmt)@", ci, #checks))
-      scr:picture(art.layout(wiz.surfaces(), c.axis), "@i18n(app.modules.setup_wizard.dir_from_behind)@")
+      scr:picture(art.layout(wiz.surfaces(), c.axis), FROM_ABOVE)
       focus = scr:row(backFromCheck, {
         {text = string.format("@i18n(app.modules.setup_wizard.dir_move_fmt)@", deflection()), weight = 0.6,
           small = true, needsMotion = true,
@@ -264,7 +242,7 @@ local function new(wiz)
 
     elseif screen == "all" then
       scr:text(c.title, "@i18n(app.modules.setup_wizard.dir_q_all)@", nil, true)
-      scr:picture(art.layout(wiz.surfaces(), c.axis), "@i18n(app.modules.setup_wizard.dir_from_behind)@")
+      scr:picture(art.layout(wiz.surfaces(), c.axis), FROM_ABOVE)
       focus = scr:row(function() go("check") end, {
         {text = "@i18n(app.modules.setup_wizard.dir_some)@", press = function()
           identifyIndex, wrongOnes = 1, {}
@@ -278,7 +256,7 @@ local function new(wiz)
       startServoMotion(surface.servo)
       scr:text(c.title, string.format("@i18n(app.modules.setup_wizard.dir_identify_fmt)@", surface.servo + 1,
         wiz.kindName(surface.kind), identifyIndex, #moved), nil, true)
-      scr:picture(art.layout(wiz.surfaces(), c.axis), "@i18n(app.modules.setup_wizard.dir_from_behind)@")
+      scr:picture(art.layout(wiz.surfaces(), c.axis), FROM_ABOVE)
       focus = scr:row(function() go("check") end, {
         -- Focus starts on No: a stray press must not reverse a servo.
         {text = "@i18n(app.modules.setup_wizard.dir_no)@", primary = true, needsMotion = true,
@@ -314,8 +292,7 @@ local function new(wiz)
       else
         body = "@i18n(app.modules.setup_wizard.dir_done_changes)@ " .. table.concat(changes, ", ") .. "."
       end
-      scr:text("@i18n(app.modules.setup_wizard.dir_done_title)@", body,
-        flapReversed and "@i18n(app.modules.setup_wizard.dir_flap_radio)@" or nil)
+      scr:text("@i18n(app.modules.setup_wizard.dir_done_title)@", body)
       scr:picture(art.layout(wiz.surfaces(), nil))
       focus = scr:row(function() ci, status = math.max(1, #checks), nil; go("check") end, {
         {text = "@i18n(app.modules.setup_wizard.dir_again)@", press = function()

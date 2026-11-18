@@ -38,6 +38,12 @@ Requires a running background task and a flight controller connection.
 
 ## Notes
 
+- The Function list offers only what a car uses, the set gripora-configurator offers:
+  the profile switches, the steering (yaw) rates, gains, filters, dynamics, master gain,
+  I-term decay and relax and servo trim, and the two mixer role gains. A range that
+  still holds another function is listed as *Function <id>*; it keeps that function
+  unless you pick a new one.
+
 TODO: Verify persistence, reboot behaviour, profile scope and any restrictions in
 this page and its shared helpers. Codec defaults may be UI fallbacks rather than
 firmware defaults; wire values may need scaling before display.

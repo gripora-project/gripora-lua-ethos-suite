@@ -8,7 +8,7 @@ source: app/pages/motor_override.lua
 
 # Motor Override
 
-> **Remove the propeller and secure the model first.** Here the flight controller
+> **Lift the wheels off the ground and secure the car first.** Here the flight controller
 > drives the motor directly: no throttle stick and no mix sit between the value on
 > this page and the output. It still refuses the write while the model is armed, so
 > disarm first. Anything still attached turns.
@@ -28,7 +28,7 @@ Requires a running background task and a flight controller connection.
 | --- | --- |
 | Motor | Which motor this page drives. Offered only on a board with more than one. |
 | Enable motor override | Arms the page. Asks for confirmation first. |
-| Throttle | 0-100 % of full throttle, applied directly to the selected motor. |
+| Throttle | -100 to +100 % around neutral, applied directly to the selected motor: above 0 drives forward, below 0 brakes or reverses as the ESC does. |
 
 ## How it stays safe
 
@@ -74,9 +74,8 @@ no motor, one second after the last one.
 - The page shows what the flight controller is *already* overriding when it
   opens, rather than starting from zero. A non-zero value there means something
   else is driving that motor.
-- Only the forward half of the range is offered. The firmware accepts negative
-  values and they run the motor backwards; that is not part of any setup
-  procedure.
+- The whole signed range is offered, as on gripora-configurator's Motors tab: a car
+  ESC is reversible, and 0 is neutral.
 - The title carries a `*` while the override is engaged.
 - Nothing on this page is written to the flight controller EEPROM. A reboot, a
   disarm or a link loss ends the override; nothing is saved.

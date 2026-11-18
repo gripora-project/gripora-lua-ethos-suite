@@ -68,10 +68,6 @@ return {
   esc_model = {
     {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5129},
   },
-  governor = {
-    {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5125},
-    {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5450},
-  },
   flight_mode = {
     {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5121},
   },

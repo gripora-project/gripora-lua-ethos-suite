@@ -2,8 +2,8 @@
 --
 -- The callouts that follow a decoded System Status / System Config word from
 -- the flight controller rather than a value crossing a threshold: RX backup
--- active, gyro overflow, GPS not responding, blackbox full, autotrim completed,
--- and the control-limit warning.
+-- active, gyro overflow, GPS not responding, blackbox full and the
+-- control-limit warning.
 --
 -- They keep the panel of their own that was in the monolithic page, now as a
 -- page of their own. Two reasons not to fold them into State callouts: these
@@ -24,14 +24,12 @@ local function open(opts)
     local fields = ctx.fields
 
     -- status_saturation ships off (DEFAULTS.events.status_saturation = false,
-    -- "control limit" can be chatty on 3D models) while the others ship on.
+    -- "control limit" can be chatty) while the others ship on.
     -- Nothing here gates another field, so there are no enable rules.
     fields.statusRxBackup = ctx.addBool("@i18n(app.modules.settings.status_rx_backup)@", "status_rx_backup")
     fields.statusGyro = ctx.addBool("@i18n(app.modules.settings.status_gyro)@", "status_gyro")
     fields.statusGps = ctx.addBool("@i18n(app.modules.settings.status_gps)@", "status_gps")
     fields.statusBlackbox = ctx.addBool("@i18n(app.modules.settings.status_blackbox)@", "status_blackbox")
-    fields.statusAutotrim = ctx.addBool("@i18n(app.modules.settings.status_autotrim)@", "status_autotrim")
-    fields.statusTrim = ctx.addBool("@i18n(app.modules.settings.status_trim)@", "status_trim")
     fields.statusSaturation = ctx.addBool("@i18n(app.modules.settings.status_saturation)@", "status_saturation")
   end)
 end

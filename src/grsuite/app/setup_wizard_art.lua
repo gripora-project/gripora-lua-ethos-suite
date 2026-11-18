@@ -1,18 +1,14 @@
--- Setup Wizard pictures: the model in 3D (app/plane3d.lua), seen from
--- behind as the pilot sees it standing behind the model, with the surfaces
--- a check moves lit and swung the way each should go.
+-- Setup Wizard pictures: the car seen from above, nose up, as on the
+-- configurator's car pictures (CarSide/GyroCheckArt/SteerBothWays). The
+-- front wheels steer (S1); a car with rear steering (S2 in the car mixer
+-- preset, lib/setup_wizard_mix.lua) has its rear wheels steer too, against
+-- the front ones or with them, as the mix says. A check lights the steering
+-- wheels and turns them the way they should go; the gyro check also draws
+-- how the car is turned by hand.
 --
--- Built from the surface kinds lib/setup_wizard_surfaces.lua finds in the
--- mix and the model type, so a V-tail, a flying wing, a delta or a model
--- with flaps each get their own airframe. Which side a servo is on cannot
--- be read from the mix (it depends on how the servo is mounted, which is
--- what the check is about), so the picture shows the airframe's surfaces,
--- not individual servos.
---
--- layout() runs when a screen is built; draw() runs from paint and only
--- draws what layout() worked out (the 3D airframe is built once per layout).
--- The wizard sets art.modelType (MSP_MIXER_CONFIG's model_type) when it
--- reads or changes the mix.
+-- layout() runs when a screen is built; draw() runs from paint and only does
+-- arithmetic and drawing on what layout() worked out, so it allocates
+-- nothing. The Sensors step's 3D car is app/plane3d.lua (art.airframe()).
 
 if package.loaded["grsuite.app.setup_wizard_art"] then
   return package.loaded["grsuite.app.setup_wizard_art"]
@@ -22,126 +18,67 @@ local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("
 local plane3d = requireModule("app/plane3d.lua")
 
 local floor = math.floor
+local sin, cos = math.sin, math.cos
 
 local art = {}
 
+-- Kept for the shell, which sets it from MSP_MIXER_CONFIG; the car picture
+-- does not depend on it.
 art.modelType = nil
 
--- Which part of the half span the surfaces cover (0 the centreline, 1 the
--- tip): whether a layout has them, and what the 3D airframe uses (spec3d()).
-local OUTER = {0.55, 0.97}   -- ailerons, elevons
-local FLAPERON = {0.30, 0.97}
-local INNER = {0.13, 0.50}   -- flaps
+-- How far the wheels are drawn turned on a check.
+local STEER_ANGLE = math.rad(24)
 
--- Arrow for each element on each check: "up", "down", "right", or nil when
--- the check does not move it. Sides: L and R as seen from behind.
-local ARROWS = {
-  pitch = {outer = {"up", "up"}, stab = {"up", "up"}, vtail = {"up", "up"}},
-  roll = {outer = {"down", "up"}, inner = {"down", "up"}},
-  yaw = {fin = {"right"}, vtail = {"right", "right"}},
-  flap = {outer = {"down", "down"}, inner = {"down", "down"}},
-}
-
-local FLIP = {up = "down", down = "up", right = "left", left = "right"}
-
--- What to draw for this mix, and which of it the check moves.
--- surfaces: wiz.surfaces(); axis: "pitch" | "roll" | "yaw" | "flap" | nil.
--- flip: every arrow the other way (the stick the other way, or the gyro
--- pushing back against a movement).
-function art.layout(surfaces, axis, flip)
-  local l = art.baseLayout(surfaces, axis)
-  if flip then
-    for key, dirs in pairs(l.arrows) do
-      local flipped = {}
-      for i = 1, #dirs do flipped[i] = FLIP[dirs[i]] end
-      l.arrows[key] = flipped
+-- The rear steering mode the mix has: nil, "opposite" or "same". The front
+-- servo is the lowest-numbered one on yaw; another one on yaw is the rear,
+-- opposite when its weight is negative.
+local function rearMode(surfaces)
+  local first = nil
+  for i = 1, #surfaces do
+    local s = surfaces[i]
+    if s.axes and s.axes.yaw then
+      if not first or s.servo < first.servo then first = s end
     end
   end
-  return l
+  if not first then return nil end
+  for i = 1, #surfaces do
+    local s = surfaces[i]
+    if s ~= first and s.axes and s.axes.yaw then
+      return (s.axes.yaw.pos or 0) < 0 and "opposite" or "same"
+    end
+  end
+  return nil
 end
 
 function art.baseLayout(surfaces, axis)
-  local kinds = {}
-  local flapRoll = false
-  for i = 1, #surfaces do
-    local s = surfaces[i]
-    kinds[s.kind] = true
-    if s.kind == "flap" and s.axes.roll then flapRoll = true end
-  end
-  local l = {
-    outer = (kinds.aileron or kinds.elevon or kinds.flaperon) and (kinds.flaperon and FLAPERON or OUTER) or nil,
-    outerKind = kinds.elevon and "elevon" or (kinds.flaperon and "flaperon" or "aileron"),
-    inner = kinds.flap and INNER or nil,
-    stab = kinds.elevator and not kinds.ruddervator,
-    vtail = kinds.ruddervator,
-    fin = (kinds.rudder or kinds.elevator) and not kinds.ruddervator,
-    rudder = kinds.rudder,
-    modelType = art.modelType,
-    arrows = {},
+  return {
+    rear = rearMode(surfaces),
+    steering = #surfaces > 0,
+    -- +1 steer right, -1 left, nil straight ahead
+    steer = (axis == "yaw") and 1 or nil,
+    lit = axis == "yaw",
+    turn = false,
   }
-  local a = ARROWS[axis] or {}
-  -- Only elements the check really moves get an arrow.
-  if l.outer and a.outer then
-    local moved = (axis == "pitch" and l.outerKind == "elevon")
-      or (axis == "roll")
-      or (axis == "flap" and l.outerKind == "flaperon")
-    if moved then l.arrows.outer = a.outer end
+end
+
+-- What to draw for this mix, and what the check moves.
+-- surfaces: wiz.surfaces(); axis: "yaw" for a steering check, nil for none.
+-- flip: the gyro answering a turn by hand: the car is turned clockwise (an
+-- arrow over the nose) and the wheels steer left, against it.
+function art.layout(surfaces, axis, flip)
+  local l = art.baseLayout(surfaces, axis)
+  if axis == "yaw" and flip then
+    l.steer = -1
+    l.turn = true
   end
-  if l.inner and a.inner and (axis == "flap" or (axis == "roll" and flapRoll)) then
-    l.arrows.inner = a.inner
-  end
-  if l.stab and a.stab then l.arrows.stab = a.stab end
-  if l.vtail and a.vtail then l.arrows.vtail = a.vtail end
-  if l.rudder and a.fin then l.arrows.fin = a.fin end
   return l
 end
 
--- The 3D airframe (app/plane3d.lua) for a layout: which tail and wing, and
--- where its surfaces sit along the half span. Elevons mean a tailless
--- model: a delta when the model type says so (lib/setup_wizard_mix.lua's
--- deltaWing, 3), a swept flying wing with winglets otherwise.
-local MODEL_TYPE_DELTA = 3
-local SPAN_AILERON = {0.30, 1.0}
-local SPAN_AILERON_WITH_FLAPS = {0.52, 1.0}
-local SPAN_FLAPERON = {0.18, 1.0}
-local SPAN_ELEVON = {0.20, 0.97}
-local SPAN_FLAP = {0.17, 0.50}
-
-local function spec3d(l)
-  local tailless = l.outerKind == "elevon" and not l.stab and not l.vtail
-  local outer = nil
-  if l.outer then
-    if l.outerKind == "elevon" then outer = SPAN_ELEVON
-    elseif l.outerKind == "flaperon" then outer = SPAN_FLAPERON
-    else outer = l.inner and SPAN_AILERON_WITH_FLAPS or SPAN_AILERON end
-  end
-  local wing = "straight"
-  if tailless then wing = (l.modelType == MODEL_TYPE_DELTA) and "delta" or "swept" end
-  return {
-    tail = tailless and "none" or (l.vtail and "vtail" or "conventional"),
-    wing = wing,
-    outer = outer,
-    inner = l.inner and SPAN_FLAP or nil,
-    fin = tailless and l.rudder or (not tailless and not l.vtail),
-    rudder = l.rudder,
-    winglets = tailless and wing == "swept",
-    gear = not tailless,
-  }
-end
-
--- Which picture element a surface kind is (lib/setup_wizard_surfaces.lua).
-local GROUP_OF = {
-  aileron = "outer", elevon = "outer", flaperon = "outer", flap = "inner",
-  elevator = "stab", ruddervator = "vtail", rudder = "fin",
-}
-local LIT_BOTH = {"lit", "lit"}
-
--- The airframe with one kind of surface lit (both sides: which side a servo
--- drives is not known), for a step that works one surface at a time.
+-- The car with its steering wheels lit at centre, for a step that works one
+-- servo at a time (Center).
 function art.surfaceLayout(surfaces, kind)
   local l = art.baseLayout(surfaces, nil)
-  local group = GROUP_OF[kind]
-  if group then l.arrows[group] = LIT_BOTH end
+  l.lit = true
   return l
 end
 
@@ -171,8 +108,8 @@ function art.tick(cx, cy, r)
   lcd.drawFilledCircle(bx, by, half)
 end
 
--- The model with the done badge in the corner (a step's or the wizard's
--- end). l: a layout, art.layout(wiz.surfaces(), nil).
+-- The car with the done badge in the corner (a step's or the wizard's end).
+-- l: a layout, art.layout(wiz.surfaces(), nil).
 function art.done(l, x, y, w, h, colors)
   art.draw(l, x, y, w, h, colors)
   local r = math.max(12, floor(math.min(w, h) * 0.17))
@@ -183,26 +120,88 @@ end
 -- it from every wakeup.
 art.service = plane3d.service
 
--- The 3D airframe for this mix, for a step that draws the plane itself
--- (plane3d.setup(art.airframe(wiz.surfaces()))). Allocates: call it from
--- build, not paint.
+-- The 3D car (app/plane3d.lua) for the Sensors step's attitude pictures.
+local CAR_SPEC = {car = true}
 function art.airframe(surfaces)
-  return spec3d(art.baseLayout(surfaces, nil))
+  return CAR_SPEC
 end
 
--- Seen from behind, a little from the left and well above (the nose tipped
--- down VIEW_PITCH on top of plane3d's own camera height): from low behind
--- the surfaces' chord, and how far they swing, shrink to a thin line.
-local VIEW_YAW = -20
-local VIEW_PITCH = -28
-local VIEW_ZOOM = 1.3
+-- A rectangle (half sizes hw x hh) centred on cx, cy and turned by angle
+-- (radians, clockwise on screen), as two triangles.
+local function turnedRect(cx, cy, hw, hh, angle)
+  local c, s = cos(angle), sin(angle)
+  local ax, ay = cx - hw * c + hh * s, cy - hw * s - hh * c
+  local bx, by = cx + hw * c + hh * s, cy + hw * s - hh * c
+  local qx, qy = cx + hw * c - hh * s, cy + hw * s + hh * c
+  local dx, dy = cx - hw * c - hh * s, cy - hw * s + hh * c
+  lcd.drawFilledTriangle(ax, ay, bx, by, qx, qy)
+  lcd.drawFilledTriangle(ax, ay, qx, qy, dx, dy)
+end
 
--- colors: unused (plane3d has its own); kept for the caller's signature.
+-- An arrow from x1, y1 to x2, y2, its head at the end.
+local function arrow(x1, y1, x2, y2, half, head)
+  local dx, dy = x2 - x1, y2 - y1
+  local l = math.sqrt(dx * dx + dy * dy)
+  if l < 1 then return end
+  local ux, uy = dx / l, dy / l
+  local bx, by = x2 - ux * head, y2 - uy * head
+  thickLine(x1, y1, bx, by, half)
+  local px, py = -uy * head * 0.7, ux * head * 0.7
+  lcd.drawFilledTriangle(x2, y2, bx + px, by + py, bx - px, by - py)
+end
+
+-- The car from above in x, y, w, h: body, cabin and four wheels; the
+-- steering wheels lit and turned for a check, with an arrow ahead of them,
+-- and for the gyro check an arrow over the nose for the turn by hand.
 function art.draw(l, x, y, w, h, colors)
-  l.spec3d = l.spec3d or spec3d(l)
-  plane3d.setup(l.spec3d)
-  plane3d.pose(l.arrows)
-  plane3d.draw(x, y, w, h, 0, VIEW_PITCH, VIEW_YAW, VIEW_ZOOM)
+  local turnRoom = l.turn and 0.22 or 0.06
+  local carH = math.min(h * (1 - turnRoom) * 0.9, w * 1.5)
+  local carW = carH * 0.48
+  local cx = x + w / 2
+  local cy = y + h * turnRoom + h * (1 - turnRoom) / 2
+  local top, bottom = cy - carH / 2, cy + carH / 2
+
+  -- Wheels first, the body over their inner edges.
+  local wheelHW, wheelHH = carW * 0.13, carH * 0.1
+  local wheelX = carW / 2
+  local frontY, rearY = top + carH * 0.2, bottom - carH * 0.2
+  local steer = l.steer or 0
+  local frontAngle = steer * STEER_ANGLE
+  local rearAngle = 0
+  if l.rear == "opposite" then rearAngle = -frontAngle elseif l.rear == "same" then rearAngle = frontAngle end
+
+  lcd.color((l.lit and l.steering) and colors.active or colors.surface)
+  turnedRect(cx - wheelX, frontY, wheelHW, wheelHH, frontAngle)
+  turnedRect(cx + wheelX, frontY, wheelHW, wheelHH, frontAngle)
+  lcd.color((l.lit and l.rear) and colors.active or colors.surface)
+  turnedRect(cx - wheelX, rearY, wheelHW, wheelHH, rearAngle)
+  turnedRect(cx + wheelX, rearY, wheelHW, wheelHH, rearAngle)
+
+  -- Body: a long block with a tapered nose, and the cabin on it.
+  local bodyHW = carW * 0.38
+  local noseY = top + carH * 0.04
+  local shoulderY = top + carH * 0.12
+  lcd.color(colors.body)
+  lcd.drawFilledRectangle(floor(cx - bodyHW), floor(shoulderY), floor(bodyHW * 2), floor(bottom - shoulderY))
+  lcd.drawFilledTriangle(cx - bodyHW, shoulderY, cx + bodyHW, shoulderY, cx + bodyHW * 0.6, noseY)
+  lcd.drawFilledTriangle(cx - bodyHW, shoulderY, cx + bodyHW * 0.6, noseY, cx - bodyHW * 0.6, noseY)
+  lcd.color(colors.muted)
+  lcd.drawFilledRectangle(floor(cx - bodyHW * 0.7), floor(cy - carH * 0.12), floor(bodyHW * 1.4), floor(carH * 0.3))
+
+  local half = math.max(2, floor(carW * 0.035))
+  local head = math.max(6, floor(carW * 0.16))
+  if steer ~= 0 and l.lit then
+    -- Which way the front wheels steer: an arrow just ahead of them.
+    lcd.color(colors.active)
+    local ay = frontY - wheelHH - head
+    arrow(cx - carW * 0.15 * steer, ay, cx + carW * 0.35 * steer, ay, half, head)
+  end
+  if l.turn then
+    -- The turn by hand, clockwise seen from above: the nose goes right.
+    lcd.color(colors.text)
+    local ty = y + h * turnRoom * 0.5
+    arrow(cx - carW * 0.4, ty + head * 0.5, cx + carW * 0.5, ty - head * 0.2, half, head)
+  end
 end
 
 -- A servo seen from above: its horn on an arc from Min (left) to Max

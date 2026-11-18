@@ -5,18 +5,18 @@
 -- orientation (AutoAlignWizard.svelte) and automatic level
 -- (MountTrimAutoWizard.svelte). One screen each, in that order:
 --
---   intro   the tail-wheel note; Start, or Next to leave the step as it is
+--   intro   what the step does; Start, or Next to leave the step as it is
 --   acc     calibrate the accelerometer (MSP_ACC_CALIBRATION, then wait for
 --           the FC to clear ARMING_DISABLED_CALIBRATING, lib/acc_calibration_wait.lua)
---   align   MSP2_GRIPORA_BOARD_AUTO_ALIGN: flat, Start, lift the tail 20 deg; the
---           result is written as the board alignment. A side view of the
---           plane (app/plane3d.lua) shows the tail lift.
---   check   the live attitude (MSP_ATTITUDE) on the 3D plane, seen from
---           behind: tilting the model must move the picture the same way.
+--   align   MSP2_GRIPORA_BOARD_AUTO_ALIGN: flat, Start, lift the rear 20 deg;
+--           the result is written as the board alignment. A side view of
+--           the car (app/plane3d.lua) shows the rear lift.
+--   check   the live attitude (MSP_ATTITUDE) on the 3D car, seen from
+--           behind: tilting the car must move the picture the same way.
 --           The firmware applies an auto-align result at once, so this
 --           shows the new orientation without a restart.
---   level   MSP2_GRIPORA_BOARD_MOUNT_TRIM_AUTO: hold the flying attitude; the
---           result is written as the mount trim
+--   level   MSP2_GRIPORA_BOARD_MOUNT_TRIM_AUTO: the car on its wheels on a
+--           level surface; the result is written as the mount trim
 --   done    board alignment only applies after a restart, so Save and
 --           restart when either changed
 --
@@ -41,7 +41,6 @@ local art = requireModule("app/setup_wizard_art.lua")
 local T = {
   title = "@i18n(app.modules.setup_wizard.sen_title)@",
   intro = "@i18n(app.modules.setup_wizard.sen_intro)@",
-  tail = "@i18n(app.modules.setup_wizard.sen_tail)@",
   noAcc = "@i18n(app.modules.setup_wizard.sen_no_acc)@",
   accTitle = "@i18n(app.modules.setup_wizard.sen_acc_title)@",
   accText = "@i18n(app.modules.setup_wizard.sen_acc_text)@",
@@ -85,7 +84,7 @@ local AUTO_POLL = 0.25
 local ATTITUDE_POLL = 0.3
 local ATTITUDE_TIMEOUT = 3.0
 -- The orientation screen's view: from behind and to the side, nose to the
--- left, and the tail lift it asks for.
+-- left, and the rear lift it asks for.
 local SIDE_YAW = -65
 local TAIL_LIFT = 20
 -- The pictures tilt only a little: a little bigger
@@ -132,7 +131,7 @@ local function new(wiz)
     wiz.rebuild()
   end
 
-  -- This model's airframe (as the other steps' pictures), surfaces neutral.
+  -- The 3D car.
   local airframe = art.airframe(wiz.surfaces())
   local function plane(x, y, w, h, roll, pitch, yaw, zoom)
     plane3d.setup(airframe)
@@ -140,17 +139,17 @@ local function new(wiz)
     plane3d.draw(x, y, w, h, roll, pitch, yaw, zoom)
   end
 
-  -- The model level: the intro, the calibration and the level screens.
+  -- The car level: the intro, the calibration and the level screens.
   local function drawLevel(x, y, w, h)
     plane(x, y, w, h, 0, 0, SIDE_YAW, LIFT_ZOOM)
   end
 
-  -- The plane from the side, its tail lifted while auto align waits for it.
+  -- The car from the side, its rear lifted while auto align waits for it.
   local function drawLift(x, y, w, h)
     plane(x, y, w, h, 0, (autoKind == "align") and TAIL_LIFT or 0, SIDE_YAW, LIFT_ZOOM)
   end
 
-  -- The plane from behind at the live attitude (the numbers are rows).
+  -- The car from behind at the live attitude (the numbers are rows).
   local function drawLive(x, y, w, h)
     plane(x, y, w, h, live.roll, live.pitch, 0, LIVE_ZOOM)
   end
@@ -252,7 +251,7 @@ local function new(wiz)
     end
 
     if screen == "intro" then
-      scr:text(T.title, T.intro .. " " .. T.tail, (not hasAcc) and T.noAcc or nil)
+      scr:text(T.title, T.intro, (not hasAcc) and T.noAcc or nil)
       scr:draw(drawLevel, nil, true)
       return scr:row(nil, hasAcc and {{text = T.start, primary = true, press = function() go("acc") end}} or nil)
 

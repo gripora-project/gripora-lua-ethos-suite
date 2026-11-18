@@ -1,10 +1,11 @@
--- PID Bandwidth profile editor page. Loaded on demand (plain loadfile) only when the user opens Flight Tuning -> Advanced ->
+-- PID Bandwidth profile editor page. Loaded on demand (plain loadfile) only when the user opens Tuning -> Advanced ->
 -- PID Bandwidth -- see app/tool.lua.
 --
 -- Edits nine more MSP_PID_PROFILE fields (cmd 94/95, see
 -- lib/msp_pid_profile.lua) that no other page touches yet: the gyro/
--- dterm/bterm cutoff frequencies, roll/pitch/yaw each. Matches the
--- original suite's own app/modules/profile_pidbandwidth/pidbandwidth.lua.
+-- dterm/bterm cutoff frequencies. Only yaw is stabilised (steering), so
+-- only the yaw cutoffs (*_cutoff_2) are shown, as on gripora-configurator's
+-- PID Bandwidth panel; the roll and pitch cutoffs are written back unchanged.
 --
 -- Layout simplified vs. the original in one respect: its own first row
 -- label is literally its own page name ("PID Bandwidth") reused for the
@@ -42,23 +43,11 @@ local function open(opts)
   form.clear()
   runtime:buildChrome()
 
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.pid_bandwidth.gyro_cutoff)@", {
-    {title = "@i18n(app.modules.pid_bandwidth.roll)@", spec = {key = "gyro_cutoff_0"}},
-    {title = "@i18n(app.modules.pid_bandwidth.pitch)@", spec = {key = "gyro_cutoff_1"}},
-    {title = "@i18n(app.modules.pid_bandwidth.yaw)@", spec = {key = "gyro_cutoff_2"}},
-  })
+  fieldLayout.buildSingle(runtime, "@i18n(app.modules.pid_bandwidth.gyro_cutoff)@", {key = "gyro_cutoff_2"})
 
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.pid_bandwidth.dterm_cutoff)@", {
-    {title = "@i18n(app.modules.pid_bandwidth.roll)@", spec = {key = "dterm_cutoff_0"}},
-    {title = "@i18n(app.modules.pid_bandwidth.pitch)@", spec = {key = "dterm_cutoff_1"}},
-    {title = "@i18n(app.modules.pid_bandwidth.yaw)@", spec = {key = "dterm_cutoff_2"}},
-  })
+  fieldLayout.buildSingle(runtime, "@i18n(app.modules.pid_bandwidth.dterm_cutoff)@", {key = "dterm_cutoff_2"})
 
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.pid_bandwidth.bterm_cutoff)@", {
-    {title = "@i18n(app.modules.pid_bandwidth.roll)@", spec = {key = "bterm_cutoff_0"}},
-    {title = "@i18n(app.modules.pid_bandwidth.pitch)@", spec = {key = "bterm_cutoff_1"}},
-    {title = "@i18n(app.modules.pid_bandwidth.yaw)@", spec = {key = "bterm_cutoff_2"}},
-  })
+  fieldLayout.buildSingle(runtime, "@i18n(app.modules.pid_bandwidth.bterm_cutoff)@", {key = "bterm_cutoff_2"})
 
   runtime:loadInitial()
 end

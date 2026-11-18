@@ -1,6 +1,6 @@
 -- Controls -> Failsafe Stage 2 page.
 --
--- Edits MSP_FAILSAFE_CONFIG: the failsafe_procedure the aircraft runs once
+-- Edits MSP_FAILSAFE_CONFIG: the failsafe_procedure the car runs once
 -- stage 1 (Channel Fallback, see failsafe.lua) has held for failsafe_delay,
 -- plus its timing/throttle/switch settings. See
 -- gripora-project/gripora-firmware#146 -- this MSP pair/behaviour did nothing
@@ -33,7 +33,6 @@ local BTN_CANCEL = "@i18n(app.btn_cancel)@"
 local PROCEDURE_OPTIONS = {
   {"@i18n(app.modules.failsafe_procedure.procedure_land)@", 0},
   {"@i18n(app.modules.failsafe_procedure.procedure_drop)@", 1},
-  {"@i18n(app.modules.failsafe_procedure.procedure_gpsrescue)@", 2},
 }
 
 -- Values match TABLE_FAILSAFE_SWITCH_MODE (STAGE1, KILL, STAGE2).

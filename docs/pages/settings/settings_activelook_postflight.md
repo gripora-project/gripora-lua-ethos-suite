@@ -1,21 +1,21 @@
 ---
-title: "Postflight"
-sidebar_label: "Postflight"
+title: "After Run"
+sidebar_label: "After Run"
 sidebar_position: 40
 documentation_status: draft
 source: app/pages/settings_activelook_postflight.lua
 ---
 
-# Postflight
+# After Run
 
 > Draft scaffold. Extracted labels may be incomplete or out of order. Behaviour,
 > displayed units, defaults and save effects require source review.
 
-TODO: Explain what this page controls and when a pilot would use it.
+TODO: Explain what this page controls and when a driver would use it.
 
 ## Where to find it
 
-*System* → *Settings* → *ActiveLook* → *Postflight*
+*System* → *Settings* → **ActiveLook* → *After Run*
 
 Available without a flight controller connection; the background task must be running.
 

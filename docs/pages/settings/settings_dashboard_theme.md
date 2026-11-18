@@ -11,7 +11,7 @@ source: app/pages/settings_dashboard_theme.lua
 > Draft scaffold. Extracted labels may be incomplete or out of order. Behaviour,
 > displayed units, defaults and save effects require source review.
 
-TODO: Explain what this page controls and when a pilot would use it.
+TODO: Explain what this page controls and when a driver would use it.
 
 ## Where to find it
 
@@ -52,34 +52,34 @@ theme whose folder is gone, and saving the page stores that. See
 **KSE4** (`system/kse4`) and **KSE5** (`system/kse5`) follow the layouts of
 Kyle Stacy's [KSE dashboards](https://github.com/kylestacy2/KSE-Dashboards).
 They draw every tile in the Ethos theme's colours, so the radio's theme picks
-the palette. Each has its own preflight, inflight and postflight screen.
+the palette. Each has its own screen for before, during and after a run.
 
 **KSE4** is a tile dashboard.
 
-- **Preflight**: model image and flight count, a large RPM tile beside the
-  flight timer, and a strip with current, pack voltage, BEC voltage and ESC
-  temperature. The bottom row has the governor and a battery or fuel bar.
-- **Inflight**: large RPM and timer tiles, a strip with current, cell voltage,
-  ESC temperature and throttle, then the governor and the fuel bar.
-- **Postflight**: flight time, consumed mAh and remaining fuel across the top,
-  then the flight's peaks and lows: maximum RPM, current, power, throttle and
+- **Before a run**: model image and run count, a large RPM tile beside the
+  run timer, and a strip with current, pack voltage, BEC voltage and ESC
+  temperature. The bottom row has the arming state and a battery or fuel bar.
+- **During a run**: large RPM and timer tiles, a strip with current, cell voltage,
+  ESC temperature and throttle, then the arming state and the fuel bar.
+- **After a run**: run time, consumed mAh and remaining fuel across the top,
+  then the run's peaks and lows: maximum RPM, current, power, throttle and
   ESC temperature, and minimum cell voltage, BEC voltage and link.
 
 **KSE5** is a ring dashboard.
 
-- **Preflight**: four rings for battery or fuel, RPM, current and ESC
-  temperature. Below them are the model image, the flight count, and tiles for
-  the governor, BEC voltage, cell voltage and consumed mAh.
-- **Inflight**: a large battery or fuel ring, smaller RPM and ESC temperature
-  rings with the timer and governor below them, and a row with current, cell
+- **Before a run**: four rings for battery or fuel, RPM, current and ESC
+  temperature. Below them are the model image, the run count, and tiles for
+  the arming state, BEC voltage, cell voltage and consumed mAh.
+- **During a run**: a large battery or fuel ring, smaller RPM and ESC temperature
+  rings with the timer and arming state below them, and a row with current, cell
   voltage, BEC voltage and throttle.
-- **Postflight**: rings for the lowest fuel and the highest RPM, current and
-  ESC temperature, then flight time, consumed mAh, minimum cell and BEC
+- **After a run**: rings for the lowest fuel and the highest RPM, current and
+  ESC temperature, then run time, consumed mAh, minimum cell and BEC
   voltage, maximum power and minimum link.
 
 Set the full-scale RPM, current and ESC temperature of the KSE5 rings in
-[Dashboard Settings](settings_dashboard_settings.md). Postflight figures fill
-in once a flight has been recorded.
+[Dashboard Settings](settings_dashboard_settings.md). The after-run figures fill
+in once a run has been recorded.
 
 ## Source
 

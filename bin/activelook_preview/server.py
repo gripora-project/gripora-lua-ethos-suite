@@ -31,7 +31,6 @@ SENSOR_FILES = {
     "tempMcu": "temp_mcu",
     "consumption": "consumption",
     "cellCount": "cell_count",
-    "governorState": "governor",
     "throttlePercent": "throttle_percent",
     "armflags": "armflags",
     "pidProfile": "pid_profile",
@@ -47,7 +46,7 @@ LAYOUT_KEYS = {
     "stacked_three",
 }
 SENSOR_KEYS = {
-    "off", "flightmode", "timer", "governor", "armed", "temp_esc", "temp_mcu", "link", "fuel",
+    "off", "flightmode", "timer", "armed", "temp_esc", "temp_mcu", "link", "fuel",
     "current", "voltage", "cell_voltage", "rpm", "consumption", "temp_esc_max", "temp_mcu_max",
     "link_min", "link_max", "fuel_min", "fuel_max", "current_min", "current_max", "voltage_min",
     "voltage_max", "rpm_min", "rpm_max",
@@ -214,7 +213,7 @@ def telemetry_payload() -> dict:
     values = {}
     for field in (
         "current", "becVoltage", "fuel", "rpm", "tempEsc", "tempMcu",
-        "consumption", "cellCount", "governorState", "throttlePercent",
+        "consumption", "cellCount", "throttlePercent",
         "pidProfile", "rateProfile", "batteryProfile", "altitude",
     ):
         if field in raw:

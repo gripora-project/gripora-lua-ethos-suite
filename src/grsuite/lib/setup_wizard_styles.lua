@@ -1,6 +1,9 @@
--- Flying-style starting points for the Setup Wizard's Flying style step,
--- applied to roll, pitch and yaw: rates (deg/s at full stick and expo
--- percent) and I-term relax (score 1-10 and level in deg/s).
+-- Driving-style starting points for the Setup Wizard's Driving style step:
+-- rates (deg/s at full steering and expo percent) and I-term relax (score
+-- 1-10 and level in deg/s). Only yaw (steering) is stabilised, so a style
+-- only sets and matches the yaw values (AXES below); roll and pitch are left
+-- as they are and not written. Keys stay "trainer"/"sport"/"3d" as in the
+-- configurator; they are shown as Beginner, Sport and Drift.
 --
 -- A port of gripora-configurator src/tabs/setup_wizard/styles.js; the
 -- style cases in bin/tests/setup_wizard_controls.lua are the configurator's
@@ -23,7 +26,8 @@ M.STYLES = {
   {key = "3d", rate = {roll = 500, pitch = 400, yaw = 300}, expo = 60, relax = 7, relaxLevel = 15},
 }
 
-M.AXES = {"roll", "pitch", "yaw"}
+-- Only yaw is stabilised (yaw-rate gyro steering).
+M.AXES = {"yaw"}
 local RATE_N = {roll = 1, pitch = 2, yaw = 3}
 local PID_N = {roll = 0, pitch = 1, yaw = 2}
 

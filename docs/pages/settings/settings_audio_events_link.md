@@ -20,20 +20,20 @@ Available without a flight controller connection; the background task must be ru
 
 | Setting | What it does |
 | --- | --- |
-| *Telemetry lost* | Calls out the link when it drops **while the model is armed**, and again when it comes back. On by default. |
+| *Telemetry lost* | Calls out the link when it drops **while the car is armed**, and again when it comes back. On by default. |
 | *Vibrate* | Vibrates the radio when the link drops while armed. On by default. A lost link is announced once per loss, so it has no repeat count. |
 
 ## Notes
 
 - One switch governs both halves, because the recovery is gated on the loss: the link coming
   back is only announced if the loss was announced, and only while that loss is still the same
-  flight.
+  run.
 - The armed state is read from the tick *before* the link went. Unplugging the pack on the
-  bench, or powering down after landing, is the normal end of a session and stays completely
-  silent; the same drop with the rotors turning is the one event here a pilot must not have to
+  bench, or powering down after a run, is the normal end of a session and stays completely
+  silent; the same drop with the car armed is the one event here a driver must not have to
   notice for himself.
-- A model that answers again more than 120 seconds later gets no recovery callout — that is a
-  new flight, and "telemetry recovered" belongs to the one that was interrupted.
+- A car that answers again more than 120 seconds later gets no recovery callout — that is a
+  new run, and "telemetry recovered" belongs to the one that was interrupted.
 - The dedicated *Telemetry lost* / *Telemetry recovered* sounds are not in the packs yet, and
   neither has a neighbour worth borrowing: every shipped alert word names a different event, and
   saying a lost link in the words of an empty battery is worse than saying nothing. Until a

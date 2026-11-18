@@ -1,4 +1,7 @@
--- Flight phase and flight extremes, owned by the session (#2344).
+-- Run phase and run extremes, owned by the session (#2344). The names keep the
+-- inherited "flight" wording (flightState, preflight/inflight/postflight) because
+-- themes and stored dashboard settings use them; for a car they mean before,
+-- during and after a run.
 --
 -- The session calls update(session, read) every tick, so the phase and the extremes
 -- are kept whether a dashboard is open or not. `read` is lib/live_sensors.lua's
@@ -103,36 +106,34 @@ local function sample(stats, minKey, maxKey, key, value, noMin)
   entry.avg = entry.sum / entry.count
 end
 
--- The powered gate for the minima of headspeed and current (#2344), as the EdgeTX suite's
+-- The powered gate for the minima of motor RPM and current (#2344), as the EdgeTX suite's
 -- flight record has it (tasks/events/telemetry/flight_record.lua, EdgeTX PR #384).
 --
--- A minimum taken over the whole flight phase is the minimum of the spool-up and the
--- spool-down: the first readings after arming are the lowest of the flight, and minimum
--- current reads 0 A. So these two minima are only taken while the rotor is under power.
--- The maxima, and every other value, keep the whole flight phase.
+-- A minimum taken over the whole run is the minimum of the standstill: the first readings
+-- after arming are the lowest of the run, and minimum current reads 0 A. So these two minima
+-- are only taken while the motor is under power. The maxima, and every other value, keep the
+-- whole run.
 --
--- With the FC's governor state, "under power" is ACTIVE (4) or BYPASS (9) held for 2 s. The
--- state is trusted once a value in its own range has been seen in this flight; without it
--- (governor off, or the sensor not sent) the head has to turn (>= 100 rpm) and be driven
--- (throttle >= 25 % or current >= 1.5 A) for 2 s, and the minimum is offered the reading of
--- 2 s ago, so the last 2 s of a driven stretch -- a spool-down, a bogging head -- never count.
--- The gate runs on the EdgeTX cadence of 0.5 s, so the hold and the delay are the same there.
-local POWERED_GOVERNOR_STATE = {[4] = true, [9] = true}
+-- "Under power": the motor turns (>= 100 rpm) and is driven (|throttle| >= 25 %, forward or
+-- reverse, or current >= 1.5 A) for 2 s, and the minimum is offered the reading of 2 s ago,
+-- so the last 2 s of a driven stretch -- the car slowing down -- never count. The gate runs
+-- on the EdgeTX cadence of 0.5 s, so the hold and the delay are the same there.
 local SPINNING_RPM = 100
 local DRIVEN_THROTTLE_PERCENT = 25
 local DRIVEN_CURRENT = 1.5
 local GATE_INTERVAL = 0.5
 local POWERED_HOLD_SAMPLES = 4
 local POWERED_TAIL_SAMPLES = 4
+-- Throttle away from neutral, in percent of full travel either way, that counts as running
+-- when the FC's running latch is not available.
+local RUNNING_THROTTLE_PERCENT = 10
 
 -- Offers one minimum through the gate. `line` holds the last four gate samples of this
--- sensor; without a governor state the value offered is the one of four samples ago.
+-- sensor; the value offered is the one of four samples ago.
 local function offerMin(self, line, key, minKey, value, positive)
   value = tonumber(value)
   if value == nil then return end
-  if not self.govStateSeen then
-    value, line[1], line[2], line[3], line[4] = line[1], line[2], line[3], line[4], value
-  end
+  value, line[1], line[2], line[3], line[4] = line[1], line[2], line[3], line[4], value
   if not self.powered or value == nil or (positive and value <= 0) then return end
   local stats = self.stats
   if stats[minKey] == nil or value < stats[minKey] then stats[minKey] = value end
@@ -146,13 +147,12 @@ FlightStats.__index = FlightStats
 function FlightStats:clear()
   for key in pairs(self.stats) do self.stats[key] = nil end
   self.rpmVariancePct = nil
-  self.govStateSeen = false
   self.poweredSamples = 0
   self.powered = false
   self.gateAt = nil
 end
 
--- The dashboard's "reset flight" action, and the start state.
+-- The dashboard's "reset run" action, and the start state.
 function FlightStats:reset()
   self.phase = "preflight"
   self.flown = false
@@ -166,7 +166,7 @@ function flight_stats.new()
   return self
 end
 
--- One tick. `s` is the session: connected, isArmed, mcuId, governorState, rxMap,
+-- One tick. `s` is the session: connected, isArmed, mcuId, systemStatus, rxMap,
 -- throttlePercent and the fields `read` takes its values from. Returns the phase.
 function FlightStats:update(s, read, now)
   local previous = self.phase
@@ -174,23 +174,26 @@ function FlightStats:update(s, read, now)
   local armed = s.isArmed == true
   local mcuId = s.mcuId
 
-  -- A different craft: nothing of the previous one carries over.
+  -- A different car: nothing of the previous one carries over.
   if mcuId ~= self.prevMcuId and connected and mcuId and mcuId ~= "" then
     if self.lastMcuId and self.lastMcuId ~= mcuId then self:reset() end
     self.lastMcuId = mcuId
   end
-  -- The link is back: a finished flight is closed, the extremes start empty.
+  -- The link is back: a finished run is closed, the extremes start empty.
   if connected and not self.prevConnected then
     if previous == "postflight" or previous == "offline" then self:reset() else self:clear() end
   end
 
-  -- In flight: the governor drives the rotors, or the radio's throttle channel
-  -- (RX_MAP), or until RX_MAP is known the FC's telemetry throttle, is above 35.
+  -- Running: the FC's own running latch (system_status bit 1: set once armed and
+  -- the throttle has left neutral, held through stops, cleared on disarm). Without
+  -- system_status, the throttle away from neutral, either way (throttle is signed
+  -- around neutral: brake/reverse below it): the radio's throttle channel (RX_MAP,
+  -- -1024..1024), or until RX_MAP is known the FC's telemetry throttle (-100..100 %).
   local flying = false
   if armed and connected then
-    local governor = s.governorState
-    if type(governor) == "number" and governor >= 4 and governor <= 8 then
-      flying = true
+    local status = s.systemStatus
+    if status and status.running ~= nil then
+      flying = status.running == true
     else
       local member = s.rxMap and s.rxMap.throttle
       local value
@@ -201,9 +204,10 @@ function FlightStats:update(s, read, now)
             and system.getSource({category = CATEGORY_CHANNEL, member = member, options = 0}) or nil
         end
         value = self.throttleSource and self.throttleSource:value()
+        if type(value) == "number" then value = value * 100 / 1024 end
       end
       if type(value) ~= "number" then value = s.throttlePercent end
-      flying = type(value) == "number" and value > 35
+      flying = type(value) == "number" and math.abs(value) > RUNNING_THROTTLE_PERCENT
     end
   end
 
@@ -219,7 +223,7 @@ function FlightStats:update(s, read, now)
     self.flown = true
     mode = "inflight"
   elseif self.flown then
-    -- Armed after a flight holds inflight through a gap in the spool-up check.
+    -- Armed after a run holds inflight through a stop.
     mode = armed and "inflight" or "postflight"
   else
     mode = armed and "armed" or "preflight"
@@ -243,19 +247,10 @@ function FlightStats:update(s, read, now)
     now = now or os.clock()
     if self.gateAt == nil or now >= self.gateAt then
       self.gateAt = now + GATE_INTERVAL
-      local governor = tonumber(s.governorState)
-      if governor and governor >= 1 and governor <= 9 then self.govStateSeen = true end
-      local gate, need
-      if self.govStateSeen then
-        gate = POWERED_GOVERNOR_STATE[governor] == true
-        need = POWERED_HOLD_SAMPLES
-      else
-        gate = (rpm or 0) >= SPINNING_RPM
-          and ((throttle or 0) >= DRIVEN_THROTTLE_PERCENT or (current or 0) >= DRIVEN_CURRENT)
-        need = POWERED_HOLD_SAMPLES + POWERED_TAIL_SAMPLES
-      end
+      local gate = (rpm or 0) >= SPINNING_RPM
+        and (math.abs(throttle or 0) >= DRIVEN_THROTTLE_PERCENT or (current or 0) >= DRIVEN_CURRENT)
       self.poweredSamples = gate and self.poweredSamples + 1 or 0
-      self.powered = self.poweredSamples >= need
+      self.powered = self.poweredSamples >= POWERED_HOLD_SAMPLES + POWERED_TAIL_SAMPLES
       offerMin(self, self.rpmLine, "rpm", "minRpm", rpm, true)
       offerMin(self, self.currentLine, "current", "minCurrent", current, false)
     end

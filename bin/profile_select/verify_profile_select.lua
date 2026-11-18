@@ -117,20 +117,6 @@ package.loaded["grsuite.lib.msp_status"] = {
   end,
 }
 
--- The Thrust Vector profile: read with the status, written as the last step of a save.
-local tvRead = nil
-package.loaded["grsuite.lib.msp_tv_pid"] = {
-  buildReadMessage = function(onOk, onErr)
-    tvRead = {processReply = function() onOk({tv_profile_index = 0}) end, errorHandler = onErr}
-    return tvRead
-  end,
-}
-package.loaded["grsuite.lib.msp_select_tv_profile"] = {
-  buildSelectMessage = function(profile, onOk, onErr)
-    return {processReply = function() if onOk then onOk() end end, errorHandler = onErr}
-  end,
-}
-
 local bus = requireModule("lib/bus.lua")
 local writes = {}   -- every msp.request the page publishes, in order
 bus.subscribe("msp.request", function(message) writes[#writes + 1] = message end)
@@ -150,16 +136,11 @@ local function open()
     setWakeupHandler = function(fn) wakeupHandler = fn end,
   })
   statusRead.processReply()                   -- the FC answers the status read
-  tvRead.processReply()                       -- and the Thrust Vector read that follows it
   if wakeupHandler then wakeupHandler() end   -- renders the page
 end
 
 local function choose(index)
   choiceSetters[2].set(index)                 -- the rate field is the second choice field
-end
-
-local function chooseTv(index)
-  choiceSetters[3].set(index)                 -- the Thrust Vector field is the third choice field
 end
 
 local function pressSave()
@@ -224,26 +205,8 @@ choose(1)
 pressSave()
 writes[#writes].processReply()                -- rate accepted
 writes[#writes].processReply()                -- PID accepted
-writes[#writes].processReply()                -- Thrust Vector accepted
 check("an accepted save shows no failure dialog", not failureDialogOpened())
 check("an accepted save darkens the Save button", lastSaveEnabled() == false,
-      tostring(lastSaveEnabled()))
-
--- ---------------------------------------------------------------------------
--- 4. A refused Thrust Vector write, after rate and PID were accepted, is reported
--- ---------------------------------------------------------------------------
-
-print("refused Thrust Vector write")
-open()
-chooseTv(1)                                   -- a real change on the TV profile only: 0 -> 1
-pressSave()
-writes[#writes - 2].processReply()            -- rate write accepted
-writes[#writes - 1].processReply()            -- PID write accepted
-local tvWrite = writes[#writes]
-check("the last write of a save is the Thrust Vector write", tvWrite ~= nil)
-tvWrite.errorHandler()                        -- Thrust Vector write refused
-check("a refused Thrust Vector write shows the save-failed dialog", failureDialogOpened())
-check("a refused Thrust Vector write keeps the Save button lit", lastSaveEnabled() == true,
       tostring(lastSaveEnabled()))
 
 print(string.format("\n%d checks, %d failed", checks, failures))

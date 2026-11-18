@@ -7,8 +7,9 @@
 -- Each servo the mix drives is named after the surface it moves
 -- (lib/setup_wizard_surfaces.lua's surfaceKind()): a pair of one kind is left
 -- and right, in servo order (the wizards give the left surface the lower
--- servo), one alone has no side, and more are numbered. Thrust-vector servos
--- are named after their axis.
+-- servo), one alone has no side, and more are numbered; a pair of steering
+-- servos is front and rear. A servo on yaw alone is a car's steering (STEER).
+-- Thrust-vector servos are named after their axis.
 
 if package.loaded["grsuite.lib.servo_names"] then
   return package.loaded["grsuite.lib.servo_names"]
@@ -28,10 +29,13 @@ local ABBREVIATIONS = {
   elevon = "ELEVON",
   ruddervator = "VTAIL",
   elevator = "ELEV",
-  rudder = "RUDDER",
+  rudder = "STEER",
   flap = "FLAP",
   mixed = "MIX",
 }
+
+-- Names earlier versions generated, still cleared when the mix moves on
+local LEGACY_NAMES = {"RUDDER"}
 
 -- Mixer inputs MIXER_IN_STABILIZED_TV_ROLL/PITCH/YAW
 local TV_NAMES = {[27] = "TV ROLL", [28] = "TV PITCH", [29] = "TV YAW"}
@@ -55,6 +59,10 @@ function M.namesFromRules(rules)
     for i, servo in ipairs(servos) do
       if #servos == 1 then
         names[servo] = abbr
+      elseif #servos == 2 and kind == "rudder" then
+        -- A pair of steering servos is front and rear (the car setup puts
+        -- the front on S1).
+        names[servo] = (i == 1 and "F " or "R ") .. abbr
       elseif #servos == 2 then
         names[servo] = (i == 1 and "L " or "R ") .. abbr
       else
@@ -81,8 +89,11 @@ function M.isGenerated(name)
   for _, tv in pairs(TV_NAMES) do
     if name == tv then return true end
   end
-  local body = name:gsub("^[LR] ", ""):gsub(" %d+$", "")
+  local body = name:gsub("^[LRF] ", ""):gsub(" %d+$", "")
   for _, abbr in pairs(ABBREVIATIONS) do
+    if body == abbr then return true end
+  end
+  for _, abbr in ipairs(LEGACY_NAMES) do
     if body == abbr then return true end
   end
   return false

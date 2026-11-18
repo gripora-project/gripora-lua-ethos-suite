@@ -1,19 +1,22 @@
 -- Setup Wizard step: Trim and gain. Opened by app/pages/setup_wizard.lua.
 --
 -- The radio's copy of gripora-configurator's StepTrimGain.svelte: a way to
--- trim in the air, and a knob for the stabilizer gain. Each control is found
--- by moving it: the AUX channel that clearly moves most from where it was
--- when Detect was pressed (lib/setup_wizard_controls.lua movedChannel(), on
+-- trim the steering, and a knob for the stabilizer gain. Only yaw is
+-- stabilised (yaw-rate gyro steering), so the trim and the gain knob are set
+-- up for steering only; roll and pitch adjustments are left as they are.
+-- Each control is found by moving it: the AUX channel that clearly moves
+-- most from where it was when Detect was pressed (lib/setup_wizard_controls.lua movedChannel(), on
 -- the live MSP_RC channels). The adjustment ranges (trimRange(),
 -- steppedTrimRange(), gainRange()) are written as soon as they are found,
 -- so the knob and trims work on the bench straight away.
 --
---   trimQ     trim buttons on one channel (the FC keeps the trim), a channel
---             per trim (the radio keeps it), or Auto trim only
+--   trimQ     trim buttons on one channel (the controller keeps the trim), a
+--             trim channel (the radio keeps it), or no trim channel
 --   howTo     what to set up on the radio for the choice, then Detect
---   listen    "press any trim button" / "press the roll trim" / "turn the knob"
+--   listen    "press any trim button" / "press the steering trim" / "turn the knob"
 --   buttons   live check: which trim button the channel shows
---   gainQ     one knob, one per axis, or none
+--   gainQ     one knob or none ("one per axis" only shown for a setup that
+--             already has it, as in the configurator)
 --   done      what is set up
 --
 -- The configurator shows Ethos screenshots of the radio setup; here the
@@ -64,10 +67,11 @@ local T = {
 }
 
 local AXIS_NAMES = {
-  roll = "@i18n(app.modules.setup_wizard.axis_roll)@",
-  pitch = "@i18n(app.modules.setup_wizard.axis_pitch)@",
-  yaw = "@i18n(app.modules.setup_wizard.axis_yaw)@",
+  yaw = "@i18n(app.modules.setup_wizard.axis_steering)@",
 }
+
+-- Only yaw is stabilised, so the trims and gain knobs are set up for yaw only.
+local AXES = {"yaw"}
 
 local AUX_OFFSET = 4          -- AUX1 is the fifth channel
 local LISTEN_SECONDS = 15
@@ -127,7 +131,7 @@ local function new(wiz)
   end
 
   local function removeAll(functions)
-    for _, axis in ipairs(controls.AXES) do removeFunction(functions[axis]) end
+    for _, axis in ipairs(AXES) do removeFunction(functions[axis]) end
   end
 
   -- queue: the detections to run in turn, {kind =, axis =} each.
@@ -147,11 +151,11 @@ local function new(wiz)
     if l.kind == "trim" then
       ok = writeRange(controls.trimRange(l.axis, aux))
     elseif l.kind == "buttons" then
-      for _, axis in ipairs(controls.AXES) do ok = writeRange(controls.steppedTrimRange(axis, aux)) and ok end
+      for _, axis in ipairs(AXES) do ok = writeRange(controls.steppedTrimRange(axis, aux)) and ok end
     elseif l.axis then
       ok = writeRange(controls.gainRange(l.axis, aux))
     else
-      for _, axis in ipairs(controls.AXES) do ok = writeRange(controls.gainRange(axis, aux)) and ok end
+      for _, axis in ipairs(AXES) do ok = writeRange(controls.gainRange(axis, aux)) and ok end
     end
     listening = nil
     if ok and #l.queue > 0 then
@@ -171,17 +175,29 @@ local function new(wiz)
   local function describeTrim()
     local mode = controls.trimMode(ranges)
     if mode == "buttons" then
-      return T.trimButtons .. ", " .. string.format(T.auxFmt, controls.channelOf(ranges, controls.SERVO_TRIM.roll) + 1)
+      return T.trimButtons .. ", " .. string.format(T.auxFmt, controls.channelOf(ranges, controls.SERVO_TRIM.yaw) + 1)
     elseif mode == "programmable" then
       return T.trimChannels
     end
     return T.trimAuto
   end
 
+  -- The gain as set up now: "single" (the steering knob, and any roll or
+  -- pitch knob on the same channel), "separate" (another axis on another
+  -- channel, from an earlier setup) or "none".
+  local function gainMode()
+    local yaw = controls.channelOf(ranges, controls.MASTER_GAIN.yaw)
+    local roll = controls.channelOf(ranges, controls.MASTER_GAIN.roll)
+    local pitch = controls.channelOf(ranges, controls.MASTER_GAIN.pitch)
+    if yaw == nil and roll == nil and pitch == nil then return "none" end
+    if yaw == nil or (roll ~= nil and roll ~= yaw) or (pitch ~= nil and pitch ~= yaw) then return "separate" end
+    return "single"
+  end
+
   local function describeGain()
-    local mode = controls.gainMode(ranges)
+    local mode = gainMode()
     if mode == "single" then
-      return T.gainSingle .. ", " .. string.format(T.auxFmt, controls.channelOf(ranges, controls.MASTER_GAIN.roll) + 1)
+      return T.gainSingle .. ", " .. string.format(T.auxFmt, controls.channelOf(ranges, controls.MASTER_GAIN.yaw) + 1)
     elseif mode == "separate" then
       return T.gainSeparate
     end
@@ -189,7 +205,7 @@ local function new(wiz)
   end
 
   local function drawButtonCheck(x, y, w, h, colors)
-    local aux = controls.channelOf(ranges, controls.SERVO_TRIM.roll)
+    local aux = controls.channelOf(ranges, controls.SERVO_TRIM.yaw)
     local value = aux and wiz.rc[AUX_OFFSET + aux + 1]
     local b = controls.buttonAt(value)
     lcd.font(FONT_STD)
@@ -237,8 +253,7 @@ local function new(wiz)
           if buttons then
             listen({{kind = "buttons"}}, "buttons")
           else
-            listen({{kind = "trim", axis = "roll"}, {kind = "trim", axis = "pitch"}, {kind = "trim", axis = "yaw"}},
-              "gainQ")
+            listen({{kind = "trim", axis = "yaw"}}, "gainQ")
           end
         end},
       }, detectNext)
@@ -260,22 +275,25 @@ local function new(wiz)
         {text = T.next, press = function() go("gainQ") end})
 
     elseif screen == "gainQ" then
-      local mode = controls.gainMode(ranges)
+      local mode = gainMode()
       scr:text(T.title, T.gainQ .. " " .. T.gainCentre, note)
-      -- The grid first: the encoder visits fields in the order they are made.
-      local focus = scr:grid({
+      -- Only steering is stabilised, so one knob is all a car needs. "One
+      -- per axis" is shown only for a setup that already has it, and pressing
+      -- it keeps it as it is.
+      local specs = {
         {text = T.gainSingle, primary = mode == "single", press = function()
           listen({{kind = "gain"}}, "done")
         end},
-        {text = T.gainSeparate, primary = mode == "separate", press = function()
-          listen({{kind = "gain", axis = "roll"}, {kind = "gain", axis = "pitch"},
-            {kind = "gain", axis = "yaw"}}, "done")
-        end},
-        {text = T.gainNone, primary = mode == "none", press = function()
-          removeAll(controls.MASTER_GAIN)
-          go("done")
-        end},
-      }, 1)
+      }
+      if mode == "separate" then
+        specs[#specs + 1] = {text = T.gainSeparate, primary = true, press = function() go("done") end}
+      end
+      specs[#specs + 1] = {text = T.gainNone, primary = mode == "none", press = function()
+        removeAll(controls.MASTER_GAIN)
+        go("done")
+      end}
+      -- The grid first: the encoder visits fields in the order they are made.
+      local focus = scr:grid(specs, 1)
       -- Next keeps the gain knob as it is set up now.
       local forward = scr:row(function() go("trimQ") end, nil, {text = T.next, press = function() go("done") end})
       return focus or forward
@@ -291,7 +309,7 @@ local function new(wiz)
   local lastButton = nil
   function self.wakeup(now)
     if screen == "buttons" then
-      local aux = controls.channelOf(ranges, controls.SERVO_TRIM.roll)
+      local aux = controls.channelOf(ranges, controls.SERVO_TRIM.yaw)
       local value = aux and wiz.rc[AUX_OFFSET + aux + 1]
       if value ~= lastButton then
         lastButton = value

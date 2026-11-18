@@ -12,11 +12,11 @@
   Preflight
     model (1-4, 1-5)     | RPM (5-12, 1-5)               | timer (13-16, 1-5)
     flights (1-4, 6-8)   | current | voltage | BEC V | ESC temp (5-16, 6-8)
-    governor (1-4, 9-12) | fuel bar (5-16, 9-12)
+    arming (1-4, 9-12)   | fuel bar (5-16, 9-12)
   Inflight
     RPM (1-8, 1-5)  | timer (9-16, 1-5)
     current | cell V | ESC temp | throttle (rows 6-8)
-    governor (1-4, 9-12) | fuel bar (5-16, 9-12)
+    arming (1-4, 9-12)   | fuel bar (5-16, 9-12)
   Postflight
     flight time (1-6, 1-4) | consumed (7-11) | fuel left (12-16)
     rpm max | current max | watts max | throttle max (rows 5-8)
@@ -67,14 +67,9 @@ local function fuelTitle()
     return utils.isElectricEngine() and "@i18n(widgets.dashboard.battery):upper()@" or "@i18n(widgets.dashboard.fuel):upper()@"
 end
 
-local GOVERNOR_THRESHOLDS = {
+local ARM_THRESHOLDS = {
     {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor},
-    {value = "@i18n(widgets.governor.OFF)@",      textcolor = colorMode.fillcritcolor},
-    {value = "@i18n(widgets.governor.IDLE)@",     textcolor = colorMode.accentcolor},
-    {value = "@i18n(widgets.governor.SPOOLUP)@",  textcolor = colorMode.accentcolor},
-    {value = "@i18n(widgets.governor.RECOVERY)@", textcolor = colorMode.fillwarncolor},
-    {value = "@i18n(widgets.governor.ACTIVE)@",   textcolor = colorMode.fillcolor},
-    {value = "@i18n(widgets.governor.THROFF)@",   textcolor = colorMode.fillcritcolor},
+    {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
 }
 
 local FUEL_THRESHOLDS = {
@@ -119,11 +114,11 @@ function common.buildBoxes(W, phase)
         return at(col, row, colspan, rowspan, box)
     end
 
-    local function governor(col, row, colspan, rowspan)
+    local function arming(col, row, colspan, rowspan)
         return at(col, row, colspan, rowspan, {
-            type = "text", subtype = "governor",
-            title = "@i18n(widgets.dashboard.governor):upper()@",
-            font = opts.sfont, thresholds = GOVERNOR_THRESHOLDS,
+            type = "text", subtype = "armflags",
+            title = "@i18n(widgets.dashboard.info_arming):upper()@",
+            font = opts.sfont, thresholds = ARM_THRESHOLDS,
         })
     end
 
@@ -162,7 +157,7 @@ function common.buildBoxes(W, phase)
             live(9, 6, 4, 3, {source = "temp_esc", transform = "floor", title = "@i18n(widgets.dashboard.esc_temp):upper()@"}),
             live(13, 6, 4, 3, {source = "throttle_percent", unit = "%", transform = "floor", title = "@i18n(widgets.dashboard.throttle):upper()@"}),
 
-            governor(1, 9, 4, 4),
+            arming(1, 9, 4, 4),
             fuelBar(5, 9, 12, 4),
         }
     end
@@ -202,7 +197,7 @@ function common.buildBoxes(W, phase)
         live(11, 6, 3, 3, {source = "bec_voltage", unit = "", decimals = 1, title = "@i18n(widgets.dashboard.bec_voltage):upper()@"}),
         live(14, 6, 3, 3, {source = "temp_esc", unit = "", transform = "floor", title = "@i18n(widgets.dashboard.esc_temp):upper()@"}),
 
-        governor(1, 9, 4, 4),
+        arming(1, 9, 4, 4),
         fuelBar(5, 9, 12, 4),
     }
 end

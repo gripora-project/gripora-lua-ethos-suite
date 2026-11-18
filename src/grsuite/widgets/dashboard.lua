@@ -751,22 +751,14 @@ local INFO_GOOD = lcd.RGB(0, 170, 60, 1)
 local INFO_WARN = lcd.RGB(230, 150, 0, 1)
 local INFO_BAD = lcd.RGB(210, 40, 40, 1)
 local INFO_TRANSPORT_NAMES = {sport = "S.Port", crsf = "CRSF", sim = "SIM"}
--- Flight-mode bits, first match wins. Same order as tasks/audio_events.lua's
--- FLIGHT_MODE_PRIORITY, so the panel names the mode the callout speaks.
+-- Mode bits (firmware flightModeFlags), first match wins. Same order as
+-- tasks/audio_events.lua's FLIGHT_MODE_PRIORITY, so the panel names the mode the
+-- callout speaks. Gripora reports only FAILSAFE and GYRO OFF (PASSTHROUGH bit);
+-- the aircraft modes are removed from the firmware.
 local INFO_FLIGHT_MODES = {
   {bit = 0, name = "@i18n(widgets.dashboard.mode_failsafe)@"},
-  {bit = 6, name = "@i18n(widgets.dashboard.mode_gps_rescue)@"},
-  {bit = 13, name = "@i18n(widgets.dashboard.mode_rth)@"},
-  {bit = 12, name = "@i18n(widgets.dashboard.mode_loiter)@"},
   {bit = 7, name = "@i18n(widgets.dashboard.mode_passthrough)@"},
-  {bit = 10, name = "@i18n(widgets.dashboard.mode_manual)@"},
-  {bit = 5, name = "@i18n(widgets.dashboard.mode_att_hold)@"},
-  {bit = 11, name = "@i18n(widgets.dashboard.mode_autotrim)@"},
-  {bit = 1, name = "@i18n(widgets.dashboard.mode_angle)@"},
-  {bit = 3, name = "@i18n(widgets.dashboard.mode_trainer)@"},
 }
--- system_status NAV_BLOCKED (LOITER/RTH on but unable to fly) -> mode bit.
-local INFO_NAV_BLOCKED_BIT = {[1] = 12, [2] = 13}
 local armingFlags = nil
 
 local function infoRow(rows, i, id, label)
@@ -909,17 +901,13 @@ local function refreshControllerRows(widget, rows, reasons)
   if flags then
     n = n + 1
     row = infoRow(rows, n, "mode", "@i18n(widgets.dashboard.info_mode)@")
-    local blockedBit = INFO_NAV_BLOCKED_BIT[widget.navBlocked]
     flags = math.floor(flags)
-    if row.key ~= flags or row.key2 ~= blockedBit then
-      row.key, row.key2 = flags, blockedBit
+    if row.key ~= flags then
+      row.key = flags
       row.text, row.color = "@i18n(widgets.dashboard.mode_normal)@", nil
       for i = 1, #INFO_FLIGHT_MODES do
         local mode = INFO_FLIGHT_MODES[i]
-        if mode.bit == blockedBit then
-          row.text, row.color = mode.name, INFO_WARN
-          break
-        elseif (flags >> mode.bit) & 1 == 1 then
+        if (flags >> mode.bit) & 1 == 1 then
           row.text = mode.name
           break
         end
@@ -1610,8 +1598,6 @@ local function create()
     tempMcu = nil,
     becVoltage = nil,
     fuelPercent = nil,
-    governorMode = nil,
-    governorState = nil,
     rxMap = nil,
     mspTransport = nil,
     pidProfile = nil,
@@ -1701,7 +1687,6 @@ local function update(widget, snapshot)
   widget.systemConfig = snapshot.systemConfig
   widget.gpsSats = snapshot.gpsSats
   widget.flightModeFlags = snapshot.flightModeFlags
-  widget.navBlocked = snapshot.navBlocked
 
   widget.craftName = snapshot.craftName
   widget.mcuId = snapshot.mcuId
@@ -1724,8 +1709,6 @@ local function update(widget, snapshot)
   widget.tempMcu = snapshot.tempMcu
   widget.becVoltage = snapshot.becVoltage
   widget.fuelPercent = snapshot.fuelPercent
-  widget.governorMode = snapshot.governorMode
-  widget.governorState = snapshot.governorState
   widget.rxMap = snapshot.rxMap
   widget.mspTransport = snapshot.mspTransport
   widget.pidProfile = snapshot.pidProfile

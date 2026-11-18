@@ -1,7 +1,7 @@
 ---
 title: "Radio Config"
 sidebar_label: "Radio Config"
-sidebar_position: 20
+sidebar_position: 30
 documentation_status: draft
 source: app/pages/radio_config.lua
 ---
@@ -23,13 +23,11 @@ Requires a running background task and a flight controller connection.
 
 | Setting | What it does |
 | --- | --- |
-| Stick (Deflection) | TODO: explain behaviour, displayed units, range and conditions. |
-| Stick (Center) | TODO: explain behaviour, displayed units, range and conditions. |
+| Channel (Travel) | TODO: explain behaviour, displayed units, range and conditions. |
+| Channel (Center) | TODO: explain behaviour, displayed units, range and conditions. |
 | Throttle (Max) | TODO: explain behaviour, displayed units, range and conditions. |
 | Throttle (Min) | TODO: explain behaviour, displayed units, range and conditions. |
-| Roll | TODO: explain behaviour, displayed units, range and conditions. |
-| Pitch | TODO: explain behaviour, displayed units, range and conditions. |
-| Yaw | TODO: explain behaviour, displayed units, range and conditions. |
+| Steering Deadband | TODO: explain behaviour, displayed units, range and conditions. |
 
 ## Notes
 

@@ -77,10 +77,11 @@ local REFRESH_INTERVAL = 0.25
 -- the page keeps one write at a time, so the queue cannot outgrow the wire.
 local WRITE_GIVE_UP = 1.0
 
--- Only the forward half of the range is offered. MOTOR_OVERRIDE_MIN is -1000
--- and drives the motor backwards, which is not part of any setup procedure and
--- is not something to put one turn of a wheel away from zero.
+-- A car ESC is reversible: the override runs -100..+100 % with neutral at 0,
+-- as gripora-configurator's Motors tab does (MOTOR_OVERRIDE_MIN -1000 drives
+-- the motor backwards, below neutral: brake or reverse, as the ESC does it).
 local MAX_PERCENT = 100
+local MIN_PERCENT = -100
 
 -- How many motors to offer. A board that answers 0 has no motor outputs
 -- configured; the page still shows the first one rather than a dead end, and
@@ -94,7 +95,7 @@ end
 
 local function percentToValue(percent)
   local p = tonumber(percent) or 0
-  if p < 0 then p = 0 end
+  if p < MIN_PERCENT then p = MIN_PERCENT end
   if p > MAX_PERCENT then p = MAX_PERCENT end
   return math.floor(p * motorOverride.OVERRIDE_MAX / 100)
 end
@@ -291,7 +292,7 @@ local function open(opts)
       end)
 
     fields.throttle = form.addNumberField(
-      form.addLine("@i18n(app.modules.esc_motors.motor_override_throttle)@"), nil, 0, MAX_PERCENT,
+      form.addLine("@i18n(app.modules.esc_motors.motor_override_throttle)@"), nil, MIN_PERCENT, MAX_PERCENT,
       function() return percent[selected] or 0 end,
       function(value)
         -- Recorded here and sent by the keep-alive that is running anyway. A write
@@ -383,8 +384,11 @@ local function open(opts)
         -- non-zero value here means something else is driving that motor.
         for i = 0, count() - 1 do
           local value = tonumber(pendingOverride["motor_" .. (i + 1)]) or 0
-          if value < 0 then value = 0 end
-          percent[i] = math.floor(value * MAX_PERCENT / motorOverride.OVERRIDE_MAX)
+          if value < motorOverride.OVERRIDE_MIN then value = motorOverride.OVERRIDE_MIN end
+          if value > motorOverride.OVERRIDE_MAX then value = motorOverride.OVERRIDE_MAX end
+          -- Truncated towards zero, so a small reverse value does not read as -1 %.
+          local p = value * MAX_PERCENT / motorOverride.OVERRIDE_MAX
+          percent[i] = p < 0 and -math.floor(-p) or math.floor(p)
         end
         if selected >= count() then selected = 0 end
         loaded = true

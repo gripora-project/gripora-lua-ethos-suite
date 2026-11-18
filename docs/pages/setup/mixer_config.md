@@ -8,7 +8,7 @@ source: app/pages/mixer_config.lua
 
 # Mixer
 
-Scale or invert stabilized roll, pitch and yaw before mixer rules use them. This changes every rule that reads the selected stabilized axis.
+Scale or invert the stabilized steering before mixer rules use it, and set the steering gyro direction. Scaling changes every rule that reads the stabilized steering. A car only stabilises yaw, so roll and pitch are not shown.
 
 ## Where to find it
 
@@ -20,14 +20,15 @@ Requires a running background task and a flight controller connection.
 
 | Setting | What it does |
 | --- | --- |
-| Roll / Pitch / Yaw: Gain | Axis input gain, 0–200%, adjusted in steps of 5%. |
-| Roll / Pitch / Yaw: Invert | Select Normal or Inverted to change the sign of the axis input. |
+| Steering: Throw | Steering input gain, 0–200%, adjusted in steps of 5%. |
+| Steering: Invert | Normal or Inverted: changes the sign of the steering input. |
+| Gyro Direction | Normal or Inverted: reverses the steering gyro (yaw_gyro_reverse), for a controller whose gyro corrects the wrong way. Greyed out on firmware older than MSP API 33.0. |
 
 ## Notes
 
-Save writes all three axis input settings and commits them to EEPROM. These are aircraft-wide settings, independent of the selected PID or rate profile. This page does not request a reboot.
+Save writes the steering input and the mixer config (with the gyro direction) and commits them to EEPROM. These are car-wide settings, independent of the selected PID or rate profile. This page does not request a reboot.
 
-The stored input limits are preserved when saving. To edit which outputs receive an input, use [Mixer Rules](mixer_rules.md).
+The roll and pitch inputs are not written. The stored input limits and the other mixer config fields are preserved when saving. To edit which outputs receive an input, use [Mixer Rules](mixer_rules.md).
 
 ## Source
 

@@ -115,7 +115,7 @@ end
 
 
 -- wakeup for the consolidated right-hand info stack: flight time, smart fuel
--- gauge + battery overlay text, and governor status. Replaces what used to
+-- gauge + battery overlay text, and arming status. Replaces what used to
 -- be 8 separately-offset overlapping boxes with one coordinated panel.
 local function rightStackWakeup(box, telemetry)
     local c = box._cache or {}
@@ -156,12 +156,11 @@ local function rightStackWakeup(box, telemetry)
     c.cellStr = formatCellVoltageAndCount(voltage)
     c.consumedStr = formatConsumedMah(consumed)
 
-    local govRaw = getSensor and getSensor("governor")
-    c.governorText = grsuite.utils.getGovernorState(govRaw)
-    if govRaw == nil and c.governorText == "UNKNOWN" then
-        c.governorText = utils.getPulsingDots(box, "_govDots")
+    c.armText = grsuite.utils.getArmStateText()
+    if c.armText == "UNKNOWN" then
+        c.armText = utils.getPulsingDots(box, "_govDots")
     end
-    c.governorColor = utils.resolveThresholdColor(c.governorText, box, "textcolor", "textcolor", box.rs_govthresholds)
+    c.armColor = utils.resolveThresholdColor(c.armText, box, "textcolor", "textcolor", box.rs_govthresholds)
 
     return c
 end
@@ -185,7 +184,7 @@ local function rightStackPaint(x, y, w, h, box, c)
 
     -- FLIGHT TIME (rows 1-2)
     utils.box(x, y + box.rs_flightoffsety, w, rowH * 2,
-        "FLIGHT TIME", "bottom", "center", box.rs_flighttitlefont, box.rs_flighttitlespacing, box.rs_titlecolor,
+        "RUN TIME", "bottom", "center", box.rs_flighttitlefont, box.rs_flighttitlespacing, box.rs_titlecolor,
         nil, nil, nil, nil, box.rs_flighttitlepaddingbottom,
         c.flightTime, nil, box.rs_flightfont, "center", box.rs_textcolor,
         nil, nil, nil, box.rs_flightvaluepaddingtop, box.rs_flightvaluepaddingbottom,
@@ -217,7 +216,7 @@ local function rightStackPaint(x, y, w, h, box, c)
     utils.box(x, fuelY + box.rs_consumedoffsety, w, rowH, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
         c.consumedStr, nil, box.rs_overlayfont, "right", box.rs_textcolor, nil, nil, nil, nil, nil, nil)
 
-    -- GOVERNOR status (rows 7.5-10)
+    -- Arming status (rows 7.5-10)
     -- govY/govH are derived from fuelY/fuelH and the panel's integer height
     -- (h) so that govY+govH lands exactly on y+h. This keeps govBgH's bottom
     -- edge pixel-aligned with rs_bgstyle's border, so both tiles' rounded
@@ -233,9 +232,9 @@ local function rightStackPaint(x, y, w, h, box, c)
     utils.drawBoxBackground(x, govBgY, w, govBgH, box.rs_govbgstyle)
 
     utils.box(x, govY + box.rs_govoffsety, w, govBgH,
-        "GOVERNOR", "bottom", "center", box.rs_govfont, box.rs_govtitlespacing, box.rs_titlecolor,
+        "@i18n(widgets.dashboard.info_arming):upper()@", "bottom", "center", box.rs_govfont, box.rs_govtitlespacing, box.rs_titlecolor,
         nil, nil, nil, nil, box.rs_govtitlepaddingbottom,
-        c.governorText, nil, box.rs_govfont, "center", c.governorColor,
+        c.armText, nil, box.rs_govfont, "center", c.armColor,
         nil, nil, nil, nil, box.rs_govvaluepaddingbottom,
         nil)
 end
@@ -323,13 +322,13 @@ local function buildBoxes(W)
     local compactWindow = optionKey == nil or optionKey == "ls_std" or optionKey == "ms_std" or optionKey == "ss_std"
     local arcTitleFont = compactWindow and "FONT_S" or "FONT_STD"
     local arcMaxFont = compactWindow and opts.maxfont or "FONT_L"
-    local governorFont = compactWindow and "FONT_S" or opts.govfont
-    local governorTitleSpacing = compactWindow and 5 or opts.tiletitlespacing
-    local governorTitlePaddingBottom = compactWindow and 0 or 3
-    local governorValuePaddingBottom = compactWindow and 0 or -5
+    local armFont = compactWindow and "FONT_S" or opts.govfont
+    local armTitleSpacing = compactWindow and 5 or opts.tiletitlespacing
+    local armTitlePaddingBottom = compactWindow and 0 or 3
+    local armValuePaddingBottom = compactWindow and 0 or -5
 
 
-    local governorDisarmedTileBg = {
+    local armDisarmedTileBg = {
         backfillcolor = colorMode.tbbgcolor or colorMode.headerbgcolor or pageBgColor,
         fillcolor = colorMode.tbbgcolor or colorMode.headerbgcolor or pageBgColor, -- was a hardcoded black, which looked fine in dark themes but ignored the OS theme entirely (stood out as a jarring black box against a light theme); match the panel's own fill instead, same as every other tile
         bordercolor = colorMode.fillcritcolor,
@@ -338,7 +337,7 @@ local function buildBoxes(W)
         inset = 4,
         insettop = 4,
         insetbottom = 0,
-        insetleft = -9, --(adjust governor tile border)
+        insetleft = -9, --(adjust arming tile border)
         insetright = -5,
         contentpadding = 1
     }
@@ -427,7 +426,7 @@ local function buildBoxes(W)
 
             -- shared styling
             rs_bgstyle = rightStackTileBg,
-            rs_govbgstyle = governorDisarmedTileBg,
+            rs_govbgstyle = armDisarmedTileBg,
             rs_titlecolor = colorMode.titlecolor,
             rs_textcolor = colorMode.textcolor,
             fillcolor = colorMode.fillcolor, -- threshold fallback for the fuel gauge fill colour
@@ -461,21 +460,16 @@ local function buildBoxes(W)
             rs_celloffsety = 34,
             rs_consumedoffsety = 60,
 
-            -- governor status
+            -- arming status
             rs_govbgoffsety = 0,
             rs_govoffsety = -3,
-            rs_govfont = governorFont,
-            rs_govtitlespacing = governorTitleSpacing,
-            rs_govtitlepaddingbottom = governorTitlePaddingBottom,
-            rs_govvaluepaddingbottom = governorValuePaddingBottom,
+            rs_govfont = armFont,
+            rs_govtitlespacing = armTitleSpacing,
+            rs_govtitlepaddingbottom = armTitlePaddingBottom,
+            rs_govvaluepaddingbottom = armValuePaddingBottom,
             rs_govthresholds = {
                 {value = "DISARMED", textcolor = colorMode.fillcritcolor},
-                {value = "OFF", textcolor = colorMode.fillcritcolor},
-                {value = "IDLE", textcolor = colorMode.accentcolor},
-                {value = "SPOOLUP", textcolor = colorMode.accentcolor},
-                {value = "RECOVERY", textcolor = colorMode.fillwarncolor},
-                {value = "ACTIVE", textcolor = colorMode.fillcolor},
-                {value = "@i18n(widgets.governor.THROFF)@", textcolor = colorMode.fillcritcolor}
+                {value = "ARMED", textcolor = colorMode.fillcolor}
             }
         },
 

@@ -43,10 +43,11 @@ local COLUMNS = {
   "@i18n(app.modules.pids.f)@", "@i18n(app.modules.pids.b)@",
 }
 local COLUMN_SUFFIXES = {"p", "i", "d", "f", "b"}
+-- Only yaw is stabilised (yaw-rate gyro steering), so only the steering row
+-- is shown. The roll and pitch gains stay in runtime.data as read and are
+-- written back unchanged on save (lib/msp_pid_tuning.lua encodes every field).
 local ROWS = {
-  {label = "@i18n(app.modules.pids.roll)@", axis = "roll"},
-  {label = "@i18n(app.modules.pids.pitch)@", axis = "pitch"},
-  {label = "@i18n(app.modules.pids.yaw)@", axis = "yaw"},
+  {label = "@i18n(app.modules.pids.steering)@", axis = "yaw"},
 }
 
 local LOW_RES_WIDTH = 640
@@ -135,7 +136,7 @@ local function open(opts)
   end
 
   -- A blank-but-non-empty label (" ", not "") so this line reserves the
-  -- same row-label gutter width as the "Roll"/"Pitch"/"Yaw" lines below --
+  -- same row-label gutter width as the "Steering" line below --
   -- an empty "" label reserves none, which threw the 6-slot column math
   -- out of alignment with the data rows (confirmed on a live render).
   local headerLine = form.addLine(" ")

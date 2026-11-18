@@ -82,17 +82,13 @@ local function defaultRule()
 end
 
 -- The simulator's whole-pool fixture: the firmware's reset defaults
--- (pg/mixer.c pgResetFn_mixerRules(), a two-aileron glider), so the Mixer
--- Rules page and the Setup Wizard have a real mix to show. Then the
--- remaining slots unused, 32 * 14 = 448 bytes in all.
---   oper, input, output, offset, weight, weightNeg: S1 left aileron (roll
---   +1000), S2 right aileron (roll -1000), S3 elevator (pitch), S4 rudder
---   (yaw), Motor 1 (output 27) from throttle.
+-- (pg/mixer.c pgResetFn_mixerRules(), the default car), so the Mixer Rules
+-- page and the Setup Wizard have a real mix to show. Then the remaining
+-- slots unused, 32 * 14 = 448 bytes in all.
+--   oper, input, output, weight, weightNeg: S1 steering (stabilized yaw),
+--   Motor 1 (output 27) the ESC from the signed stabilized throttle.
 local SIMULATOR_DEFAULT_RULES = {
-  {1, 1, 1, 1000, 1000},
-  {1, 1, 2, -1000, -1000},
-  {1, 2, 3, 1000, 1000},
-  {1, 3, 4, 1000, 1000},
+  {1, 3, 1, 1000, 1000},
   {1, 4, 27, 1000, 1000},
 }
 local SIMULATOR_RESPONSE_POOL = {}

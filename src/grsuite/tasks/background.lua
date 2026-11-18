@@ -85,7 +85,7 @@
 -- pendingMspRequests below.
 
 local bus, settingsStore, debugLog, mspCommon, mspTransportSelect, Scheduler,
-      telemetrySensors, mspQueue, session, logging, tuneHistory, audioEvents, audioSwitches,
+      telemetrySensors, mspQueue, session, logging, audioEvents, audioSwitches,
       scheduler, overrideKeepalive, taskWatchdog, watchdog
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
@@ -246,10 +246,6 @@ local function registerSubtasks()
   scheduler:add("logging", 0.25, function()
     logging.wakeup(protocol)
   end)
-  -- Its waits are timed: "session.update" alone may not come again in time
-  scheduler:add("tune_history", 0.5, function()
-    tuneHistory.wakeup()
-  end)
   scheduler:add("audio_events", 0.25, function()
     audioEvents.wakeup()
   end)
@@ -377,10 +373,6 @@ local loadSteps = {
   end,
   function()
     logging = assert(loadfile("tasks/logging.lua"))(bus, settingsStore, debugLog)
-  end,
-  function()
-    -- Follows "session.update"; registerSubtasks() clocks its timed waits
-    tuneHistory = assert(loadfile("tasks/tune_history.lua"))(bus)
   end,
   function()
     audioEvents = assert(loadfile("tasks/audio_events.lua"))(bus, settingsStore)

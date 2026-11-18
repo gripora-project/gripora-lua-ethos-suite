@@ -259,7 +259,7 @@
             <canvas id="display" width="304" height="256" aria-label="Simulated ActiveLook display"></canvas>
           </div>
           <div class="screen-footer">
-            <span>Phase: <strong id="phase-label">PRE-FLIGHT</strong></span>
+            <span>Phase: <strong id="phase-label">BEFORE RUN</strong></span>
             <span id="layout-label">Stacked Large + Large + Small</span>
           </div>
         </div>
@@ -268,13 +268,13 @@
       <section class="controls-column" aria-label="Preview controls">
         <div class="control-block">
           <div class="control-title">
-            <h3>Flight phase</h3>
+            <h3>Run phase</h3>
             <span id="phase-source">Automatic from sensors</span>
           </div>
-          <div class="phase-switch" role="group" aria-label="Select flight phase">
+          <div class="phase-switch" role="group" aria-label="Select run phase">
             <button class="phase-button" data-mode="auto" aria-pressed="true">AUTO</button>
             <button class="phase-button" data-mode="preflight" aria-pressed="false">PRE</button>
-            <button class="phase-button" data-mode="inflight" aria-pressed="false">FLIGHT</button>
+            <button class="phase-button" data-mode="inflight" aria-pressed="false">RUN</button>
             <button class="phase-button" data-mode="postflight" aria-pressed="false">POST</button>
           </div>
         </div>
@@ -305,7 +305,7 @@
           </div>
           <div class="telemetry-groups">
             <section class="telemetry-group" aria-labelledby="flight-control-title">
-              <h4 id="flight-control-title">Flight Control</h4>
+              <h4 id="flight-control-title">Drive Control</h4>
               <div class="field-grid">
                 <label class="field"><span class="field-label">Arm</span><input data-value="armed" data-feed="armed" type="checkbox"></label>
                 <label class="field"><span class="field-label">Motor RPM</span><input data-value="rpm" data-feed="rpm" type="number" min="0" max="5000" step="10" value="1840"></label>
@@ -324,7 +324,7 @@
             </section>
 
             <section class="telemetry-group" aria-labelledby="flight-profiles-title">
-              <h4 id="flight-profiles-title">Flight Profiles</h4>
+              <h4 id="flight-profiles-title">Profiles</h4>
               <div class="field-grid">
                 <label class="field"><span class="field-label">PID profile</span><select data-value="pidProfile" data-feed="pidProfile"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
                 <label class="field"><span class="field-label">Rate profile</span><select data-value="rateProfile" data-feed="rateProfile"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
@@ -361,10 +361,10 @@
       const phases = ["preflight", "inflight", "postflight"];
       const VIEW_WIDTH = 304;
       const VIEW_HEIGHT = 256;
-      const THROTTLE_THRESHOLD = 35;
+      const THROTTLE_THRESHOLD = 10;
       const sensorChoices = [
-        ["off", "Off"], ["flightmode", "Flight Mode"], ["timer", "Timer"],
-        ["governor", "Governor"], ["armed", "Arm Status"], ["temp_esc", "ESC Temp"],
+        ["off", "Off"], ["flightmode", "Run Phase"], ["timer", "Timer"],
+        ["armed", "Arm Status"], ["temp_esc", "ESC Temp"],
         ["temp_mcu", "MCU Temp"], ["link", "Link"], ["fuel", "Fuel"],
         ["current", "Current"], ["voltage", "Voltage"], ["cell_voltage", "Cell Voltage"],
         ["rpm", "Motor RPM"], ["consumption", "Consumed mAh"],
@@ -384,7 +384,7 @@
         ["stacked_three", "Stacked Large + Large + Small"],
       ];
       const defaults = {
-        preflight: {layout: "stacked_three", slots: ["governor", "armed", "flightmode", "off"]},
+        preflight: {layout: "stacked_three", slots: ["armed", "flightmode", "voltage", "off"]},
         inflight: {layout: "one_top_two_bottom", slots: ["current", "voltage", "fuel", "timer"]},
         postflight: {layout: "two_top_two_bottom", slots: ["current", "voltage", "fuel", "timer"]},
       };
@@ -392,7 +392,7 @@
         current: 18.6, voltage: 24.8, becVoltage: 8, fuel: 76, timer: 92, rpm: 1840,
         tempEsc: 58, tempMcu: 42, link: 82, consumption: 428, cellCount: 6, altitude: 25,
         throttlePercent: 76, pidProfile: 1, rateProfile: 1, batteryProfile: 0,
-        governor: "ACTIVE", governorState: 4, armed: false,
+        armed: false,
       };
       let mode = "preflight";
       let phaseSelection = "auto";
@@ -585,9 +585,8 @@
           hasBeenInFlight = false;
           nextMode = "preflight";
         } else {
-          const governorState = Number(sensors.governorState);
-          const governorActive = governorState >= 4 && governorState <= 8;
-          const isFlying = armed && connected && (governorActive || Number(sensors.throttlePercent) > THROTTLE_THRESHOLD);
+          // Throttle is signed around neutral: forward or reverse past the threshold is a run.
+          const isFlying = armed && connected && Math.abs(Number(sensors.throttlePercent)) > THROTTLE_THRESHOLD;
 
           if (isFlying) {
             hasBeenInFlight = true;
@@ -607,10 +606,7 @@
       function applyTelemetry(payload) {
         const values = payload.values || {};
         for (const [key, value] of Object.entries(values)) {
-          if (key === "governorState") {
-            sensors.governorState = Number(value);
-            sensors.governor = ({0: "OFF", 1: "IDLE", 2: "SPOOLUP", 3: "RECOVERY", 4: "ACTIVE", 5: "THR OFF", 6: "LOST HS", 7: "AUTOROT", 8: "BAILOUT", 100: "DISABLED", 101: "DISARMED"})[Math.floor(Number(value))] || "UNKNOWN";
-          } else if (key === "armed") {
+          if (key === "armed") {
             sensors.armed = value === true;
           } else if (Object.prototype.hasOwnProperty.call(sensors, key)) {
             sensors[key] = Number(value);
@@ -628,7 +624,7 @@
         liveFeed = true;
         sourceStatus.dataset.state = "live";
         sourceStatus.textContent = `Live · ${payload.target}`;
-        phaseSource.textContent = phaseSelection === "auto" ? "Auto · active governor or throttle > 35%" : "Manual override";
+        phaseSource.textContent = phaseSelection === "auto" ? "Auto · throttle away from neutral (> 10%)" : "Manual override";
         telemetrySource.textContent = "Values read from simulator sensor profiles";
       }
 
@@ -664,9 +660,8 @@
         const stat = (name, kind) => stats[name]?.[kind];
         const values = {
           off: "-",
-          flightmode: mode === "inflight" ? "FLY" : mode === "postflight" ? "POST" : "PRE",
+          flightmode: mode === "inflight" ? "RUN" : mode === "postflight" ? "POST" : "PRE",
           timer: formatDuration(sensors.timer),
-          governor: sensors.governor,
           armed: sensors.armed ? "ARMED" : "DISARMED",
           fuel: `${Math.round(sensors.fuel)}%`,
           consumption: `${Math.round(sensors.consumption)}mAh`,
@@ -784,10 +779,10 @@
         });
         const activeSlots = layoutActive[config[mode].layout].filter(Boolean).length;
         slotState.textContent = `${activeSlots} active slots${simulatorConfigLoaded ? " · simulator settings" : " · local defaults"}`;
-        phaseLabel.textContent = mode === "preflight" ? "PRE-FLIGHT" : mode === "inflight" ? "IN-FLIGHT" : "POST-FLIGHT";
+        phaseLabel.textContent = mode === "preflight" ? "BEFORE RUN" : mode === "inflight" ? "DURING RUN" : "AFTER RUN";
         layoutLabel.textContent = layouts.find(([key]) => key === config[mode].layout)?.[1] || "Custom layout";
         phaseSource.textContent = phaseSelection === "auto"
-          ? "Auto · active governor or throttle > 35%"
+          ? "Auto · throttle away from neutral (> 10%)"
           : "Manual override";
         layoutSyncStatus.textContent = configSaveStatus;
         const configControlsDisabled = !simulatorConfigLoaded || configSaveInFlight;
@@ -874,10 +869,7 @@
         const updateValue = () => {
           const key = input.dataset.value;
           if (input.type === "checkbox") sensors[key] = input.checked;
-          else if (key === "governorState") {
-            sensors.governorState = Number(input.value);
-            sensors.governor = input.selectedOptions[0]?.textContent || "UNKNOWN";
-          } else sensors[key] = Number(input.value);
+          else sensors[key] = Number(input.value);
           if (mode === "inflight") recordFlightStats();
           if (phaseSelection === "auto") updateAutomaticMode();
           else draw();

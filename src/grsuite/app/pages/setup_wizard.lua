@@ -106,13 +106,16 @@ local BTN_OK = "@i18n(app.btn_ok)@"
 local BTN_CANCEL = "@i18n(app.btn_cancel)@"
 
 -- Order is the procedure, as in the configurator's STEPS: each step relies
--- on the ones before it. needsSurfaces: the step works on the mixed control
--- surfaces, so it waits for the Airframe step.
+-- on the ones before it (the Model step says which servo steers and which
+-- output is the ESC, the steering direction comes before the gyro check).
+-- needsSurfaces: the step works on the mixed steering servos, so it waits for
+-- the Model step. The configurator's aircraft Throws and Travel check steps
+-- are gone, as there.
 local STEPS = {
   {key = "sensors", title = "@i18n(app.modules.setup_wizard.step_sensors)@"},
   {key = "receiver", title = "@i18n(app.modules.setup_wizard.step_receiver)@"},
-  -- Optional. Before the airframe, because a bus output is what gives the
-  -- model more servos than the board has pins for.
+  -- Optional. Before the Model step, because a bus output is what gives the
+  -- car more servos than the board has pins for.
   {key = "busoutput", title = "@i18n(app.modules.setup_wizard.step_busoutput)@"},
   {key = "airframe", title = "@i18n(app.modules.setup_wizard.step_airframe)@"},
   -- The one PWM update rate of the board's servo outputs: no surfaces needed.
@@ -123,8 +126,6 @@ local STEPS = {
   {key = "centre", title = "@i18n(app.modules.setup_wizard.step_centre)@", needsSurfaces = true},
   {key = "direction", title = "@i18n(app.modules.setup_wizard.step_direction)@", needsSurfaces = true},
   {key = "limits", title = "@i18n(app.modules.setup_wizard.step_limits)@", needsSurfaces = true},
-  {key = "throws", title = "@i18n(app.modules.setup_wizard.step_throws)@", needsSurfaces = true},
-  {key = "travel", title = "@i18n(app.modules.setup_wizard.step_travel)@", needsSurfaces = true},
   {key = "gyro", title = "@i18n(app.modules.setup_wizard.step_gyro)@", needsSurfaces = true},
   {key = "trimgain", title = "@i18n(app.modules.setup_wizard.step_trimgain)@"},
   {key = "modes", title = "@i18n(app.modules.setup_wizard.step_modes)@"},
@@ -150,8 +151,9 @@ memory.restartSaved = memory.restartSaved or {}
 -- directly (MSP API 22.16). MAX_SUPPORTED_SERVOS in the firmware.
 local SERVO_SLOTS = 24
 
--- Mixer inputs the wizard holds: the stabilized axes, and the flap channel
--- for the flap direction check.
+-- Mixer inputs the wizard holds: the stabilized axes (only steering moves on
+-- a car; roll and pitch are held at zero) and the flap channel, as the
+-- configurator's HELD_INPUTS.
 local HELD_INPUTS = {1, 2, 3, surfacesLib.FLAP_INPUT}
 local AXIS_INPUT = {roll = 1, pitch = 2, yaw = 3, flap = surfacesLib.FLAP_INPUT}
 
@@ -163,10 +165,10 @@ local POLL_GIVE_UP = 1.0
 -- Give-up bound for a restart, as app/page_runtime.lua's.
 local REBOOT_TIMEOUT_SECONDS = 20
 
--- Flight mode bits of the "flight_mode" telemetry sensor
--- (tasks/audio_events.lua): modes that put the sticks on the surfaces.
+-- Flight mode bit of the "flight_mode" telemetry sensor (firmware
+-- fc/runtime_config.h PASSTHROUGH_MODE_BIT): GYRO OFF, which puts the sticks
+-- straight on the outputs, so the wizard can't move the steering.
 local PASSTHROUGH_BIT = 7
-local MANUAL_BIT = 10
 
 local FORM_RIGHT_PADDING = 8
 
@@ -250,7 +252,8 @@ local function open(opts)
   local servoCount = 0
   local motorCount = 0
   local rules = nil
-  local inputCodecs = {roll = mixerInput.roll(), pitch = mixerInput.pitch(), yaw = mixerInput.yaw()}
+  local inputCodecs = {roll = mixerInput.roll(), pitch = mixerInput.pitch(), yaw = mixerInput.yaw(),
+    throttle = mixerInput.throttle()}
   local rateKeys = {roll = "rate_stabilized_roll", pitch = "rate_stabilized_pitch", yaw = "rate_stabilized_yaw"}
   local inputs = {}        -- axis -> decoded mixer input record (sent back whole)
   local configs = {}       -- servo (0-based) -> decoded servo config
@@ -397,7 +400,6 @@ local function open(opts)
   local function recompute()
     surfaces = surfacesLib.surfacesFromRules(rules, servoCount)
     missingServos = surfacesLib.servosPastCount(rules, servoCount, SERVO_SLOTS)
-    -- The pictures draw a delta or a flying wing by the model type.
     art.modelType = mixConfig and mixConfig.model_type or nil
   end
 
@@ -418,7 +420,6 @@ local function open(opts)
     configs = configs,
     trims = trims,
     inputs = inputs,
-    BOX_ANGLE = modeOverride.BOX_ANGLE,
     BOX_PASSTHROUGH = modeOverride.BOX_PASSTHROUGH,
   }
 
@@ -492,7 +493,7 @@ local function open(opts)
 
   wiz.releaseProbe = releaseProbe
 
-  -- Forces a mode on top of the setup state (wiz.BOX_ANGLE, wiz.BOX_PASSTHROUGH)
+  -- Forces a mode on top of the setup state (wiz.BOX_PASSTHROUGH)
   -- until the step closes or wiz.releaseMode().
   function wiz.forceMode(boxId)
     if not canMove() then return false end
@@ -591,7 +592,34 @@ local function open(opts)
     bus.publish("msp.request", mixerConfig.buildWriteMessage({model_type = mixConfig.model_type}))
   end
 
-  -- Replaces the whole mix (Airframe step): every rule slot and the model type.
+  -- The model type alone (Model step: Custom keeps the rules as they are).
+  function wiz.setModelType(modelType)
+    if not mixConfig or mixConfig.model_type == modelType then return end
+    change("model_type", mixConfig.model_type, function(o)
+      mixConfig.model_type = o
+      sendModelType()
+    end)
+    mixConfig.model_type = modelType
+    sendModelType()
+    recompute()
+  end
+
+  -- Stabilized throttle must keep its negative half (brake and reverse), as
+  -- the configurator's car setup makes sure: a min clamped at or above 0 is
+  -- put back to -1000. Returns whether it changed anything.
+  function wiz.ensureSignedThrottle()
+    local record = inputs.throttle
+    if not record or (record.min_stabilized_throttle or 0) < 0 then return false end
+    change("input_throttle", record, function(o)
+      inputs.throttle = copyDeep(o)
+      sendInput("throttle")
+    end)
+    record.min_stabilized_throttle = -1000
+    sendInput("throttle")
+    return true
+  end
+
+  -- Replaces the whole mix (Model step): every rule slot and the model type.
   function wiz.setMix(ruleTable, modelType)
     change("mix", {rules = rules, modelType = mixConfig and mixConfig.model_type}, function(o)
       rules = copyDeep(o.rules)
@@ -659,6 +687,7 @@ local function open(opts)
     aileron = "@i18n(app.modules.setup_wizard.surface_aileron)@",
     flaperon = "@i18n(app.modules.setup_wizard.surface_flaperon)@",
     elevator = "@i18n(app.modules.setup_wizard.surface_elevator)@",
+    -- A servo on yaw alone is a car's steering.
     rudder = "@i18n(app.modules.setup_wizard.surface_rudder)@",
     elevon = "@i18n(app.modules.setup_wizard.surface_elevon)@",
     ruddervator = "@i18n(app.modules.setup_wizard.surface_ruddervator)@",
@@ -668,7 +697,7 @@ local function open(opts)
 
   function wiz.kindName(kind) return KIND_NAMES[kind] or kind end
 
-  -- "Servo 3 (Elevator)".
+  -- "Servo 1 (Steering)".
   function wiz.surfaceName(surface)
     return string.format("@i18n(app.modules.setup_wizard.servo_kind_fmt)@", surface.servo + 1,
       KIND_NAMES[surface.kind] or surface.kind)
@@ -692,11 +721,10 @@ local function open(opts)
     if refused then return "@i18n(app.modules.setup_wizard.refused)@" end
     if connected == false then return "@i18n(app.modules.setup_wizard.disconnected)@" end
     if armed == true then return "@i18n(app.modules.setup_wizard.armed)@" end
-    -- PASSTHROUGH forced by the wizard is meant; only the pilot's own is not.
+    -- GYRO OFF forced by the wizard is meant; only the driver's own is not.
     if hasBit(modeFlags, PASSTHROUGH_BIT) and forcedMode ~= modeOverride.BOX_PASSTHROUGH then
       return "@i18n(app.modules.setup_wizard.bypass_passthrough)@"
     end
-    if hasBit(modeFlags, MANUAL_BIT) then return "@i18n(app.modules.setup_wizard.bypass_manual)@" end
     return ""
   end
 
@@ -747,7 +775,7 @@ local function open(opts)
     rebuildWanted = true
   end
 
-  -- A step that needs control surfaces, on a model with none mixed yet.
+  -- A step that needs a steering servo, on a car with none mixed yet.
   local noSurfacesScreen = ui.new(wiz)
 
   function wiz.stepNumber() return stepIndex, #STEPS end
@@ -846,8 +874,8 @@ local function open(opts)
         table.concat(missingServos, ", ")))
     end
     if not step then
-      -- A step that needs control surfaces, on a model with none mixed yet.
-      -- The same row as every step, with a button to the Airframe step.
+      -- A step that needs a steering servo, on a car with none mixed yet.
+      -- The same row as every step, with a button to the Model step.
       addWrapped("@i18n(app.modules.setup_wizard.no_surfaces)@")
       noSurfacesScreen:begin()
       local button = noSurfacesScreen:row(nil, {
@@ -1106,7 +1134,7 @@ local function open(opts)
   end
 
   local function requestRest()
-    outstanding = 1 + 1 + 3 + 1 + 1 + servoCount
+    outstanding = 1 + 1 + 4 + 1 + 1 + servoCount
     -- Best-effort: firmware without servo names refuses the read, and the
     -- wizard then names nothing.
     bus.publish("msp.request", servoNamesApi.buildReadMessage(function(names)
@@ -1309,7 +1337,7 @@ local function open(opts)
     end)
   end
 
-  -- A model that arms or a link that drops lets go of everything the step
+  -- A car that arms or a link that drops lets go of everything the step
   -- holds. The setup state itself stays held: the flight controller refuses
   -- it while armed (the hold then stops, see onRefused()) and lets it lapse
   -- while nothing reaches it.

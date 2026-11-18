@@ -1,21 +1,21 @@
 ---
-title: "Preflight"
-sidebar_label: "Preflight"
+title: "Before Run"
+sidebar_label: "Before Run"
 sidebar_position: 20
 documentation_status: draft
 source: app/pages/settings_activelook_preflight.lua
 ---
 
-# Preflight
+# Before Run
 
 > Draft scaffold. Extracted labels may be incomplete or out of order. Behaviour,
 > displayed units, defaults and save effects require source review.
 
-TODO: Explain what this page controls and when a pilot would use it.
+TODO: Explain what this page controls and when a driver would use it.
 
 ## Where to find it
 
-*System* → *Settings* → *ActiveLook* → *Preflight*
+*System* → *Settings* → **ActiveLook* → *Before Run*
 
 Available without a flight controller connection; the background task must be running.
 

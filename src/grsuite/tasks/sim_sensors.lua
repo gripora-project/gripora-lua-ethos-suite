@@ -50,10 +50,9 @@ local SENSORS = {
   temp_mcu         = {uid = 0x5006, name = "MCU Temp",         unit = UNIT_DEGREE,        dec = 0,   min = 0,     max = 100},
   fuel             = {uid = 0x5007, name = "Fuel",             unit = UNIT_PERCENT,       dec = 0,   min = 0,     max = 100},
   consumption      = {uid = 0x5008, name = "Consumption",      unit = UNIT_MILLIAMPERE_HOUR, dec = 0, min = 0,    max = 5000},
-  governor         = {uid = 0x5009, name = "Governor",         unit = nil,                dec = 0,   min = 0,     max = 200},
   adj_f            = {uid = 0x5010, name = "Adjust Function",  unit = nil,                dec = 0,   min = 0,     max = 10},
   adj_v            = {uid = 0x5011, name = "Adjust Value",     unit = nil,                dec = 0,   min = 0,     max = 2000},
-  throttle_percent = {uid = 0x5014, name = "Throttle %",       unit = nil,                dec = 0,   min = 0,     max = 100},
+  throttle_percent = {uid = 0x5014, name = "Throttle %",       unit = nil,                dec = 0,   min = -100,  max = 100},
   armdisableflags  = {uid = 0x5015, name = "Arm Disable Flags", unit = nil,               dec = nil, min = 0,     max = 65536},
   altitude         = {uid = 0x5016, name = "Altitude",         unit = UNIT_METER,         dec = 0,   min = 0,     max = 50000},
   bec_voltage      = {uid = 0x5017, name = "BEC Voltage",      unit = UNIT_VOLT,          dec = 2,   min = 0,     max = 3000},
@@ -80,12 +79,17 @@ local PACKED = {
   system_status = function(read)
     local armed = (math.floor(tonumber(read("armflags")) or 0) & 1)
     local gpsFix = math.floor(tonumber(read("gps_fix_type")) or 0) & 0x3
-    return armed | (gpsFix << 9)
+    -- Bit 1, "the car is running": armed with the throttle away from neutral
+    -- (the firmware latches it until disarm; lib/flight_stats.lua holds the run
+    -- phase the same way).
+    local throttle = tonumber(read("throttle_percent")) or 0
+    local running = (armed == 1 and math.abs(throttle) > 10) and 1 or 0
+    return armed | (running << 1) | (gpsFix << 9)
   end,
   system_config = function(read)
     local function profile(key) return math.floor(tonumber(read(key)) or 1) & 0x7 end
     return profile("pid_profile") | (profile("rate_profile") << 3)
-      | (profile("battery_profile") << 6) | (profile("tv_profile") << 9)
+      | (profile("battery_profile") << 6)
   end,
 }
 

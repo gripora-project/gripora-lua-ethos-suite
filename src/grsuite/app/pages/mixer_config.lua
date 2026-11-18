@@ -1,33 +1,23 @@
 -- Mixer Config page. Loaded on demand from Setup -> Mixer.
 --
--- Gripora's own feature (not part of the rotorflight-based rewrite this
--- base came from -- see AGENTS.md's migration notes): scales/inverts the
--- stabilized Roll/Pitch/Yaw axes that every mixer rule reads from, via
--- MSP_GET_MIXER_INPUT/MSP_SET_MIXER_INPUT (cmd 174/171, one index per
--- axis -- see lib/msp_mixer_input.lua). One flight controller adjustment
--- affecting every rule reading that axis at once, rather than editing
--- each rule individually -- see @i18n(app.modules.mixer.axis_gain_help)@.
+-- Scales/inverts the stabilized steering (yaw) axis that every mixer rule
+-- reads from, via MSP_GET_MIXER_INPUT/MSP_SET_MIXER_INPUT (cmd 174/171, one
+-- index per axis -- see lib/msp_mixer_input.lua), and sets the steering gyro
+-- direction (yaw_gyro_reverse on MSP_MIXER_CONFIG, API 33.0), as
+-- gripora-configurator's Mixer tab does. A car only stabilises yaw, so the
+-- roll and pitch inputs are not shown or written.
 --
--- Each axis's single wire field (`rate`, signed S16) is *split* into two
--- widgets here: Throw (0-200%, |rate|/10) and Invert (rate's sign) --
--- matches this project's own last-known-good app/modules/mixer/mixer.lua
--- and tasks/scheduler/msp/api/MIXER_INPUT_ROLL.lua's parseRead()/
--- buildWritePayload() exactly (gain = min(200, |rate|//10), invert =
--- rate < 0). `min`/`max` (the wire's other two fields) are read but never
--- shown here -- carried through unchanged on write, same as that
--- project's own comment on why they aren't user-editable from this page.
+-- The input's single wire field (`rate`, signed S16) is split into two
+-- widgets: Throw (0-200%, |rate|/10) and Invert (rate's sign). `min`/`max`
+-- are read and written back unchanged.
 --
--- Three independent MSP commands (one per axis, lib/msp_mixer_input.lua's
--- roll()/pitch()/yaw() factories), combined via app/page_runtime.lua's
--- multi-source `sources` list -- see app/pages/alignment.lua for the same
--- pattern with two sources instead of three. Not profile-scoped
--- (`profileField = "none"`): mixer input scaling is a per-aircraft
--- geometry setting, not something that varies by PID/rate profile,
--- same reasoning as app/pages/alignment.lua's own board-alignment data.
+-- Not profile-scoped (`profileField = "none"`): a per-car geometry setting.
+-- yaw_gyro_reverse is read live by the firmware, so no reboot.
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local pageRuntime = requireModule("app/page_runtime.lua")
 local mixerInput = requireModule("lib/msp_mixer_input.lua")
+local mixerConfig = requireModule("lib/msp_mixer_config.lua")
 
 local PAGE_TITLE = "@i18n(app.modules.mixer.name)@"
 local GAIN_MAX = 200
@@ -40,10 +30,16 @@ local INVERT_OPTIONS = {
 
 -- key: source key (also lib/msp_mixer_input.lua's factory name).
 -- rateKey: the field name that factory's decode()/encode() uses.
+-- A car only stabilises yaw (steering), so only the yaw input is shown and
+-- read/written, as on gripora-configurator's Mixer tab; the roll and pitch
+-- inputs are separate MSP indices and are left untouched.
 local AXES = {
-  {key = "roll", label = "@i18n(app.modules.mixer.roll)@", rateKey = "rate_stabilized_roll"},
-  {key = "pitch", label = "@i18n(app.modules.mixer.pitch)@", rateKey = "rate_stabilized_pitch"},
-  {key = "yaw", label = "@i18n(app.modules.mixer.yaw)@", rateKey = "rate_stabilized_yaw"},
+  {key = "yaw", label = "@i18n(app.modules.pids.steering)@", rateKey = "rate_stabilized_yaw"},
+}
+
+local GYRO_OPTIONS = {
+  {"@i18n(app.modules.mixer.normal)@", 0},
+  {"@i18n(app.modules.mixer.inverted)@", 1},
 }
 
 local function gainFromRate(rate)
@@ -58,10 +54,14 @@ local function invertFromRate(rate)
 end
 
 local function open(opts)
+  local controlRefHolder = {}
   local sources = {}
   for _, axis in ipairs(AXES) do
     sources[#sources + 1] = {key = axis.key, mspModule = mixerInput[axis.key]()}
   end
+  -- MSP_MIXER_CONFIG, for yaw_gyro_reverse (API 33.0). Every other field is
+  -- written back as read.
+  sources[#sources + 1] = {key = "config", mspModule = mixerConfig}
 
   local runtime = pageRuntime.new({
     pageTitle = PAGE_TITLE,
@@ -69,7 +69,14 @@ local function open(opts)
     sources = sources,
     opts = opts,
     profileField = "none",
-    unloadPackageKeys = {"grsuite.lib.msp_mixer_input"},
+    unloadPackageKeys = {"grsuite.lib.msp_mixer_input", "grsuite.lib.msp_mixer_config"},
+    -- Firmware older than API 33.0 does not report the gyro direction.
+    onLoaded = function()
+      local rt = controlRefHolder.ref and controlRefHolder.ref.runtime
+      local config = rt and rt.data and rt.data.config
+      local field = rt and rt.fields.gyro_reverse
+      if field and not (config and config.yaw_gyro_reverse ~= nil) then field:enable(false) end
+    end,
   })
 
   form.clear()
@@ -82,6 +89,7 @@ local function open(opts)
   -- whatever gets retained here stays small instead of pinning the whole
   -- disposed PageRuntime.
   local controlRef = runtime.controlRef
+  controlRefHolder.ref = controlRef
   local function markDirty()
     local rt = controlRef.runtime
     if rt then rt:markDirty() end
@@ -134,6 +142,21 @@ local function open(opts)
       end)
     runtime:registerField(axis.key .. "_invert", invertField)
   end
+
+  -- Steering gyro direction (mixerGyroReverseTitle on the Configurator).
+  local gyroLine = form.addLine("@i18n(app.modules.mixer.gyro_direction)@")
+  local gyroField = form.addChoiceField(gyroLine, nil, GYRO_OPTIONS,
+    function()
+      local data = axisData("config")
+      return (data and data.yaw_gyro_reverse) or 0
+    end,
+    function(value)
+      local data = axisData("config")
+      if not data or data.yaw_gyro_reverse == nil then return end
+      markDirty()
+      data.yaw_gyro_reverse = (tonumber(value) or 0) ~= 0 and 1 or 0
+    end)
+  runtime:registerField("gyro_reverse", gyroField)
 
   runtime:loadInitial()
 end

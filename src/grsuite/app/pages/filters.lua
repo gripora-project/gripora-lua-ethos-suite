@@ -1,4 +1,4 @@
--- Filters profile editor page. Loaded on demand (plain loadfile) only when the user opens Flight Tuning -> Advanced ->
+-- Filters profile editor page. Loaded on demand (plain loadfile) only when the user opens Tuning -> Advanced ->
 -- Filters -- see app/tool.lua.
 --
 -- First page against MSP_FILTER_CONFIG (cmd 92/93, see

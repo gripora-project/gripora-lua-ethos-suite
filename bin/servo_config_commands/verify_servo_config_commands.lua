@@ -178,9 +178,16 @@ local function pinCommands(cfg, center, override, mixer)
   check("a reply without the rate never writes a rate of 0",
     bytes(mixer.buildWriteMessage(mixer.decode({1, 0, 16, 24, 24})).payload) == "1,0",
     bytes(mixer.buildWriteMessage(mixer.decode({1, 0, 16, 24, 24})).payload))
-  check("the mixer config simulator reply is 7 bytes at 50 Hz",
-    #mixer.buildReadMessage(function() end).simulatorResponse == 7
-      and mixer.decode({table.unpack(mixer.buildReadMessage(function() end).simulatorResponse)}).servo_pwm_rate == 50)
+  check("the mixer config simulator reply is 8 bytes at 50 Hz, gyro not reversed",
+    #mixer.buildReadMessage(function() end).simulatorResponse == 8
+      and mixer.decode({table.unpack(mixer.buildReadMessage(function() end).simulatorResponse)}).servo_pwm_rate == 50
+      and mixer.decode({table.unpack(mixer.buildReadMessage(function() end).simulatorResponse)}).yaw_gyro_reverse == 0)
+  -- API 33.0: yaw_gyro_reverse follows the rate, read and written back.
+  local rev = mixer.decode({0, 0, 16, 24, 24, 50, 0, 1})
+  check("an 8-byte reply carries yaw_gyro_reverse", rev.yaw_gyro_reverse == 1, tostring(rev.yaw_gyro_reverse))
+  check("yaw_gyro_reverse goes back after the rate",
+    bytes(mixer.buildWriteMessage(rev).payload) == "0,0,16,24,50,0,1",
+    bytes(mixer.buildWriteMessage(rev).payload))
 
   return failures - before
 end

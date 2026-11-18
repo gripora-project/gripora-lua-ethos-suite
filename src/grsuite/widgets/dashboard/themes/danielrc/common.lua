@@ -338,17 +338,6 @@ local function readStats(spec, telemetry)
     return value, unit, localizedThresholds
 end
 
-local function readGovernor(telemetry)
-    local raw = telemetry and telemetry.getSensor and telemetry.getSensor("governor")
-    if raw == nil then return nil end
-    local display = grsuite.utils.getGovernorState(raw)
-
-    if type(display) == "string" and display:find(",", 1, true) then
-        display = trim(display:match("([^,]+)")) or display
-    end
-    return display
-end
-
 local function readArmflags(telemetry, showReason)
     local value = telemetry and telemetry.getSensor and telemetry.getSensor("armflags")
     local disableflags = telemetry and telemetry.getSensor and telemetry.getSensor("armdisableflags")
@@ -415,9 +404,6 @@ local function readSpec(box, spec, telemetry, slotKey)
         rawValue = wattsMode == "current" and currentWatts(telemetry) or statsWatts(telemetry, wattsMode)
         dynamicUnit = "W"
         if rawValue ~= nil then displayValue = spec.transformFn(rawValue) end
-    elseif kind == "governor" then
-        displayValue = readGovernor(telemetry)
-        rawValue = displayValue
     elseif kind == "armflags" then
         displayValue = readArmflags(telemetry, spec.showReason)
         rawValue = displayValue
@@ -452,7 +438,7 @@ local function readSpec(box, spec, telemetry, slotKey)
     if type(displayValue) == "string" and displayValue:match("^%.+$") then unit = nil end
 
     local textValueForThreshold = rawValue
-    if kind == "governor" or kind == "armflags" or kind == "craftname" or kind == "time" or kind == "static" then
+    if kind == "armflags" or kind == "craftname" or kind == "time" or kind == "static" then
         textValueForThreshold = displayValue
     end
 
@@ -744,7 +730,7 @@ local function wakeTwoRowPanel(box, telemetry)
             gap = box.gap or 10,
             labelfont = utils.resolveFont(box.labelfont, utils.resolveFont("FONT_STD", nil)),
             valuefont = utils.resolveFont(box.valuefont, utils.resolveFont("FONT_STD", nil)),
-            row1 = rowSpec(box, "row1", {label = "GOV", kind = "governor"}),
+            row1 = rowSpec(box, "row1", {label = "PID", kind = "telemetry", source = "pid_profile"}),
             row2 = rowSpec(box, "row2", {label = "RATE", kind = "telemetry", source = "rate_profile"})
         }
         box._cache = cache
@@ -1091,8 +1077,9 @@ function common.buildCockpitBoxes()
         border = frameT,
         padding = panelPad,
         gap = readoutGap,
-        row1label = "GOV",
-        row1kind = "governor",
+        row1label = "PID",
+        row1kind = "telemetry",
+        row1source = "pid_profile",
         row1textcolor = p.yellow,
         row2label = "ERR",
         row2kind = "session",
@@ -1270,8 +1257,9 @@ function common.buildInflightBoxes()
         border = frameT,
         padding = panelPad,
         gap = readoutGap,
-        row1label = "GOV",
-        row1kind = "governor",
+        row1label = "PID",
+        row1kind = "telemetry",
+        row1source = "pid_profile",
         row1textcolor = p.yellow,
         row2label = "ERR",
         row2kind = "session",
@@ -1303,7 +1291,7 @@ function common.buildReportBoxes()
         lineheight = lineH,
         linecolor = p.line
     }))
-    add(out, sectionBox(W, H, 0.36, 0.04, 0.24, 0.09, "FLIGHT TIME", opts.headingfont, p.line, "center", {
+    add(out, sectionBox(W, H, 0.36, 0.04, 0.24, 0.09, "RUN TIME", opts.headingfont, p.line, "center", {
         lineheight = lineH
     }))
     add(out, sectionBox(W, H, 0.75, 0.04, 0.20, 0.09, "STATUS", opts.headingfont, p.line, "center", {
@@ -1344,7 +1332,7 @@ function common.buildReportBoxes()
         padding = readoutPad,
         gap = readoutGap
     }))
-    add(out, readoutBox(W, H, 0.03, 0.58, 0.26, 0.065, "FLIGHTS", opts.leftlabelfont, opts.leftvaluefont, p.line, p.white, {
+    add(out, readoutBox(W, H, 0.03, 0.58, 0.26, 0.065, "RUNS", opts.leftlabelfont, opts.leftvaluefont, p.line, p.white, {
         kind = "time",
         timesource = "count",
         unit = "",
@@ -1352,7 +1340,7 @@ function common.buildReportBoxes()
         gap = readoutGap
     }))
 
-    add(out, titledValueBox(W, H, 0.40, 0.25, 0.21, 0.24, "time", "flight", "LAST FLIGHT", opts.biglabelfont, opts.bigfont, p.line, p.white, {
+    add(out, titledValueBox(W, H, 0.40, 0.25, 0.21, 0.24, "time", "flight", "LAST RUN", opts.biglabelfont, opts.bigfont, p.line, p.white, {
         titlespacing = titleGap
     }))
 
@@ -1397,7 +1385,7 @@ function common.buildReportBoxes()
     add(out, titledValueBox(W, H, 0.03, 0.82, 0.12, 0.12, "time", "total", "TOTAL", opts.bottomtitlefont, opts.bottomvaluefont, p.line, p.white, {
         titlespacing = titleGap
     }))
-    add(out, titledValueBox(W, H, 0.18, 0.82, 0.14, 0.12, "time", "count", "FLIGHTS", opts.bottomtitlefont, opts.bottomvaluefont, p.line, p.white, {
+    add(out, titledValueBox(W, H, 0.18, 0.82, 0.14, 0.12, "time", "count", "RUNS", opts.bottomtitlefont, opts.bottomvaluefont, p.line, p.white, {
         titlespacing = titleGap
     }))
     add(out, titledValueBox(W, H, 0.35, 0.82, 0.12, 0.12, "text", "stats", "USED", opts.bottomtitlefont, opts.bottomvaluefont, p.line, p.white, {

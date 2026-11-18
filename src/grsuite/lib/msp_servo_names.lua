@@ -27,10 +27,9 @@ local WRITE_COMMAND = 0x5F3B
 -- SERVO_NAME_LENGTH in the firmware (pg/servo_name.h)
 local NAME_LENGTH = 8
 
--- 24 servos, the four in use (MSP_STATUS's servo_count fixture) named like
--- the default mix's surfaces, as the Configurator's Virtual FC does. A real
+-- 24 servos, S1 named like the default car mix's steering servo. A real
 -- flight controller starts with none.
-local SIMULATOR_NAMES = {"L AIL", "R AIL", "ELEV", "RUDDER"}
+local SIMULATOR_NAMES = {"STEER"}
 local SIMULATOR_RESPONSE = {24, NAME_LENGTH}
 for servo = 1, 24 do
   local name = SIMULATOR_NAMES[servo] or ""

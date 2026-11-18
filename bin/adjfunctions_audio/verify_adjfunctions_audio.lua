@@ -67,13 +67,13 @@ local function pageIds(path)
 end
 
 local function runChecks(names, offered)
-  -- C1: adjustment functions 76 to 82 have spoken names in wavs.lua.
-  local requiredIds = { 76, 77, 78, 79, 80, 81, 82 }
+  -- C1: the car adjustment functions that have word clips have spoken names in wavs.lua.
+  local requiredIds = { 7, 10, 13, 22, 23, 24, 25, 35, 38, 58, 70, 72, 73, 74, 82, 91 }
   local unnamed = {}
   for _, id in ipairs(requiredIds) do
     if names[id] == nil then unnamed[#unnamed + 1] = id end
   end
-  check("C1 adjustment functions 76 to 82 have names in wavs.lua", #unnamed == 0,
+  check("C1 the car adjustment functions have names in wavs.lua", #unnamed == 0,
     "no name for ids: " .. table.concat(unnamed, ", "))
 
   -- C1b: every name in wavs.lua is offered by the page.
@@ -120,19 +120,19 @@ end
 
 if selfTest then
   print("")
-  print("--self-test: the checks must go red without the name for function 76")
+  print("--self-test: the checks must go red without the name for function 82")
   local source = readFile(WAVS)
-  local spliced, n = source:gsub('%s*%[76%] = "gov idle throttle",', "", 1)
+  local spliced, n = source:gsub('%s*%[82%] = "battery profile",', "", 1)
   if n ~= 1 then
-    check("the name for function 76 is present to splice out", false, "no match in wavs.lua")
+    check("the name for function 82 is present to splice out", false, "no match in wavs.lua")
   else
-    local chunk = assert(load(spliced, "@wavs_without_76"))
+    local chunk = assert(load(spliced, "@wavs_without_82"))
     local lacking = chunk()
     local before = failures
     runChecks(lacking, pageIds(PAGE))
     local red = failures > before
     failures = before
-    check("the name checks go red without the name for function 76", red)
+    check("the name checks go red without the name for function 82", red)
   end
 end
 

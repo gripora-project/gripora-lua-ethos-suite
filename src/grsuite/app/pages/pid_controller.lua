@@ -4,20 +4,18 @@
 -- Edits the MSP_PID_PROFILE / MSP_SET_PID_PROFILE command (cmd 94/95, see
 -- lib/msp_pid_profile.lua) -- a *different* command from app/pages/pids.lua's
 -- MSP_PID_TUNING (cmd 112/202), even though both are scoped to the same
--- active PID profile on the flight controller. Exposes iterm decay
--- limit (the decay time is on Flight Feel), error limit (roll/pitch/yaw), iterm relax level
--- (roll/pitch/yaw; the Relax score is on Flight Feel), and cross-axis relax (gripora-native) --
--- gripora-firmware has no HSI offset limit or ground-error-decay
--- concept (both heli-only; see lib/msp_pid_profile.lua for the full list
--- of wire-present-but-dead fields), so neither gets a widget here, unlike
--- the rotorflight-based guess this replaced.
+-- active PID profile on the flight controller. Only yaw is stabilised
+-- (steering), so this exposes the I-term decay limit (the decay time is on
+-- Driving Feel), the yaw I-term relax level and the yaw error limit. The
+-- roll/pitch values, cross-axis, snap and prop-hang relax are not shown
+-- (the firmware no longer uses them); they are written back unchanged.
 -- master_gain_0-2/gain_curve_0-2/fw_tpa_gain/fw_tpa_curve (the "Master
 -- Gains" table -- per-axis live P/I/D/F scale plus which
 -- app/pages/curves.lua gain-curve slot shapes it) live on their own
 -- app/pages/master_gains.lua page instead, sharing this same codec --
 -- see that file's own header for why.
 -- The other fields in that MSP command (gyro/dterm/bterm cutoffs,
--- angle/trainer, atthold, etc.) are still read and
+-- removed leveling fields, etc.) are still read and
 -- written back unchanged every round-trip -- lib/msp_pid_profile.lua's
 -- codec always handles the full struct -- this page just doesn't build an
 -- editable widget for them yet (most belong on dedicated pages once those
@@ -42,78 +40,24 @@ local PAGE_TITLE = "@i18n(app.modules.pid_controller.name)@"
 -- the physical Back key -- see app/page_runtime.lua's buildChrome()).
 -- opts.setEventHandler/opts.setWakeupHandler: see app/menu_container.lua
 -- and app/tool.lua for how Ethos's event()/wakeup() reach a page.
--- Prop-hang relax is optional on the wire (see lib/msp_pid_profile.lua), so
--- its fields stay disabled on firmware that doesn't send it.
-local HANG_KEYS = {"prop_hang_strength", "prop_hang_angle", "prop_hang_fade"}
-
 local function open(opts)
-  local runtime
-  runtime = pageRuntime.new({
+  local runtime = pageRuntime.new({
     pageTitle = PAGE_TITLE,
     logTag = "pidctrl",
     mspModule = pidProfile,
     opts = opts,
     unloadPackageKeys = {"grsuite.lib.msp_pid_profile"},
-    onLoaded = function()
-      if runtime.data.has_prop_hang then return end
-      for _, key in ipairs(HANG_KEYS) do
-        local field = runtime.fields[key]
-        if field then field:enable(false) end
-      end
-    end,
   })
 
   form.clear()
   runtime:buildChrome()
 
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.pid_controller.inflight_error_decay)@", {
-    {title = "@i18n(app.modules.pid_controller.limit)@", spec = {key = "iterm_decay_limit"}},
-  })
-
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.pid_controller.error_limit)@", {
-    {title = "@i18n(app.modules.pid_controller.roll)@", spec = {key = "error_limit_0"}},
-    {title = "@i18n(app.modules.pid_controller.pitch)@", spec = {key = "error_limit_1"}},
-    {title = "@i18n(app.modules.pid_controller.yaw)@", spec = {key = "error_limit_2"}},
-  })
-
-  -- Relax is always on for roll/pitch/yaw (API 22.8); its main setting,
-  -- I-term Relax score, is a column on Flight Feel. Level stays here.
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.thrust_vector.iterm_relax_level)@", {
-    {title = "@i18n(app.modules.pid_controller.roll)@", spec = {key = "iterm_relax_level_0"}},
-    {title = "@i18n(app.modules.pid_controller.pitch)@", spec = {key = "iterm_relax_level_1"}},
-    {title = "@i18n(app.modules.pid_controller.yaw)@", spec = {key = "iterm_relax_level_2"}},
-  })
-
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.pid_controller.cross_axis_relax)@", {
-    {title = "@i18n(app.modules.pid_controller.roll)@", spec = {key = "cross_axis_relax_strength"}},
-    {title = "@i18n(app.modules.pid_controller.pitch)@", spec = {key = "cross_axis_relax_pitch_strength"}},
-  })
-
-  fieldLayout.buildGroup(runtime, "", {
-    {title = "@i18n(app.modules.pid_controller.level)@", spec = {key = "cross_axis_relax_level"}},
-    {title = "@i18n(app.modules.pid_controller.cutoff)@", spec = {key = "cross_axis_relax_cutoff"}},
-  })
-
-  -- Snap relax: stops roll/pitch/yaw feedback fighting pop tops, pinwheels and snaps
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.pid_controller.snap_relax)@", {
-    {title = "@i18n(app.modules.pid_controller.strength)@", spec = {key = "snap_relax_strength"}},
-    {title = "@i18n(app.modules.pid_controller.threshold)@", spec = {key = "snap_relax_threshold"}},
-  })
-
-  fieldLayout.buildGroup(runtime, "", {
-    {title = "@i18n(app.modules.pid_controller.window)@", spec = {key = "snap_relax_window"}},
-    {title = "@i18n(app.modules.pid_controller.hold)@", spec = {key = "snap_relax_hold"}},
-  })
-
-  -- Prop-hang relax: lets the prop torque roll the airframe in a prop hang (roll only)
-  fieldLayout.buildGroup(runtime, "@i18n(app.modules.pid_controller.prop_hang)@", {
-    {title = "@i18n(app.modules.pid_controller.strength)@", spec = {key = "prop_hang_strength"}},
-    {title = "@i18n(app.modules.pid_controller.angle)@", spec = {key = "prop_hang_angle"}},
-  })
-
-  fieldLayout.buildGroup(runtime, "", {
-    {title = "@i18n(app.modules.pid_controller.hold)@", spec = {key = "prop_hang_fade"}},
-  })
+  -- Steering only, as on gripora-configurator's PID Controller Settings panel:
+  -- I-term decay limit, the yaw I-term relax level (its Relax score is on
+  -- Driving Feel) and the yaw error limit.
+  fieldLayout.buildSingle(runtime, "@i18n(app.modules.pid_controller.inflight_error_decay)@", {key = "iterm_decay_limit"})
+  fieldLayout.buildSingle(runtime, "@i18n(app.modules.pid_controller.iterm_relax_level)@", {key = "iterm_relax_level_2"})
+  fieldLayout.buildSingle(runtime, "@i18n(app.modules.pid_controller.error_limit)@", {key = "error_limit_2"})
 
   runtime:loadInitial()
 end

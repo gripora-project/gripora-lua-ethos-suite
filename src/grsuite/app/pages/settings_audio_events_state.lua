@@ -1,9 +1,9 @@
 -- Settings -> Audio -> Events -> State callouts.
 --
 -- Everything the suite announces when a state changes rather than when a
--- value crosses a threshold: arming flags, governor state, flight mode, GPS fix,
--- the four profile switches (PID, rate, thrust vectoring, battery), and the
--- two adjustment callouts. Ten independent booleans with no dependent fields,
+-- value crosses a threshold: arming flags, drive mode, GPS fix, the three
+-- profile switches (PID, rate, battery), and the two adjustment callouts.
+-- Eight independent booleans with no dependent fields,
 -- which is why this page needs no enable rules at all.
 --
 -- The adjustment callouts were their own expansion panel ("Adjustment
@@ -23,12 +23,10 @@ local function open(opts)
     local fields = ctx.fields
 
     fields.armflags = ctx.addBool("@i18n(app.modules.settings.arming_flags)@", "armflags")
-    fields.governor = ctx.addBool("@i18n(app.modules.settings.governor_state)@", "governor")
     fields.flightMode = ctx.addBool("@i18n(app.modules.settings.flight_mode_state)@", "flight_mode")
     fields.gpsFix = ctx.addBool("@i18n(app.modules.settings.gps_fix_state)@", "gps_fix")
     fields.pidProfile = ctx.addBool("@i18n(app.modules.settings.pid_profile)@", "pid_profile")
     fields.rateProfile = ctx.addBool("@i18n(app.modules.settings.rate_profile)@", "rate_profile")
-    fields.tvProfile = ctx.addBool("@i18n(app.modules.settings.tv_profile)@", "tv_profile")
     fields.batteryProfile = ctx.addBool("@i18n(app.modules.settings.battery_profile_event)@", "battery_profile")
     fields.adjFunction = ctx.addBool("@i18n(app.modules.settings.adj_function)@", "adj_f")
     fields.adjValue = ctx.addBool("@i18n(app.modules.settings.adj_value)@", "adj_v")

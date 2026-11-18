@@ -9,7 +9,7 @@
 --   failsafe_throttle           U16  (PWM us)
 --   failsafe_switch_mode        U8   (0=Stage1, 1=Kill, 2=Stage2)
 --   failsafe_throttle_low_delay U16  (0.1s units)
---   failsafe_procedure          U8   (0=Land, 1=Drop, 2=GPS Rescue)
+--   failsafe_procedure          U8   (0=Stop, 1=Drop; 2, GPS Rescue, is removed)
 --   failsafe_recovery_delay     U16  (0.1s units) -- appended field, only
 --                                     present on firmware that supports it
 --                                     (see gripora-firmware#146); older

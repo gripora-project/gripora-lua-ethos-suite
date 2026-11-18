@@ -26,7 +26,7 @@ They do not regenerate menus or locale files.
 
 ```sh
 python3 bin/docs/generate_menu_docs.py --scaffold-all
-python3 bin/docs/generate_menu_docs.py --page setup/governor.md
+python3 bin/docs/generate_menu_docs.py --page setup/radio_config.md
 python3 bin/docs/generate_menu_docs.py --update-index
 python3 bin/docs/generate_menu_docs.py --check
 python3 -m unittest discover -s bin/docs -p 'test_*.py'

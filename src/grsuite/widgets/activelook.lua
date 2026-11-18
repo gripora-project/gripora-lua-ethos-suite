@@ -29,20 +29,6 @@ local FONT_PX = {
   [5] = 82,
 }
 
-local GOVERNOR_LABELS = {
-  [0] = "OFF",
-  [1] = "IDLE",
-  [2] = "SPOOLUP",
-  [3] = "RECOVERY",
-  [4] = "ACTIVE",
-  [5] = "THR OFF",
-  [6] = "LOST HS",
-  [7] = "AUTOROT",
-  [8] = "BAILOUT",
-  [100] = "DISABLED",
-  [101] = "DISARMED",
-}
-
 local function clamp(value, min, max)
   value = tonumber(value) or 0
   if value < min then return min end
@@ -99,12 +85,6 @@ local function temperatureSuffix(widget)
   return widget and widget.temperatureUnit == 1 and "°F" or "°C"
 end
 
-local function governorStateLabel(value)
-  value = tonumber(value)
-  if not value then return "UNKNOWN" end
-  return GOVERNOR_LABELS[floor(value)] or "UNKNOWN"
-end
-
 local function estimateTextWidth(text, fontId)
   local px = FONT_PX[fontId] or 24
   return #tostring(text or "") * (px * 0.6)
@@ -137,20 +117,14 @@ end
 local SENSOR_DEFS = {
   off = {label = "Off"},
   flightmode = {
-    label = "Flight Mode",
+    label = "Run Phase",
     value = function(_, mode)
-      if mode == "inflight" then return "FLY" end
+      if mode == "inflight" then return "RUN" end
       if mode == "postflight" then return "POST" end
       return "PRE"
     end,
   },
   timer = {label = "Timer", value = function(widget) return formatDuration(widget.timerLive or widget.timerSession or 0) end},
-  governor = {
-    label = "Governor",
-    value = function(widget)
-      return governorStateLabel(widget.governorState or widget.governorMode)
-    end,
-  },
   armed = {label = "Armed", value = function(widget) return widget.isArmed == true and "ARMED" or "DISARMED" end},
   fuel = {label = "Fuel", value = function(widget) return sensor(widget, "fuel") end, decimals = 0, suffix = "%"},
   consumption = {label = "Consumed mAh", value = function(widget) return sensor(widget, "consumption") end, decimals = 0, suffix = "mAh"},
@@ -377,8 +351,6 @@ local function update(widget, snapshot)
   widget.tempEsc = snapshot.tempEsc
   widget.tempMcu = snapshot.tempMcu
   widget.fuelPercent = snapshot.fuelPercent
-  widget.governorMode = snapshot.governorMode
-  widget.governorState = snapshot.governorState
   widget.timerLive = snapshot.timerLive or 0
   widget.timerSession = snapshot.timerSession or 0
   -- The phase comes from the session (lib/flight_stats.lua), the same one the

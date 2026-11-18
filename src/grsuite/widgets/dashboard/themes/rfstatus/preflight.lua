@@ -86,16 +86,15 @@ local function buildBoxes(W)
             row = 4,
             colspan = 2,
             type = "text",
-            subtype = "governor",
+            subtype = "armflags",
             nosource = "-",
-            title = "@i18n(widgets.dashboard.governor):upper()@",
+            title = "@i18n(widgets.dashboard.info_arming):upper()@",
             titlepos = "bottom",
             titlecolor = colorMode.textcolor,
             textcolor = colorMode.textcolor,
             thresholds = {
-                {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor}, {value = "@i18n(widgets.governor.OFF)@", textcolor = colorMode.fillcritcolor}, {value = "@i18n(widgets.governor.IDLE)@", textcolor = "blue"}, {value = "@i18n(widgets.governor.SPOOLUP)@", textcolor = "blue"}, {value = "@i18n(widgets.governor.RECOVERY)@", textcolor = colorMode.fillwarncolor}, {value = "@i18n(widgets.governor.ACTIVE)@", textcolor = colorMode.fillcolor},
-                {value = "@i18n(widgets.governor.THROFF)@", textcolor = colorMode.fillcritcolor}
-            }
+                {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor}, {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
+                }
         }, {
             col = 3,
             row = 1,

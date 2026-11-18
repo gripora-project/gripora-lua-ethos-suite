@@ -540,14 +540,14 @@ do
     "rpm", "link", "fuel", "smartfuel", "throttle_percent", "temp_mcu", "temp_esc",
     "bec_voltage", "watts" }
 
-  -- Record through the real path: the session's flight record on this state, the armed
-  -- edge and then 2.5 s in flight with the governor active, so the powered gate has
-  -- opened and the rpm and current minima are taken too.
+  -- Record through the real path: the session's run record on this state, the armed
+  -- edge and then 4.5 s running (the FC's running latch) with the motor driven, so the
+  -- powered gate has opened and the rpm and current minima are taken too.
   local liveSensors = dofile(ROOT .. "/src/grsuite/lib/live_sensors.lua")
   local record = dofile(ROOT .. "/src/grsuite/lib/flight_stats.lua").new()
   record.stats = stats
-  widget.isArmed, widget.governorState, widget.mcuId = true, 4, "churn"
-  for tick = 1, 6 do record:update(widget, liveSensors.read, tick * 0.5) end
+  widget.isArmed, widget.systemStatus, widget.mcuId = true, {running = true}, "churn"
+  for tick = 1, 10 do record:update(widget, liveSensors.read, tick * 0.5) end
 
   local problems = {}
   for _, name in ipairs(flatOnly) do
@@ -608,7 +608,7 @@ do
   local record = dofile(ROOT .. "/src/grsuite/lib/flight_stats.lua").new()
   record.stats = widget.dashboardStats
   local liveSensors = dofile(ROOT .. "/src/grsuite/lib/live_sensors.lua")
-  widget.isArmed, widget.governorState, widget.mcuId = true, 4, "temp"
+  widget.isArmed, widget.systemStatus, widget.mcuId = true, {running = true}, "temp"
   record:update(widget, liveSensors.read, 0.5)
   record:update(widget, liveSensors.read, 1.0)
   local a = context.tasks.telemetry.getSensorStats("temp_mcu")

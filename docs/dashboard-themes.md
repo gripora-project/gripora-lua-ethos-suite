@@ -92,13 +92,16 @@ Settings* values go in their own `dashboard.user/<themename>` section of
 Each theme may implement the following Lua modules:
 
 * **`init.lua`** (required): returns theme metadata (e.g., `name`, `preflight`, `inflight`, `postflight`, optional `configure`, and scheduling hints).
-* **`preflight.lua`** (optional): returns a layout table for preflight.
-* **`inflight.lua`** (optional): returns a layout table for inflight.
-* **`postflight.lua`** (optional): returns a layout table for postflight.
+** **`preflight.lua`** (optional): returns a layout table for before a run.
+* **`inflight.lua`** (optional): returns a layout table for during a run.
+* **`postflight.lua`** (optional): returns a layout table for after a run.
 
-The dashboard tracks five phases, and themes have three layouts. `armed` (armed on the ground, before
-spool-up) draws the `preflight` layout; the armed bar is its warning. `offline` (the link is gone after a
-flight) draws the `postflight` layout with the flight's summary and extremes frozen, until a connection
+The file and key names keep the inherited `preflight` / `inflight` / `postflight` names, so
+existing themes keep working; for a car they mean before, during and after a run.
+
+The dashboard tracks five phases, and themes have three layouts. `armed` (armed, before the car has
+moved) draws the `preflight` layout; the armed bar is its warning. `offline` (the link is gone after a
+run) draws the `postflight` layout with the run's summary and extremes frozen, until a connection
 returns or the model changes. A theme therefore does not need files of its own for them.
 * **`configure.lua`** (optional): exposes a configuration UI and saves preferences.
 
@@ -189,12 +192,11 @@ Outputs static or telemetry-based text. Subtypes located in `objects/text/`:
 | ------------ | -------------------------------------- | ----------------- |
 | `text`       | Static text string defined in `value`. | –                 |
 | `telemetry`  | Telemetry value (`source` required).   | –                 |
-| `apiversion` | Shows Rotorflight API version (auto).  | –                 |
+| `apiversion` | Shows Gripora MSP API version (auto).  | –                 |
 | `craftname`  | Shows current model name (auto).       | –                 |
 | `escstatus`  | Speed controller health in words, coloured by level (auto). | – |
 | `blackbox`   | Used/total Blackbox storage (auto).    | –                 |
-| `governor`   | Governor state (auto).                 | –                 |
-| `armflags`   | Armed status flags (auto).             | –                 |
+| `armflags`   | Armed status flags (auto). `governor` is kept as an alias for user themes (Gripora has no governor). | – |
 | `session`    | Any session key (`source` required).   | e.g., `"rx_rssi"` |
 | `stats`      | Session summary stats (auto).          | –                 |
 | `clock`      | Clock display (auto).                  | –                 |
@@ -202,14 +204,14 @@ Outputs static or telemetry-based text. Subtypes located in `objects/text/`:
 | `watts`      | Voltage/Current => Power (auto).       | –                 |
 
 The min, max and average values these objects show are recorded by the background task while the
-model is in flight, once per tick, whether a dashboard is on screen or not (`lib/flight_stats.lua`).
+car is running, once per tick, whether a dashboard is on screen or not (`lib/flight_stats.lua`).
 Drawing a dashboard does not add samples.
 
-The minimum headspeed and the minimum current are taken only while the rotor is under power, so
-the spool-up and the spool-down do not set them: with the flight controller's governor state, after
-2 s in ACTIVE or BYPASS; without it, after the head has turned at 100 rpm or more and been driven
-(throttle at 25 % or more, or current at 1.5 A or more) for 2 s, from the readings of 2 s earlier.
-Until then these two minima read `--`. The maxima and all other values cover the whole flight.
+The minimum motor RPM and the minimum current are taken only while the motor is under power, so
+pulling away and coasting to a stop do not set them: after the motor has turned at 100 rpm or more
+and been driven (throttle 25 % or more away from neutral, forward or reverse, or current at 1.5 A or
+more) for 2 s, from the readings of 2 s earlier. Until then these two minima read `--`. The maxima and
+all other values cover the whole run.
 
 **Common Parameters:**
 
@@ -234,11 +236,11 @@ Bar, ring, and arc gauges under `objects/gauge/`:
 | `ring`    | Ring gauge | Circular ring with fill `%`                                                            |
 | `arc`     | Arc gauge  | `startAngle`, `sweep`, `arcThickness`, `arcColor`, `arcBgColor`, `thresholds`          |
 
-A `bar` whose `source` drops out **before the flight** shows the loading dots (`.`, `..`, `...`), not its last value: on the bench a bar frozen at 85% is a wrong number, and the pilot has to see that the source is gone (#2534).
+A `bar` whose `source` drops out **before the run** shows the loading dots (`.`, `..`, `...`), not its last value: on the bench a bar frozen at 85% is a wrong number, and the driver has to see that the source is gone (#2534).
 
-Once a flight is under way the last reading is **held**, in flight as well as in postflight. A momentary telemetry gap -- one missed appId, one dropped frame behind an obstacle -- must not blank a gauge the pilot is flying on, and must not discard the reading it had. A disconnect after take-off counts as offline (`lib/flight_stats.lua`), so the reading is held while the link is away. When the link returns, the phase starts over at preflight.
+Once a run is under way the last reading is **held**, during the run as well as after it. A momentary telemetry gap -- one missed appId, one dropped frame behind an obstacle -- must not blank a gauge the driver is relying on, and must not discard the reading it had. A disconnect during a run counts as offline (`lib/flight_stats.lua`), so the reading is held while the link is away. When the link returns, the phase starts over before a run.
 
-The `watts` text object follows the same rule: before a flight a dropped current sensor shows the loading dots instead of the last wattage, and from `inflight` onwards the last reading is held (`objects/text/watts.lua`).
+The `watts` text object follows the same rule: before a run a dropped current sensor shows the loading dots instead of the last wattage, and from `inflight` onwards the last reading is held (`objects/text/watts.lua`).
 
 **Shared Gauge Parameters:**
 
@@ -295,13 +297,13 @@ Analog dial widgets (`objects/dial/`):
 
 ### 4.5 Time (`type = "time")`
 
-Displays flight timer or clock (`objects/time/`):
+Displays the run timer or clock (`objects/time/`):
 
 | `subtype` | Description                       | Key Params                          |
 | --------- | --------------------------------- | ----------------------------------- |
-| `flight`  | Elapsed flight time (mm\:ss).      | `font`, `title`                     |
-| `count`   | Flight count (from model prefs).  | `font`, `title`                     |
-| `total`   | Total flight time.                | `font`, `title`                     |
+| `flight`  | Elapsed run time (mm\:ss).         | `font`, `title`                     |
+| `count`   | Run count (from model prefs).     | `font`, `title`                     |
+| `total`   | Total run time.                   | `font`, `title`                     |
 
 **Example:**
 

@@ -11,11 +11,11 @@
   Grid: 16 cols x 14 rows
   Preflight
     fuel ring | RPM ring | current ring | ESC temp ring    (rows 1-8)
-    model (1-8, 9-12)    | governor (9-12) | BEC V (13-16)      (rows 9-11)
+    model (1-8, 9-12)    | arming (9-12)   | BEC V (13-16)      (rows 9-11)
     flights (1-8, 13-14) | cell V (9-12)   | used mAh (13-16)   (rows 12-14)
   Inflight
     fuel ring (1-6, 1-10) | RPM ring (7-11, 1-6) | ESC temp ring (12-16, 1-6)
-                          | timer (7-11, 7-10)         | governor (12-16, 7-10)
+                          | timer (7-11, 7-10)         | arming (12-16, 7-10)
     current | cell V | BEC V | throttle                         (rows 11-14)
   Postflight
     fuel min | rpm max | current max | ESC max rings            (rows 1-8)
@@ -97,14 +97,9 @@ local function fuelTitle()
     return utils.isElectricEngine() and "@i18n(widgets.dashboard.battery):upper()@" or "@i18n(widgets.dashboard.fuel):upper()@"
 end
 
-local GOVERNOR_THRESHOLDS = {
+local ARM_THRESHOLDS = {
     {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor},
-    {value = "@i18n(widgets.governor.OFF)@",      textcolor = colorMode.fillcritcolor},
-    {value = "@i18n(widgets.governor.IDLE)@",     textcolor = colorMode.accentcolor},
-    {value = "@i18n(widgets.governor.SPOOLUP)@",  textcolor = colorMode.accentcolor},
-    {value = "@i18n(widgets.governor.RECOVERY)@", textcolor = colorMode.fillwarncolor},
-    {value = "@i18n(widgets.governor.ACTIVE)@",   textcolor = colorMode.fillcolor},
-    {value = "@i18n(widgets.governor.THROFF)@",   textcolor = colorMode.fillcritcolor},
+    {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
 }
 
 local FUEL_THRESHOLDS = {
@@ -205,11 +200,11 @@ function common.buildBoxes(W, phase)
         return ring(col, row, colspan, rowspan, box)
     end
 
-    local function governor(col, row, colspan, rowspan, font, valuealign)
+    local function arming(col, row, colspan, rowspan, font, valuealign)
         return readout(col, row, colspan, rowspan, {
-            type = "text", subtype = "governor",
-            title = "@i18n(widgets.dashboard.governor):upper()@",
-            font = font, valuealign = valuealign, thresholds = GOVERNOR_THRESHOLDS,
+            type = "text", subtype = "armflags",
+            title = "@i18n(widgets.dashboard.info_arming):upper()@",
+            font = font, valuealign = valuealign, thresholds = ARM_THRESHOLDS,
         })
     end
 
@@ -220,7 +215,7 @@ function common.buildBoxes(W, phase)
             tempRing(12, 1, 5, 6, {font = opts.sfont}),
 
             tile(7, 7, 5, 4, {type = "time", subtype = "flight", title = "@i18n(widgets.dashboard.timer):upper()@"}),
-            governor(12, 7, 5, 4, opts.sfont, "center"),
+            arming(12, 7, 5, 4, opts.sfont, "center"),
 
             readout(1, 11, 4, 4, {source = "current", unit = "A", transform = "floor", title = "@i18n(widgets.dashboard.current):upper()@", font = opts.font}),
             readout(5, 11, 4, 4, {source = "voltage", unit = "V", decimals = 2, transform = cellVoltage, title = "@i18n(widgets.dashboard.volts_per_cell):upper()@", font = opts.font}),
@@ -256,7 +251,7 @@ function common.buildBoxes(W, phase)
         {col = 1, row = 9, colspan = 8, rowspan = 4, type = "image", subtype = "model", bgcolor = panel},
         tile(1, 13, 8, 2, {type = "time", subtype = "count", title = "@i18n(widgets.dashboard.flights):upper()@", font = opts.sfont}),
 
-        governor(9, 9, 4, 3),
+        arming(9, 9, 4, 3),
         readout(13, 9, 4, 3, {source = "bec_voltage", unit = "V", decimals = 1, title = "@i18n(widgets.dashboard.bec_voltage):upper()@"}),
         readout(9, 12, 4, 3, {source = "voltage", unit = "V", decimals = 2, transform = cellVoltage, title = "@i18n(widgets.dashboard.volts_per_cell):upper()@"}),
         readout(13, 12, 4, 3, {source = "smartconsumption", unit = "", transform = "floor", title = "@i18n(widgets.dashboard.consumed_mah):upper()@"}),

@@ -25,7 +25,7 @@ systemStatus.FAILSAFE = { -- failsafePhase_e
   LANDED = 3,
   RX_LOSS_MONITORING = 4,
   RX_LOSS_RECOVERED = 5,
-  GPS_RESCUE = 6,
+  -- 6 was GPS_RESCUE (removed from the firmware)
 }
 
 systemStatus.GPS_FIX = { -- telemetryGpsFix_e
@@ -34,32 +34,12 @@ systemStatus.GPS_FIX = { -- telemetryGpsFix_e
   HOME = 2, -- fix, and home position captured
 }
 
-systemStatus.NAV_BLOCKED = { -- telemetryNavBlocked_e
-  NONE = 0,
-  LOITER = 1, -- LOITER switched on but it can't fly
-  RTH = 2,    -- RTH switched on but it can't fly
-}
-
 systemStatus.BATTERY = { -- batteryState_e
   OK = 0,
   WARNING = 1,
   CRITICAL = 2,
   NOT_PRESENT = 3,
   INIT = 4,
-}
-
-systemStatus.AUTOTRIM = { -- autoTrimState_e
-  IDLE = 0,
-  COLLECTING = 1,
-  SAVE_PENDING = 2,
-}
-
--- Out of trim, per axis (trimMonitorState_e, flight/trim_monitor.h). The FC
--- watches the I-term in hands-off rate flight and says which way to trim.
-systemStatus.TRIM = {
-  IN_TRIM = 0,
-  RIGHT_UP = 1,   -- roll/yaw: trim right; pitch: trim nose up
-  LEFT_DOWN = 2,  -- roll/yaw: trim left; pitch: trim nose down
 }
 
 local LOGIC_CONDITION_COUNT = 4
@@ -94,7 +74,7 @@ function systemStatus.decodeStatus(raw)
   return {
     raw = value,
     armed = flag(value, 0),
-    airborne = flag(value, 1),
+    running = flag(value, 1), -- the car has been driven since arming (INFLIGHT_MODE latch)
     motorsRunning = flag(value, 2),
     rxLinkUp = flag(value, 3),
     rxBackupLinkUp = flag(value, 4),
@@ -102,14 +82,13 @@ function systemStatus.decodeStatus(raw)
     failsafePhase = field(value, 6, 0x7),
     gpsFix = field(value, 9, 0x3),
     gpsHealthy = flag(value, 11),
-    navBlocked = field(value, 12, 0x3),
+    -- Bits 12-13 reserved (were GPS nav blocked, removed).
     batteryState = field(value, 14, 0x7),
     controlSaturated = flag(value, 17),
     gyroOverflow = flag(value, 18),
     accNotCalibrated = flag(value, 19),
     overrideActive = flag(value, 20),
-    assistHolding = flag(value, 21),
-    autoTrim = field(value, 22, 0x3),
+    -- Bits 21-23 reserved (were assist hold and AUTO TRIM, removed).
     blackboxLogging = flag(value, 24),
     logic = logic, -- logic conditions 1-4
   }
@@ -125,7 +104,7 @@ function systemStatus.decodeConfig(raw)
     pidProfile = field(value, 0, 0x7),
     rateProfile = field(value, 3, 0x7),
     batteryProfile = field(value, 6, 0x7),
-    tvProfile = field(value, 9, 0x7),
+    -- Bits 9-11 reserved (were the thrust-vector profile, removed).
     configDirty = flag(value, 12),
     saving = flag(value, 13),
     rebootRequired = flag(value, 14),
@@ -137,12 +116,7 @@ function systemStatus.decodeConfig(raw)
     rxBackupConfigured = flag(value, 20),
     blackboxFull = flag(value, 21),
     rpmSourceActive = flag(value, 22),
-    trimRoll = field(value, 23, 0x3),
-    trimPitch = field(value, 25, 0x3),
-    trimYaw = field(value, 27, 0x3),
-    -- RTH/LOITER on a switch or GPS rescue failsafe, but the GPS provider
-    -- can't navigate (NMEA, FBUS, CRSF). From the FC settings, not the fix.
-    gpsNavUnsupported = flag(value, 29),
+    -- Bits 23-29 reserved (were the trim monitor and GPS nav unsupported, removed).
   }
 end
 

@@ -1,20 +1,21 @@
 -- Run from the repository root with Lua 5.4: lua5.4 bin/tests/setup_wizard_page.lua
 --
 -- Drives the real Setup Wizard shell (app/pages/setup_wizard.lua) and its
--- Direction step with a stubbed Ethos form, lcd, header and bus. The real MSP
--- codecs, lib/override_keepalive.lua, lib/setup_wizard_surfaces.lua and
+-- steps with a stubbed Ethos form, lcd, header and bus. The real MSP codecs,
+-- lib/override_keepalive.lua, lib/setup_wizard_surfaces.lua and
 -- app/setup_wizard_art.lua run unchanged. Every read is answered with its
--- codec's simulator reply, so the model is the firmware's default glider mix
--- (two ailerons, elevator, rudder; lib/msp_mixer_rules.lua); a second run
--- swaps in a flying wing. The checks read the bytes the page puts on the wire
--- and the text its paint draws:
+-- codec's simulator reply, except the mixer rules: the car mixer preset with
+-- rear steering (steering on S1, the ESC on M1, rear steering on S2, 50 %
+-- opposite); a second run swaps in a steering servo mixed with pitch. The
+-- checks read the bytes the page puts on the wire and the text its paint
+-- draws:
 --   * opening holds the setup state and clears overrides other pages left on;
---   * a check holds the other axes and the flaps at centre and flicks the
---     checked one, timed; leaving the check releases them;
---   * the answers fix things by the Configurator's rules: one wrong surface
---     on its own axis is reversed, all wrong inverts the axis, "only some"
---     wiggles each servo and reverses the ones picked, and a wrong surface
---     that also works another axis is left alone and explained;
+--   * the steering check holds roll and pitch at centre and flicks the
+--     steering, timed; leaving the check releases them;
+--   * the answers fix things by the Configurator's rules: one wrong servo on
+--     steering alone is reversed, all wrong inverts the steering, "only some"
+--     wiggles each servo and reverses the ones picked, and a wrong servo that
+--     also works another axis is left alone and explained;
 --   * arming lets everything go and greys out the answers;
 --   * Save and finish writes EEPROM and leaves; Discard writes back what was
 --     loaded; leaving releases the setup state;
@@ -343,7 +344,26 @@ local function openPage(api, stepKey)
   end
 end
 
--- 33.0, default glider -------------------------------------------------------
+-- 33.0, a car with rear steering ---------------------------------------------
+
+-- Every test drives the car mixer preset (lib/setup_wizard_mix.lua): steering
+-- on S1, the ESC on M1 and rear steering on S2, 50 % opposite. The codec's
+-- own simulator reply is left alone; MSP_MIXER_RULES is answered with this.
+local function rulePool(rules)
+  local mixerRules = requireModule("lib/msp_mixer_rules.lua")
+  local pool = {}
+  for i = 1, mixerRules.RULE_COUNT do
+    local p = mixerRules.encodeRule(i - 1, rules[i])
+    for b = 2, #p do pool[#pool + 1] = p[b] end
+  end
+  return pool
+end
+local CAR_POOL = rulePool({
+  {oper = 1, input = 3, output = 1, weight = 1000, weightNeg = 1000},
+  {oper = 1, input = 4, output = 27, weight = 1000, weightNeg = 1000},
+  {oper = 1, input = 3, output = 2, weight = -500, weightNeg = -500},
+})
+replies[172] = CAR_POOL
 
 openPage(CURRENT)
 
@@ -367,50 +387,48 @@ check("it opens on the intro, which moves nothing", shows("dir_intro") and #writ
 local start = button(T("dir_start"))
 check("the intro's only answer is Start, and it has the focus", start and start.focused)
 
--- Pitch: the first check for this mix (no flaps)
+-- Steering: the only check on a car
 local before = #sent
 press(T("dir_start"))
-check("Start opens the pitch check", shows("dir_check_pitch") and shows("dir_q_match"))
+check("Start opens the steering check", shows("dir_check_yaw") and shows("dir_q_match"))
 check("the check being done stands out in the accent colour, with its progress",
-  drawnColor[T("dir_check_pitch")] == 255 and drawnColor[T("progress_fmt")] ~= 255
+  drawnColor[T("dir_check_yaw")] == 255 and drawnColor[T("progress_fmt")] ~= 255
   and drawnColor[T("progress_fmt")] ~= nil)
-check("the check holds roll, yaw and flaps at centre, timed",
+check("the check holds roll and pitch at centre, timed, and leaves the flap channel alone",
   lastMixer(before + 1, 1).value == 0 and lastMixer(before + 1, 1).timed
-  and lastMixer(before + 1, 3).value == 0 and lastMixer(before + 1, 13).value == 0)
+  and lastMixer(before + 1, 2).value == 0 and lastMixer(before + 1, 13) == nil)
 for _ = 1, 4 do tick(0.9) end
-local flicks = mixerWrites(before + 1, 2)
+local flicks = mixerWrites(before + 1, 3)
 local values = {}
 for i, w in ipairs(flicks) do values[i] = w.value end
-check("then flicks pitch between centre and pitch up 25 %, timed",
+check("then flicks the steering between centre and steer right 25 % (yaw -), timed",
   #flicks >= 4 and values[2] == -250 and values[3] == 0 and values[4] == -250 and flicks[2].timed,
   table.concat(values, ","))
-check("only pitch is written while it flicks", #mixerWrites(before + 6, 1) == 0)
+check("only the steering is written while it flicks", #mixerWrites(before + 6, 1) == 0)
 
 before = #sent
 press(string.format(T("dir_move_fmt"), 25))
 for _ = 1, 2 do tick(0.9) end
 local bigger = false
-for _, w in ipairs(mixerWrites(before + 1, 2)) do if w.value == -350 then bigger = true end end
+for _, w in ipairs(mixerWrites(before + 1, 3)) do if w.value == -350 then bigger = true end end
 check("Move steps the test movement up to 35 %", bigger)
 
--- Roll: both ailerons the wrong way inverts roll
-press(T("dir_like"))
-check("Like this goes on to roll", shows("dir_check_roll"))
+-- Both steering servos the wrong way inverts the steering
 press(T("dir_unlike"))
-check("two surfaces: asks whether all of them were wrong", shows("dir_q_all"))
+check("two steering servos: asks whether all of them were wrong", shows("dir_q_all"))
 before = #sent
 press(T("dir_all"))
 local inputWrites = writesOf(171, before + 1)
-check("All of them inverts roll's axis throw",
-  #inputWrites == 1 and inputWrites[1].payload[1] == 1 and s16(inputWrites[1].payload, 2) == -1000,
+check("All of them inverts the steering's axis throw",
+  #inputWrites == 1 and inputWrites[1].payload[1] == 3 and s16(inputWrites[1].payload, 2) == -1000,
   inputWrites[1] and bytes(inputWrites[1].payload))
-check("and checks roll again, saying so", shows("dir_check_roll") and shows("dir_status_inverted"))
+check("and checks the steering again, saying so", shows("dir_check_yaw") and shows("dir_status_inverted"))
 check("Save is offered once something changed", headers[#headers].saveEnabled == true)
 
--- Roll again: only one aileron wrong
+-- Again: only the rear servo wrong
 press(T("dir_unlike"))
 press(T("dir_some"))
-check("Only some wiggles the first aileron and asks", shows("dir_identify_fmt"))
+check("Only some wiggles the front servo and asks", shows("dir_identify_fmt"))
 check("focus starts on No", button(T("dir_no")).focused == true)
 before = #sent
 for _ = 1, 3 do tick(0.35) end
@@ -422,33 +440,24 @@ check("servo 1 wiggles +-300, timed", #wiggles >= 2 and wiggles[1] ~= wiggles[2]
   and math.abs(wiggles[1]) == 300 and #writesOf(193, before + 1)[1].payload == 5, table.concat(wiggles, ","))
 check("the axes are let go while a servo wiggles", lastMixer(1, 1).value == 2501)
 before = #sent
-press(T("dir_yes"))
+press(T("dir_no"))
 local released = false
 for _, m in ipairs(writesOf(193, before + 1)) do
   if m.payload[1] == 0 and s16(m.payload, 2) == 2001 then released = true end
 end
 check("the next servo's turn releases servo 1", released)
 before = #sent
-press(T("dir_no"))
+press(T("dir_yes"))
 local cfg = writesOf(212, before + 1)
-check("the aileron picked is reversed: servo 1, reverse flag set",
-  #cfg == 1 and cfg[1].payload[1] == 0 and #cfg[1].payload == 15 and u16(cfg[1].payload, 14) == 1,
+check("the rear servo picked is reversed: servo 2, reverse flag set",
+  #cfg == 1 and cfg[1].payload[1] == 1 and #cfg[1].payload == 15 and u16(cfg[1].payload, 14) == 1,
   cfg[1] and bytes(cfg[1].payload))
-check("and roll is checked again", shows("dir_check_roll") and shows("dir_status_reversed_fmt"))
-
--- Yaw: a single rudder the wrong way is reversed straight away
-press(T("dir_like"))
-check("roll done, on to yaw", shows("dir_check_yaw"))
-before = #sent
-press(T("dir_unlike"))
-cfg = writesOf(212, before + 1)
-check("one surface wrong on its own axis: its servo is reversed",
-  #cfg == 1 and cfg[1].payload[1] == 3 and #cfg[1].payload == 15 and u16(cfg[1].payload, 14) == 1)
+check("and the steering is checked again", shows("dir_check_yaw") and shows("dir_status_reversed_fmt"))
 
 -- Arming lets go of everything
 before = #sent
 session({connected = true, isArmed = true, apiVersionMajor = 33, apiVersionMinor = 0})
-check("arming releases the held axes", lastMixer(before + 1, 2) and lastMixer(before + 1, 2).value == 2501)
+check("arming releases the held axes", lastMixer(before + 1, 3) and lastMixer(before + 1, 3).value == 2501)
 tick()
 check("arming says why", (function()
   for _, f in ipairs(fields) do if f.kind == "static" and f.text == T("armed") then return true end end
@@ -468,7 +477,7 @@ local summary = paint()
 check("the summary lists what changed",
   summary:find(T("dir_done_changes"), 1, true) and summary:find(T("dir_change_servo_fmt"), 1, true)
   and summary:find(T("dir_change_axis_fmt"), 1, true), summary)
-check("and moves nothing", lastMixer(1, 1).value == 2501 and lastMixer(1, 2).value == 2501)
+check("and moves nothing", lastMixer(1, 1).value == 2501 and lastMixer(1, 3).value == 2501)
 before = #sent
 press(T("dir_save_next"))
 check("Save and continue writes EEPROM", #writesOf(250, before + 1) == 1)
@@ -492,7 +501,6 @@ check("nothing is held after leaving", not requireModule("lib/override_keepalive
 
 openPage(CURRENT)
 press(T("dir_start"))
-press(T("dir_like"))
 press(T("dir_unlike"))
 press(T("dir_all"))
 headers[#headers].opts.onBack()
@@ -502,40 +510,30 @@ check("Back with unsaved changes asks", d and d.opts.title == T("leave_title") a
 before = #sent
 d.opts.buttons[2].action()
 local restored = writesOf(171, before + 1)
-check("Discard writes roll's axis throw back", #restored == 1 and s16(restored[1].payload, 2) == 1000)
+check("Discard writes the steering's axis throw back", #restored == 1 and restored[1].payload[1] == 3
+  and s16(restored[1].payload, 2) == 1000)
 check("and leaves", ctx.back == 1 and ctx.wakeup == nil)
 
--- A flying wing: a surface that also works another axis ---------------------
+-- A servo that also works another axis -------------------------------------
 
-do
-  local mixerRules = requireModule("lib/msp_mixer_rules.lua")
-  local pool = {}
-  local wing = {
-    {oper = 1, input = 2, output = 1, weight = 1000, weightNeg = 1000},
-    {oper = 2, input = 1, output = 1, weight = 1000, weightNeg = 1000},
-    {oper = 1, input = 2, output = 2, weight = 1000, weightNeg = 1000},
-    {oper = 2, input = 1, output = 2, weight = -1000, weightNeg = -1000},
-  }
-  for i = 1, mixerRules.RULE_COUNT do
-    local p = mixerRules.encodeRule(i - 1, wing[i])
-    for b = 2, #p do pool[#pool + 1] = p[b] end
-  end
-  replies[172] = pool
-end
+replies[172] = rulePool({
+  {oper = 1, input = 2, output = 1, weight = 1000, weightNeg = 1000},
+  {oper = 2, input = 3, output = 1, weight = 1000, weightNeg = 1000},
+  {oper = 1, input = 3, output = 2, weight = 1000, weightNeg = 1000},
+})
 openPage(CURRENT)
 press(T("dir_start"))
-check("a flying wing starts on pitch", shows("dir_check_pitch"))
-press(T("dir_like"))
+check("a steering check with a mixed servo", shows("dir_check_yaw"))
 press(T("dir_unlike"))
 press(T("dir_some"))
 press(T("dir_yes"))
 before = #sent
 press(T("dir_no"))
-check("an elevon wrong on roll alone is not reversed", #writesOf(212, before + 1) == 0)
+check("a servo wrong on steering but mixed with pitch is not reversed", #writesOf(212, before + 1) == 0)
 check("the wizard says why", shows("dir_cant_fix_fmt"))
 press(T("btn_next"))
-check("then checks roll again", shows("dir_check_roll") and shows("dir_status_none"))
-replies[172] = nil
+check("then checks the steering again", shows("dir_check_yaw") and shows("dir_status_none"))
+replies[172] = CAR_POOL
 headers[#headers].opts.onBack()
 
 -- The other steps -------------------------------------------------------------
@@ -683,56 +681,78 @@ do
   replies[114] = nil
 end
 
--- Airframe: a flying wing replaces the mix.
+-- Model: Car with rear steering and a second ESC replaces the mix.
 openPage(CURRENT, "airframe")
 settle()
-press(T("air_change"))
-do
-  -- The choice grid sits on the button row whatever the text above it, so a
-  -- status line that comes or goes never moves it.
-  local rowY, gridBottom = 0, 0
-  for _, f in ipairs(fields) do
-    if f.kind == "button" and f.rect and f.rect.y > rowY then rowY = f.rect.y end
-  end
-  for _, f in ipairs(fields) do
-    if f.kind == "button" and f.rect and f.rect.y < rowY then
-      gridBottom = math.max(gridBottom, f.rect.y + f.rect.h)
-    end
-  end
-  check("airframe: the type grid sits on the button row", rowY - gridBottom == 8, rowY .. " " .. gridBottom)
-  check("airframe: the encoder goes through the grid, then Back", inScreenOrder())
-end
-press(T("air_type_flying_wing"))
-check("airframe: asks about a rudder", shows("air_q_wing_yaw"))
-press(T("air_none"))
-check("airframe: then flaps", shows("air_q_flaps"))
-press(T("air_none"))
-press("1")
-check("airframe: reviews before applying", shows("air_review_fmt"))
+check("model: shows what the car has and offers Change options and Custom",
+  shows("air_intro") and button(T("air_options")) ~= nil and button(T("air_type_custom")) ~= nil)
+check("model: the car preset as read is not flagged as edited", not shows("air_edited"))
+press(T("air_options"))
+check("model: asks about rear steering, the current answer lit",
+  shows("air_q_rear") and button(T("air_rear_opposite")) ~= nil and button(T("air_rear_none")) ~= nil)
+check("model: the encoder goes through the answers, then Back", inScreenOrder())
+press(T("air_rear_same"))
+check("model: then the rear amount", shows("air_q_amount_fmt"))
+press("+")
+press(T("btn_next"))
+check("model: then a second ESC", shows("air_q_second_esc"))
+press(T("btn_yes"))
+check("model: reviews before applying", shows("air_review_fmt"))
 before = #sent
 press(T("air_apply"))
 local ruleWrites = writesOf(173, before + 1)
 local cfgWrites = writesOf(43, before + 1)
-check("airframe: every rule slot is written", #ruleWrites == 32
-  and bytes({table.unpack(ruleWrites[1].payload, 1, 4)}) == "0,1,2,1", ruleWrites[1] and bytes(ruleWrites[1].payload))
--- The two-byte short form: the bus channel counts and the PWM rate are left alone.
-check("airframe: the model type is flying wing, and nothing else is written with it",
-  #cfgWrites == 1 and bytes(cfgWrites[1].payload) == "1,0", cfgWrites[1] and bytes(cfgWrites[1].payload))
-check("airframe: the surfaces are elevons now", shows("surface_elevon"))
--- Servo names (lib/servo_names.lua): the codec's simulator reply names
--- servos 1-4 L AIL, R AIL, ELEV, RUDDER. The wing names its elevons and
--- clears the names it no longer drives.
-do
-  local nameWrites = {}
-  for _, m in ipairs(writesOf(0x5F3B, before + 1)) do
-    local text = {}
-    for i = 2, #m.payload do text[#text + 1] = string.char(m.payload[i]) end
-    nameWrites[#nameWrites + 1] = m.payload[1] .. "=" .. table.concat(text)
-  end
-  local got = table.concat(nameWrites, ";")
-  check("airframe: names the elevons and clears the old surface names",
-    got == "0=L ELEVON;1=R ELEVON;2=;3=", got)
+local function ruleBrief(m)
+  return bytes({m.payload[1], m.payload[2], m.payload[3], m.payload[4], s16(m.payload, 7)})
 end
+check("model: every rule slot is written, the car preset first", #ruleWrites == 32
+  and ruleBrief(ruleWrites[1]) == "0,1,3,1,1000" and ruleBrief(ruleWrites[2]) == "1,1,4,27,1000"
+  and ruleBrief(ruleWrites[3]) == "2,1,3,2,550" and ruleBrief(ruleWrites[4]) == "3,1,4,28,1000"
+  and ruleWrites[5].payload[2] == 0, ruleWrites[3] and ruleBrief(ruleWrites[3]))
+-- The two-byte short form: the bus channel counts and the PWM rate are left alone.
+check("model: the model type is car, and nothing else is written with it",
+  #cfgWrites == 1 and bytes(cfgWrites[1].payload) == "0,0", cfgWrites[1] and bytes(cfgWrites[1].payload))
+check("model: the throttle input already keeps its reverse half, so it is not written",
+  #writesOf(174, before + 1) == 0)
+check("model: the outputs are listed", shows("air_applied") and shows("surface_rudder") and shows("air_esc_fmt"))
+-- Servo names (lib/servo_names.lua): the codec's simulator reply names S1
+-- STEER. The car with rear steering names its two steering servos F STEER
+-- and R STEER and writes nothing for the unnamed servos it does not drive.
+do
+  local named = {}
+  for _, m in ipairs(writesOf(0x5F3B, before + 1)) do named[m.payload[1]] = #m.payload end
+  check("model: names the front and rear steering servos",
+    (named[0] or 0) > 1 and (named[1] or 0) > 1 and named[2] == nil and named[3] == nil)
+end
+-- Custom keeps the rules and only sets the type.
+openPage(CURRENT, "airframe")
+settle()
+before = #sent
+press(T("air_type_custom"))
+cfgWrites = writesOf(43, before + 1)
+check("model: Custom writes the model type alone and keeps the rules",
+  #cfgWrites == 1 and bytes(cfgWrites[1].payload) == "1,0" and #writesOf(173, before + 1) == 0,
+  cfgWrites[1] and bytes(cfgWrites[1].payload))
+check("model: and says the car now uses a custom mix", shows("air_custom"))
+-- A clamped throttle input gets its reverse half back when Car is applied.
+replies[174] = function(m)
+  if m.payload and m.payload[1] == 4 then return {232, 3, 0, 0, 232, 3} end
+end
+openPage(CURRENT, "airframe")
+settle()
+press(T("air_options"))
+press(T("air_rear_none"))
+press(T("btn_no"))
+before = #sent
+press(T("air_apply"))
+local throttle = {}
+for _, m in ipairs(writesOf(171, before + 1)) do
+  if m.payload[1] == 4 then throttle[#throttle + 1] = m end
+end
+check("model: a throttle clamped at 0 is put back to -1000",
+  #throttle == 1 and s16(throttle[1].payload, 4) == -1000, throttle[1] and bytes(throttle[1].payload))
+replies[174] = nil
+discardAll()
 
 -- Servo type: digital sets the one PWM rate, then save and restart.
 openPage(CURRENT, "servotype")
@@ -743,9 +763,10 @@ before = #sent
 press(T("st_digital"))
 local st = writesOf(43, before + 1)
 -- MSP_SET_MIXER_CONFIG, long form, with what the page read when it opened:
--- model type 0, reserved 0, SBUS 16, F.Bus 24, then rate 333 = 77 + 1 * 256.
+-- model type 0, reserved 0, SBUS 16, F.Bus 24, then rate 333 = 77 + 1 * 256,
+-- then yaw_gyro_reverse as read.
 check("servo type: digital writes the PWM rate, 333 Hz, with the bus channel counts as read",
-  #st == 1 and bytes(st[1].payload) == "0,0,16,24,77,1", st[1] and bytes(st[1].payload))
+  #st == 1 and bytes(st[1].payload) == "0,0,16,24,77,1,0", st[1] and bytes(st[1].payload))
 check("servo type: no servo's centre, limits or scale is written", #writesOf(212, before + 1) == 0)
 before = #sent
 press(T("btn_save_restart"))
@@ -1174,7 +1195,7 @@ do
   replies[4], replies[54] = nil, nil
 end
 
--- Motor: the protocol, and a timed spin.
+-- ESC: the protocol, then the ESC check.
 openPage(CURRENT, "motor")
 settle()
 local function protocolY() local b = button(T("mot_pwm")); return b and b.rect.y end
@@ -1285,9 +1306,9 @@ check("motor: with DShot150 set, the step says RPM needs DShot300 or telemetry",
   shows("mot_dshot150_rpm") and not shows("mot_changed"))
 replies[131] = nil
 
--- Check motor: propeller off, calibrate a PWM ESC, spin one motor at a time.
+-- Check ESC: how it reverses, wheels off, neutral, then one motor at a time
+-- forward and reverse.
 do
-  local CANCEL = "@i18n(app.btn_cancel)@"
   local function motors(count)
     replies[101] = function(m)
       local out = {}
@@ -1312,7 +1333,9 @@ do
     return true
   end
   local function last(values) return values and values[#values] end
-  local function toProp()
+  local rcValues = {1500, 1500, 1500, 1500, 1000, 1000, 1000, 1000}
+  replies[105] = function() return u16list(rcValues) end
+  local function toEscMode()
     openPage(CURRENT, "motor")
     settle()
     press(T("mot_test"))
@@ -1320,210 +1343,156 @@ do
 
   -- A twin on the PWM protocol (the simulator's motor config).
   motors(2)
-  toProp()
-  check("motor: Check motor asks about the propeller first",
-    shows("mot_prop_title") and button(T("mot_prop_off")) ~= nil
+  toEscMode()
+  check("motor: Check ESC asks how the ESC reverses first",
+    shows("mot_esc_mode_title") and button(T("mot_esc_mode_auto")) ~= nil
       and headers[#headers].title == T("name") .. " / 6. " .. T("step_motor"), headers[#headers].title)
-  press(T("mot_prop_off"))
-  check("motor: on PWM the calibration comes before the spin, and asks about the battery",
-    shows("mot_cal_title") and shows("mot_cal_text") and button(T("mot_cal_unplugged")) ~= nil
-      and button(T("mot_cal_full")) == nil)
-  check("motor: the calibration can be skipped", button(T("btn_next")) ~= nil)
-  press(T("mot_cal_unplugged"))
-  check("motor: then Start full throttle, with no other way forward",
-    shows("mot_cal_full_text") and button(T("mot_cal_full")) ~= nil and button(T("btn_next")) == nil)
-  check("motor: nothing reaches the motors before that", #writesOf(195) == 0)
-
+  check("motor: Automatic is lit, and says what it picks on PWM",
+    shows("mot_esc_mode_now_fmt") and shows("mot_esc_mode_auto_help"))
+  check("motor: nothing reaches the motors yet", #writesOf(195) == 0)
   before = #sent
-  button(T("mot_cal_full")).press()
-  local w = overrides(before + 1)
-  check("motor: Start full throttle writes full throttle on every motor",
-    all(w[0], 1000) and all(w[1], 1000) and #w[0] == 1 and #w[1] == 1 and w[2] == nil)
-  tick()
-  check("motor: Low throttle waits for the ramp, Cancel has the focus",
-    shows("mot_cal_hold_text") and shows("mot_cal_ramping_fmt") and not button(T("mot_cal_low")).enabled
-      and button(CANCEL).focused)
-  button(T("mot_cal_low")).press()
-  tick()
-  check("motor: pressing Low throttle early does nothing",
-    shows("mot_cal_ramping_fmt") and not shows("mot_cal_done") and last(overrides(before + 1)[0]) == 1000)
-  for _ = 1, 13 do tick(0.3) end   -- 4.5 s in all
-  check("motor: still waiting at 4.5 s", not button(T("mot_cal_low")).enabled)
-  w = overrides(before + 1)
-  -- Re-sent at least every 0.3 s here, against the firmware's one-second deadline.
-  check("motor: full throttle is re-sent on every motor while it is held",
-    all(w[0], 1000) and all(w[1], 1000) and #w[0] >= 14 and #w[1] >= 14, #w[0])
-  tick(0.3)
-  tick(0.3)
-  tick()
-  check("motor: after 5 s it says to plug the battery in, and Low throttle is on",
-    shows("mot_cal_plug_in") and button(T("mot_cal_low")).enabled and button(T("mot_cal_low")).focused)
-  before = #sent
-  press(T("mot_cal_low"))
-  w = overrides(before + 1)
-  check("motor: Low throttle writes zero on every motor", all(w[0], 0) and all(w[1], 0))
-  check("motor: and says it is done, back on the battery question",
-    shows("mot_cal_done") and button(T("mot_cal_unplugged")) ~= nil)
-  before = #sent
-  tick(1)
-  check("motor: nothing is sent to the motors afterwards", #writesOf(195, before + 1) == 0)
-
-  -- Cancel, Back, the step list, Save, arming, a lost link and leaving all drop the output to zero.
-  local function startFull()
-    press(T("mot_cal_unplugged"))
-    press(T("mot_cal_full"))
-    before = #sent
-  end
-  local function droppedToZero()
-    local z = overrides(before + 1)
-    return last(z[0]) == 0 and last(z[1]) == 0
-  end
-  startFull()
-  press(CANCEL)
-  check("motor: Cancel writes zero and says the calibration stopped",
-    droppedToZero() and shows("mot_cal_stopped") and button(T("mot_cal_unplugged")) ~= nil)
-  startFull()
-  press(T("btn_back"))
-  check("motor: Back writes zero", droppedToZero() and shows("mot_cal_stopped"))
-  startFull()
-  headers[#headers].opts.onTool()
-  tick()
-  check("motor: the step list writes zero", droppedToZero())
-  headers[#headers].opts.onBack()
-  tick()
-  startFull()
-  headers[#headers].opts.onSave()
-  tick()
-  tick()
-  check("motor: Save in the header writes zero", droppedToZero() and shows("mot_cal_stopped"))
-  startFull()
-  session({connected = true, isArmed = true, apiVersionMajor = 33, apiVersionMinor = 0})
-  check("motor: arming writes zero", droppedToZero())
-  tick()
-  before = #sent
-  tick(1)
-  check("motor: and nothing is sent while armed", #writesOf(195, before + 1) == 0 and shows("mot_cal_stopped"))
-  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
-  tick()
-  startFull()
-  session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
-  check("motor: a lost link writes zero", droppedToZero())
-  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
-  tick()
-  startFull()
-  headers[#headers].opts.onBack()
-  tick()
-  check("motor: leaving the wizard writes zero", droppedToZero() and ctx.back == 1)
-
-  -- Spin: one motor at a time.
-  toProp()
-  press(T("mot_prop_off"))
+  press(T("mot_esc_mode_fwd_brk_rev"))
+  local drive = writesOf(0x5F3D, before + 1)
+  check("motor: choosing Brake, then reverse writes the drive config, the rest as read",
+    #drive == 1 and bytes(drive[1].payload) == "1,100,0,20,0,60,0,1,50", drive[1] and bytes(drive[1].payload))
+  check("motor: and needs no restart", button(T("btn_next")) ~= nil and button(T("btn_save_restart")) == nil)
   press(T("btn_next"))
-  check("motor: Next skips the calibration, on to the spin",
-    shows("mot_spin_title") and shows("mot_spin_twin") and button(T("mot_motor_fmt")) ~= nil
-      and button("10%") ~= nil and button(T("mot_spin_fmt")) ~= nil)
-  check("motor: the encoder goes Back, the motor, the throttle, Spin, Next", inScreenOrder())
-  before = #sent
-  press(T("mot_spin_fmt"))
+  check("motor: then asks for the wheels off the ground", shows("mot_wheels_title") and button(T("mot_wheels_off")) ~= nil)
+  press(T("mot_wheels_off"))
   tick(0.3)
-  w = overrides(before + 1)
-  check("motor: Spin starts on the first motor only", w[1] == nil and all(w[0], 100) and #w[0] >= 2)
+  tick(0.3)
+  -- The reading's colour: the accent colour (255 here) while off centre.
+  local function readingColor()
+    paint()
+    for _, t in ipairs(drawn) do
+      -- The value may be cut short with "..." on this narrow harness screen.
+      if t:find("mot_neutral_rea", 1, true) then return drawnColor[t] end
+    end
+  end
+  check("motor: then neutral, with the throttle stick at centre",
+    shows("mot_neutral_title") and shows("mot_neutral_intro_fmt") and readingColor() ~= nil
+      and readingColor() ~= 255, tostring(readingColor()))
+  rcValues[4] = 1700
+  tick(0.3)
+  tick(0.3)
+  check("motor: a throttle off centre stands out", readingColor() == 255, tostring(readingColor()))
+  rcValues[4] = 1500
+  tick(0.3)
+  tick(0.3)
+  press(T("btn_next"))
+  check("motor: then the direction check, forward and reverse",
+    shows("mot_spin_title") and shows("mot_spin_twin") and button(T("mot_motor_fmt")) ~= nil
+      and button("10%") ~= nil and button(T("mot_forward")) ~= nil and button(T("mot_reverse")) ~= nil)
+  check("motor: the encoder goes Back, the motor, the throttle, Forward, Reverse, Save and continue", inScreenOrder())
+  before = #sent
+  press(T("mot_forward"))
+  tick(0.3)
+  local w = overrides(before + 1)
+  check("motor: Forward runs the first motor only, forward", w[1] == nil and all(w[0], 100) and #w[0] >= 2)
   press(T("mot_stop"))
   press(T("mot_motor_fmt"))   -- motor 2
   press("10%")                -- 20 %
   before = #sent
-  press(T("mot_spin_fmt"))
+  press(T("mot_reverse"))
   tick(0.3)
   w = overrides(before + 1)
-  check("motor: Spin writes only the motor chosen, at the throttle chosen",
-    w[0] == nil and all(w[1], 200) and #w[1] >= 2 and shows("mot_spinning"), w[1] and table.concat(w[1], ","))
-  check("motor: Next waits for the spin to end, and Stop is offered",
-    button(T("mot_stop")) ~= nil and not button(T("btn_next")).enabled)
+  check("motor: Reverse writes only the motor chosen, below neutral at the throttle chosen",
+    w[0] == nil and all(w[1], -200) and #w[1] >= 2 and shows("mot_spinning"), w[1] and table.concat(w[1], ","))
+  check("motor: Next waits for the run to end, and Stop is offered",
+    button(T("mot_stop")) ~= nil and button(T("dir_save_next")) ~= nil and not button(T("dir_save_next")).enabled)
   tick(4)
   tick()
   w = overrides(before + 1)
   check("motor: it stops by itself after 3 s, with zero on every motor",
-    last(w[1]) == 0 and all(w[0], 0) and button(T("mot_spin_fmt")) ~= nil)
+    last(w[1]) == 0 and all(w[0], 0) and button(T("mot_forward")) ~= nil)
   before = #sent
   tick(1)
   check("motor: and sends nothing more", #writesOf(195, before + 1) == 0)
-  press(T("mot_spin_fmt"))
+  press(T("mot_forward"))
   before = #sent
   press(T("mot_stop"))
   w = overrides(before + 1)
-  check("motor: Stop ends it early", last(w[1]) == 0 and all(w[0], 0) and button(T("mot_spin_fmt")) ~= nil)
-  press(T("mot_spin_fmt"))
+  check("motor: Stop ends it early", last(w[1]) == 0 and all(w[0], 0) and button(T("mot_forward")) ~= nil)
+  press(T("mot_forward"))
   before = #sent
   session({connected = true, isArmed = true, apiVersionMajor = 33, apiVersionMinor = 0})
   w = overrides(before + 1)
-  check("motor: arming stops a spin, with zero on every motor", last(w[1]) == 0 and last(w[0]) == 0)
+  check("motor: arming stops a run, with zero on every motor", last(w[1]) == 0 and last(w[0]) == 0)
+  session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
+  tick()
+  press(T("mot_forward"))
+  before = #sent
+  headers[#headers].opts.onTool()
+  tick()
+  w = overrides(before + 1)
+  check("motor: the step list stops a run", last(w[1]) == 0)
+  headers[#headers].opts.onBack()
+  tick()
+  press(T("mot_forward"))
+  before = #sent
+  session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
+  w = overrides(before + 1)
+  check("motor: a lost link stops a run", last(w[1]) == 0)
   session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
   tick()
   press(T("btn_back"))
-  check("motor: Back from the spin on PWM is the calibration", shows("mot_cal_title"))
+  check("motor: Back from the direction check is neutral", shows("mot_neutral_title"))
   press(T("btn_next"))
   before = #sent
-  press(T("btn_next"))
+  press(T("dir_save_next"))
   tick()
-  check("motor: Next from the spin opens the next step, with no restart",
-    headers[#headers].title == T("name") .. " / 7. " .. T("step_esctelemetry") and #writesOf(68, before + 1) == 0,
-    headers[#headers].title)
+  tick()
+  check("motor: Save and continue from the direction check opens the next step, with no restart",
+    headers[#headers].title == T("name") .. " / 7. " .. T("step_esctelemetry") and #writesOf(68, before + 1) == 0
+      and #writesOf(250, before + 1) == 1, headers[#headers].title)
 
   -- One motor: no motor button.
   motors(1)
-  toProp()
-  press(T("mot_prop_off"))
+  toEscMode()
+  press(T("btn_next"))
+  press(T("mot_wheels_off"))
   press(T("btn_next"))
   check("motor: with one motor there is no motor button",
     shows("mot_spin_title") and button(T("mot_motor_fmt")) == nil and not shows("mot_spin_twin"))
   before = #sent
-  press(T("mot_spin_fmt"))
+  press(T("mot_forward"))
   tick(0.3)
   w = overrides(before + 1)
-  check("motor: spins at 10%", all(w[0], 100) and w[1] == nil, w[0] and table.concat(w[0], ","))
+  check("motor: runs at 10%", all(w[0], 100) and w[1] == nil, w[0] and table.concat(w[0], ","))
   before = #sent
   tick(4)
   w = overrides(before + 1)
   check("motor: and stops by itself", last(w[0]) == 0)
 
-  -- DShot has no range to learn.
-  motorReply(0, 6)
-  toProp()
-  press(T("mot_prop_off"))
-  check("motor: DShot has no calibration, so the spin comes straight away",
-    shows("mot_spin_title") and not shows("mot_cal_title"))
-  press(T("btn_back"))
-  check("motor: Back from the spin on DShot is the propeller question", shows("mot_prop_title"))
-  replies[131] = nil
+  -- What Automatic picks: DShot reverses directly, PWM brakes first.
+  do
+    local driveConfig = requireModule("lib/msp_drive_config.lua")
+    check("motor: Automatic is Reverse directly on DShot and Brake, then reverse otherwise",
+      driveConfig.resolveEscMode(0, true) == 2 and driveConfig.resolveEscMode(0, false) == 1
+        and driveConfig.resolveEscMode(3, true) == 3)
+  end
 
-  -- A stall: the flight controller drops an override that is not re-sent
-  -- within a second, and the next write starts a new ramp.
-  toProp()
-  press(T("mot_prop_off"))
-  press(T("mot_cal_unplugged"))
-  press(T("mot_cal_full"))
-  for _ = 1, 10 do tick(0.3) end   -- 3.3 s of ramp
-  tick(1.5)                        -- no write for 1.5 s
-  for _ = 1, 10 do tick(0.3) end   -- 7.8 s since the start, 3 s since the stall
-  check("motor: after a stall the wait for full throttle starts again",
-    not button(T("mot_cal_low")).enabled and shows("mot_cal_ramping_fmt") and not shows("mot_cal_plug_in"))
-  for _ = 1, 8 do tick(0.3) end    -- 5.4 s since the stall
-  check("motor: and Low throttle comes on 5 s after it",
-    button(T("mot_cal_low")).enabled and shows("mot_cal_plug_in"))
-  before = #sent
-  tick(1.5)
-  tick()
-  w = overrides(before + 1)
-  check("motor: a stall once the battery may be in stops the calibration, without full throttle again",
-    all(w[0], 0) and shows("mot_cal_stopped") and button(T("mot_cal_unplugged")) ~= nil,
-    w[0] and table.concat(w[0], ","))
+  -- Firmware without drive state: no ESC behaviour screen.
+  replies[0x5F3C] = {}
+  toEscMode()
+  check("motor: without drive state, Check ESC goes straight to the wheels", shows("mot_wheels_title"))
+  replies[0x5F3C] = nil
+
+  -- No motor RPM: the ESC behaviour screen says what that means.
+  replies[0x5F3E] = {1, 0, 1, 0, 0, 0, 100}
+  toEscMode()
+  check("motor: without motor RPM, the no-RPM note", shows("mot_no_rpm_note"))
+  replies[0x5F3E] = {1, 0, 1, 1, 0, 0, 100}
+  toEscMode()
+  check("motor: with motor RPM, the how-to-tell note", shows("mot_esc_mode_tell") and not shows("mot_no_rpm_note"))
+  replies[0x5F3E] = nil
 
   -- A new protocol is not checked before the restart, also after the step
   -- is closed and opened again.
   openPage(CURRENT, "motor")
   settle()
   press(T("mot_dshot300"))
-  check("motor: a new protocol asks for Save and restart, with no Check motor",
+  check("motor: a new protocol asks for Save and restart, with no Check ESC",
     button(T("btn_save_restart")) ~= nil and button(T("mot_test")) == nil)
   reopenStep(6, "motor")
   check("motor: closed and opened again, the step still asks for Save and restart",
@@ -1536,10 +1505,10 @@ do
   tick()
   session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0, handshake = {apiVersion = true}})
   settle(6)
-  check("motor: after the restart Check motor is back",
+  check("motor: after the restart Check ESC is back",
     #writesOf(68, before + 1) == 1 and button(T("mot_test")) ~= nil and button(T("btn_save_restart")) == nil
       and not shows("mot_changed"))
-  replies[101] = nil
+  replies[101], replies[105] = nil, nil
 end
 
 -- ESC telemetry: a protocol, then a free port, then save and restart; back on
@@ -1893,7 +1862,7 @@ do
   replies[101] = nil
 end
 
--- Centre: every surface held at its centre; nudging writes the Mid.
+-- Centre: both steering servos held at their centre; nudging writes the Mid.
 openPage(CURRENT, "centre")
 settle()
 check("center: the encoder goes Back, the nudges and Identify, then Next", inScreenOrder())
@@ -1901,10 +1870,10 @@ local held = {}
 for _, m in ipairs(writesOf(193)) do
   if s16(m.payload, 2) == 0 and #m.payload == 5 then held[m.payload[1]] = true end
 end
-check("centre: holds all four servos at centre", held[0] and held[1] and held[2] and held[3])
+check("centre: holds both steering servos at centre", held[0] and held[1] and not held[2])
 do
   -- The servo being set stands out: the accent colour (lcd.RGB(255, ...) here),
-  -- the "1 of 4" after it muted, the instructions in the text colour.
+  -- the "1 of 2" after it muted, the instructions in the text colour.
   paint()
   local name, progress
   for _, t in ipairs(drawn) do
@@ -2078,46 +2047,45 @@ for _ = 1, 20 do
 end
 check("limits: after the last side, the step is done", shows("lim_done"))
 
--- Throws: PASSTHROUGH forced, Throw stepped.
-openPage(CURRENT, "throws")
-settle()
-before = #sent
-press(T("btn_start"))
-local forced = writesOf(0x5F1B, before + 1)
-check("throws: forces PASSTHROUGH", #forced >= 1 and bytes(forced[#forced].payload) == "16,39,1,12")
-before = #sent
-press("+5%")
-local throw = writesOf(171, before + 1)
-check("throws: +5% raises roll's throw to 105%", #throw == 1 and throw[1].payload[1] == 1 and s16(throw[1].payload, 2) == 1050)
-
--- Travel and Gyro.
-openPage(CURRENT, "travel")
-settle()
-check("travel: every surface inside its limits", shows("trv_ok"))
-before = #sent
-tick(1)
-check("travel: polls the live servo outputs for the gauges", #writesOf(103, before + 1) >= 1)
-check("the saved servo trims were read with the servo configs", #writesOf(233) >= 1)
-forced = writesOf(0x5F1B)
-check("travel: forces PASSTHROUGH", #forced >= 1 and bytes(forced[#forced].payload) == "16,39,1,12")
-session({connected = false, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
-settle()
-check("travel: without the link, says PASSTHROUGH is off", shows("thr_no_passthrough"))
-session({connected = true, isArmed = false, apiVersionMajor = 33, apiVersionMinor = 0})
-settle()
-check("travel: back on the link, PASSTHROUGH again", shows("trv_ok") and not shows("thr_no_passthrough"))
+-- Gyro: no mode forced; a wrong answer reverses the gyro (yaw_gyro_reverse).
 openPage(CURRENT, "gyro")
 settle()
+check("gyro: the drive state note: reverse needs no setup", shows("gyr_intro") and shows("gyr_reverse_auto"))
+check("the saved servo trims were read with the servo configs", #writesOf(233) >= 1)
 before = #sent
 press(T("btn_start"))
-forced = writesOf(0x5F1B, before + 1)
-check("gyro: forces ANGLE", #forced >= 1 and bytes(forced[#forced].payload) == "16,39,1,1")
-press(T("dir_like"))
-press(T("dir_like"))
+check("gyro: one check, for the steering", shows("gyr_yaw") and shows("dir_q_match"))
+check("gyro: forces no mode, only the setup state", #writesOf(0x5F1B, before + 1) == 0)
+press(T("dir_unlike"))
+check("gyro: the wrong way offers to reverse the gyro", shows("gyr_wrong") and button(T("gyr_reverse_on")) ~= nil)
 before = #sent
+press(T("gyr_reverse_on"))
+local mixCfg = writesOf(43, before + 1)
+check("gyro: Reverse writes yaw_gyro_reverse after the rate, the rest as read",
+  #mixCfg == 1 and bytes(mixCfg[1].payload) == "0,0,16,24,50,0,1", mixCfg[1] and bytes(mixCfg[1].payload))
+check("gyro: and asks for the check again", shows("gyr_yaw") and shows("gyr_check_again"))
 press(T("dir_like"))
-forced = writesOf(0x5F1B, before + 1)
-check("gyro: done lets ANGLE go", shows("gyr_done") and #forced >= 1 and bytes(forced[#forced].payload) == "16,39,0")
+check("gyro: done says the gyro is reversed", shows("gyr_done") and shows("gyr_reversed_now"))
+before = #sent
+discardAll()
+mixCfg = writesOf(43, before + 1)
+check("gyro: Discard puts the gyro back to normal",
+  #mixCfg == 1 and bytes(mixCfg[1].payload) == "0,0,16,24,50,0,0", mixCfg[1] and bytes(mixCfg[1].payload))
+-- Firmware without yaw_gyro_reverse: say to update it.
+replies[42] = {0, 0, 16, 24, 0, 50, 0}
+openPage(CURRENT, "gyro")
+settle()
+press(T("btn_start"))
+press(T("dir_unlike"))
+check("gyro: without yaw_gyro_reverse, update the firmware", shows("gyr_wrong_old")
+  and button(T("gyr_reverse_on")) == nil)
+replies[42] = nil
+-- With motor RPM and the car standing still the gyro does not correct: say so.
+replies[0x5F3E] = {1, 0, 1, 1, 0, 0, 0}
+openPage(CURRENT, "gyro")
+settle()
+check("gyro: at a standstill with RPM, explains why the steering doesn't answer", shows("gyr_standstill_fmt"))
+replies[0x5F3E] = nil
 
 -- Trim and gain: one gain knob found by turning it.
 do
@@ -2130,6 +2098,8 @@ do
   settle()
   press(T("btn_start"))
   press(T("tg_trim_auto"))
+  check("trim and gain: one knob or none, no knob per axis", button(T("tg_gain_single")) ~= nil
+    and button(T("tg_gain_none")) ~= nil and button(T("tg_gain_separate")) == nil)
   press(T("tg_gain_single"))
   check("trim and gain: asks to turn the knob", shows("tg_turn_knob"))
   before = #sent
@@ -2139,7 +2109,7 @@ do
   local adj = writesOf(53, before + 1)
   local fns = {}
   for _, m in ipairs(adj) do fns[#fns + 1] = m.payload[2] .. "@" .. m.payload[6] end
-  check("trim and gain: gain on AUX2 for roll, pitch and yaw", table.concat(fns, ",") == "85@1,84@1,86@1",
+  check("trim and gain: gain on AUX2 for the steering only", table.concat(fns, ",") == "86@1",
     table.concat(fns, ","))
   replies[52], replies[105] = nil, nil
 end
@@ -2163,23 +2133,26 @@ do
   replies[105] = nil
 end
 
--- Flying style and Finish.
+-- Driving style and Finish.
 openPage(CURRENT, "style")
 settle()
 check("style: the encoder goes through the styles, then Back and Next", inScreenOrder())
 before = #sent
 press(T("sty_3d"))
 local rcw, pidw = writesOf(204, before + 1), writesOf(95, before + 1)
-check("style: 3D writes 500 deg/s roll and the PID profile", #rcw == 1 and rcw[1].payload[1] == 100 and #pidw == 1)
+check("style: Drift writes 300 deg/s steering, roll left as read, and the PID profile",
+  #rcw == 1 and rcw[1].payload[13] == 60 and rcw[1].payload[14] == 60 and rcw[1].payload[1] == 18 and #pidw == 1,
+  rcw[1] and bytes({table.unpack(rcw[1].payload, 1, 14)}))
 openPage(CURRENT, "finish")
 settle()
-check("finish: the summary", shows("fin_intro"))
+check("finish: the summary, with the model and ESC telemetry", shows("fin_intro") and shows("air_type_car")
+  and shows("fin_esc_telemetry"))
 press(T("btn_next"))
-check("finish: then the checks before the first flight", shows("fin_before"))
+check("finish: then the checks before the first run", shows("fin_before"))
 press(T("fin_button"))
 check("finish: Save and finish leaves", ctx.back == 1)
 
--- The step list, and a step that needs surfaces on a model without any.
+-- The step list, and a step that needs a steering servo on a car without any.
 openPage(CURRENT, "direction")
 settle()
 headers[#headers].opts.onTool()
@@ -2192,10 +2165,10 @@ do
   replies[172] = empty
   openPage(CURRENT, "centre")
   settle()
-  check("no surfaces: the step points to Airframe", button(T("go_airframe")) ~= nil)
+  check("no steering servo: the step points to the Model step", button(T("go_airframe")) ~= nil)
   press(T("go_airframe"))
   check("and that opens it", headers[#headers].title == T("name") .. " / 4. " .. T("step_airframe"))
-  replies[172] = nil
+  replies[172] = CAR_POOL
 end
 
 check("no form was built from a reply or a bus event", #forbidden == 0, table.concat(forbidden, ","))
@@ -2219,7 +2192,7 @@ local function footer()
 end
 
 local STEP_KEYS = {"sensors", "receiver", "busoutput", "airframe", "servotype", "motor", "esctelemetry", "centre",
-  "direction", "limits", "throws", "travel", "gyro", "trimgain", "modes", "style", "finish"}
+  "direction", "limits", "gyro", "trimgain", "modes", "style", "finish"}
 local FORWARD = {[T("btn_next")] = true, [T("dir_save_next")] = true, [T("fin_button")] = true,
   [T("btn_save_restart")] = true}
 local badFooter, skips = {}, {}

@@ -134,12 +134,11 @@ local function rightStackWakeup(box, telemetry)
     c.cellStr = formatCellVoltageAndCount(voltage)
     c.consumedStr = formatConsumedMah(consumed)
 
-    local govRaw = getSensor and getSensor("governor")
-    c.governorText = grsuite.utils.getGovernorState(govRaw)
-    if govRaw == nil and c.governorText == "UNKNOWN" then
-        c.governorText = utils.getPulsingDots(box, "_govDots")
+    c.armText = grsuite.utils.getArmStateText()
+    if c.armText == "UNKNOWN" then
+        c.armText = utils.getPulsingDots(box, "_govDots")
     end
-    c.governorColor = utils.resolveThresholdColor(c.governorText, box, "textcolor", "textcolor", box.rs_govthresholds)
+    c.armColor = utils.resolveThresholdColor(c.armText, box, "textcolor", "textcolor", box.rs_govthresholds)
 
     return c
 end
@@ -158,7 +157,7 @@ local function rightStackPaint(x, y, w, h, box, c)
     local rowH = h / 10
 
     utils.box(x, y + box.rs_flightoffsety, w, rowH * 2,
-        "FLIGHT TIME", "bottom", "center", box.rs_flighttitlefont, box.rs_flighttitlespacing, box.rs_titlecolor,
+        "RUN TIME", "bottom", "center", box.rs_flighttitlefont, box.rs_flighttitlespacing, box.rs_titlecolor,
         nil, nil, nil, nil, box.rs_flighttitlepaddingbottom,
         c.flightTime, nil, box.rs_flightfont, "center", box.rs_textcolor,
         nil, nil, nil, box.rs_flightvaluepaddingtop, box.rs_flightvaluepaddingbottom,
@@ -195,9 +194,9 @@ local function rightStackPaint(x, y, w, h, box, c)
     utils.drawBoxBackground(x, govBgY, w, govBgH, box.rs_govbgstyle)
 
     utils.box(x, govY + box.rs_govoffsety, w, govBgH,
-        "GOVERNOR", "bottom", "center", box.rs_govfont, box.rs_govtitlespacing, box.rs_titlecolor,
+        "@i18n(widgets.dashboard.info_arming):upper()@", "bottom", "center", box.rs_govfont, box.rs_govtitlespacing, box.rs_titlecolor,
         nil, nil, nil, nil, box.rs_govtitlepaddingbottom,
-        c.governorText, nil, box.rs_govfont, "center", c.governorColor,
+        c.armText, nil, box.rs_govfont, "center", c.armColor,
         nil, nil, nil, nil, box.rs_govvaluepaddingbottom,
         nil)
 end
@@ -299,10 +298,10 @@ local function buildBoxes(W)
     local opts = themeOptions[themeKey] or themeOptions.ls_full
     local stackOpts = rightStackOptions[themeKey] or rightStackOptions.ls_full
     local compactWindow = themeKey == nil or themeKey == "ls_std" or themeKey == "ms_std" or themeKey == "ss_std"
-    local governorFont = compactWindow and "FONT_S" or stackOpts.govfont
-    local governorTitleSpacing = compactWindow and 5 or stackOpts.tiletitlespacing
-    local governorTitlePaddingBottom = compactWindow and 0 or 10
-    local governorValuePaddingBottom = compactWindow and 0 or 6
+    local armFont = compactWindow and "FONT_S" or stackOpts.govfont
+    local armTitleSpacing = compactWindow and 5 or stackOpts.tiletitlespacing
+    local armTitlePaddingBottom = compactWindow and 0 or 10
+    local armValuePaddingBottom = compactWindow and 0 or 6
     local gaugeGrow = 10
     local gaugeShiftUp = 10
     local gaugeShrinkTop = 5
@@ -339,7 +338,7 @@ local function buildBoxes(W)
         contentpadding = 1
     }
 
-    local governorDisarmedTileBg = {
+    local armDisarmedTileBg = {
         backfillcolor = colorMode.tbbgcolor or colorMode.headerbgcolor or pageBgColor,
         fillcolor = colorMode.tbbgcolor or colorMode.headerbgcolor or pageBgColor, -- was a hardcoded black, which looked fine in dark themes but ignored the OS theme entirely (stood out as a jarring black box against a light theme); match the panel's own fill instead, same as every other tile
         bordercolor = colorMode.fillcritcolor,
@@ -377,7 +376,7 @@ local function buildBoxes(W)
             paint = rightStackPaint,
 
             rs_bgstyle = rightStackTileBg,
-            rs_govbgstyle = governorDisarmedTileBg,
+            rs_govbgstyle = armDisarmedTileBg,
             rs_titlecolor = colorMode.titlecolor,
             rs_textcolor = colorMode.textcolor,
             fillcolor = colorMode.fillcolor,
@@ -414,18 +413,13 @@ local function buildBoxes(W)
             rs_govbgoffsety = 0,
             rs_govoffsety = -3,
             rs_heightadjust = -7,
-            rs_govfont = governorFont,
-            rs_govtitlespacing = governorTitleSpacing,
-            rs_govtitlepaddingbottom = governorTitlePaddingBottom,
-            rs_govvaluepaddingbottom = governorValuePaddingBottom,
+            rs_govfont = armFont,
+            rs_govtitlespacing = armTitleSpacing,
+            rs_govtitlepaddingbottom = armTitlePaddingBottom,
+            rs_govvaluepaddingbottom = armValuePaddingBottom,
             rs_govthresholds = {
                 {value = "DISARMED", textcolor = colorMode.fillcritcolor},
-                {value = "OFF", textcolor = colorMode.fillcritcolor},
-                {value = "IDLE", textcolor = colorMode.accentcolor},
-                {value = "SPOOLUP", textcolor = colorMode.accentcolor},
-                {value = "RECOVERY", textcolor = colorMode.fillwarncolor},
-                {value = "ACTIVE", textcolor = colorMode.fillcolor},
-                {value = "@i18n(widgets.governor.THROFF)@", textcolor = colorMode.fillcritcolor}
+                {value = "ARMED", textcolor = colorMode.fillcolor}
             }
         },
         {
@@ -433,7 +427,7 @@ local function buildBoxes(W)
             offsetx = 60,
             type = "time",
             subtype = "total",
-            title = "Total Flight Time",
+            title = "Total Run Time",
             titlepos = "top",
             titlealign = "center",
             valuealign = "center",
@@ -452,7 +446,7 @@ local function buildBoxes(W)
             offsetx = 30,
             type = "time",
             subtype = "count",
-            title = "Flights",
+            title = "Runs",
             titlepos = "top",
             titlealign = "center",
             valuealign = "center",

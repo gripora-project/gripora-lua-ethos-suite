@@ -23,7 +23,7 @@ Requires a running background task and a flight controller connection.
 
 | Setting | What it does |
 | --- | --- |
-| Flight Time Alarm | TODO: explain behaviour, displayed units, range and conditions. |
+| Run Time Alarm | TODO: explain behaviour, displayed units, range and conditions. |
 | Alert Type | TODO: explain behaviour, displayed units, range and conditions. |
 | BEC Alert Value | TODO: explain behaviour, displayed units, range and conditions. |
 | RxBatt Alert Value | TODO: explain behaviour, displayed units, range and conditions. |

@@ -4,7 +4,7 @@
 
 ## Current Object Type/Subtype Map
 
-- `text`: apiversion, armflags, blackbox, clock, craftname, governor, pidrates, session, stats, telemetry, text, watts
+- `text`: apiversion, armflags, blackbox, clock, craftname, pidrates, session, stats, telemetry, text, watts (`governor` is kept as an alias of `armflags` for user themes; Gripora has no governor)
 - `gauge`: arc, bar, ring, step
 - `dial`: image, rainbow
 - `image`: image, model
@@ -430,7 +430,7 @@ dial image & needle styling
 ```
 ---
 
-### Flight Count Widget (type="time", subtype="count")
+### Run Count Widget (type="time", subtype="count")
 
 ```
     wakeupinterval      : number                    -- Optional wakeup interval in seconds (set in wrapper)
@@ -460,7 +460,7 @@ dial image & needle styling
 ```
 ---
 
-### Flight Time Widget (type="time", subtype="flight")
+### Run Time Widget (type="time", subtype="flight")
 
 ```
     wakeupinterval      : number                    -- Optional wakeup interval in seconds (set in wrapper)
@@ -485,43 +485,6 @@ dial image & needle styling
     valuepaddingtop     : number                    -- (Optional) Top padding for value
     valuepaddingbottom  : number                    -- (Optional) Bottom padding for value
     bgcolor             : color                     -- (Optional) Widget background color (theme fallback if nil)
-```
----
-
-### Governor State Widget (type="text", subtype="governor")
-
-```
-    wakeupinterval      : number                    -- Optional wakeup interval in seconds (set in wrapper)
-    title               : string                    -- (Optional) Title text
-    titlepos            : string                    -- (Optional) Title position ("top" or "bottom")
-    titlealign          : string                    -- (Optional) Title alignment ("center", "left", "right")
-    titlefont           : font                      -- (Optional) Title font (e.g., FONT_L, FONT_XL), dynamic by default
-    titlespacing        : number                    -- (Optional) Vertical gap between title and value text
-    titlecolor          : color                     -- (Optional) Title text color (theme/text fallback if nil)
-    titlepadding        : number                    -- (Optional) Padding for title (all sides unless overridden)
-    titlepaddingleft    : number                    -- (Optional) Left padding for title
-    titlepaddingright   : number                    -- (Optional) Right padding for title
-    titlepaddingtop     : number                    -- (Optional) Top padding for title
-    titlepaddingbottom  : number                    -- (Optional) Bottom padding for title
-    displayValue        : any                       -- (Optional) Value to display (processed governor state)
-    unit                : string                    -- (Not used)
-    font                : font                      -- (Optional) Value font (e.g., FONT_L, FONT_XL)
-    valuealign          : string                    -- (Optional) Value alignment ("center", "left", "right")
-    textcolor           : color                     -- (Optional) Value text color (theme/text fallback if nil)
-    valuepadding        : number                    -- (Optional) Padding for value (all sides unless overridden)
-    valuepaddingleft    : number                    -- (Optional) Left padding for value
-    valuepaddingright   : number                    -- (Optional) Right padding for value
-    valuepaddingtop     : number                    -- (Optional) Top padding for value
-    valuepaddingbottom  : number                    -- (Optional) Bottom padding for value
-    bgcolor             : color                     -- (Optional) Widget background color (theme fallback if nil)
-    thresholds          : table                     -- (Optional) List of threshold tables: {value=..., textcolor=...}
-    novalue             : string                    -- (Optional) Text shown if value is missing (default: "-")
-Example thresholds:
-thresholds = {
-    { value = "DISARMED", textcolor = "red" },
-    { value = "ACTIVE",   textcolor = "green" },
-    ...
-}
 ```
 ---
 
@@ -927,9 +890,9 @@ If you need dynamic stats or telemetry (min/max/live), use `stats.lua` or other 
 ```
 ---
 
-### Total Flight Time Widget (type="time", subtype="total")
+### Total Run Time Widget (type="time", subtype="total")
 
-Total Flight Time Widget
+Total Run Time Widget
 
 ```
     wakeupinterval      : number                    -- Optional wakeup interval in seconds (set in wrapper)

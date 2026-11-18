@@ -114,56 +114,18 @@ local MAIN_POWER_OK_SOUNDS = {
 }
 local SPEAK_NUM_SECONDS = 0.6
 
-local GOVERNOR_FILES = {
-  [0] = "off.wav",
-  [1] = "idle.wav",
-  [2] = "spoolup.wav",
-  [3] = "recovery.wav",
-  [4] = "active.wav",
-  [5] = "thr-off.wav",
-  [6] = "lost-hs.wav",
-  [7] = "autorot.wav",
-  [8] = "bailout.wav",
-  [100] = "disabled.wav",
-  [101] = "disarmed.wav",
-}
-
 -- Bit -> announcement file, checked top to bottom (first match wins) --
--- same decreasing-importance order gripora-firmware uses for its own
--- CRSF flight-mode text sensor, so the spoken callout always matches
--- whatever a glance at the radio's telemetry screen would say. Matches
--- this project's own last-known-good tasks/scheduler/events/tasks/
--- telemetry.lua FLIGHT_MODE_PRIORITY exactly.
+-- the same order gripora-firmware uses for its own CRSF flight-mode text
+-- sensor, so the callout matches the radio's telemetry screen. Gripora
+-- reports two modes: FAILSAFE and GYRO OFF (the PASSTHROUGH bit;
+-- passthrough.wav is the "Gyro off" callout). The aircraft modes (ANGLE,
+-- TRAINER, ATT HOLD, GPS RESCUE, MANUAL, AUTO TRIM, LOITER, RTH, TRADITIONAL)
+-- are removed from the firmware; their bits are reserved and never set.
+-- INFLIGHT (8) is the firmware's "the car is running" latch, not a mode, so it
+-- is not in the table and cannot change what is spoken.
 local FLIGHT_MODE_PRIORITY = {
   {bit = 0, file = "failsafe.wav"},     -- FAILSAFE_MODE_BIT
-  {bit = 6, file = "gpsrescue.wav"},    -- GPS_RESCUE_MODE_BIT
-  {bit = 13, file = "rth.wav"},         -- RTH_MODE_BIT
-  {bit = 12, file = "gpsloiter.wav"},   -- LOITER_MODE_BIT
-  {bit = 7, file = "passthrough.wav"},  -- PASSTHROUGH_MODE_BIT
-  {bit = 10, file = "manual.wav"},      -- MANUAL_MODE_BIT
-  {bit = 5, file = "atthold.wav"},      -- ATTHOLD_MODE_BIT
-  {bit = 11, file = "autotrim.wav"},    -- AUTOTRIM_MODE_BIT
-  {bit = 1, file = "angle.wav"},        -- ANGLE_MODE_BIT
-  {bit = 3, file = "trainer.wav"},      -- TRAINER_MODE_BIT
-}
-
--- Bits deliberately left out of FLIGHT_MODE_PRIORITY:
--- * INFLIGHT (8) is the firmware's "are we flying" latch, not a pilot mode;
---   it never appears in the table, so it can't change the spoken mode (it
---   used to re-trigger a callout of the unchanged mode at takeoff/landing).
--- * TRADITIONAL (14) layers on top of whatever mode is active, so under
---   first-match-wins it was masked by Angle/Trainer/etc. It gets its own
---   on/off edge callout in announceFlightMode() instead.
---
--- A LOITER/RTH switch that is on but can't fly (disarmed, no fix/home) never
--- sets its flight-mode bit. system_status reports it instead
--- (session.navBlocked, see lib/system_status.lua); effectiveFlightMode()
--- folds it back in as the requested mode's bit so the table still picks the
--- right name, and "unavailable" is appended.
-local TRADITIONAL_MODE_BIT = 14
-local NAV_BLOCKED_MODE_BIT = {
-  [1] = 12, -- NAV_BLOCKED.LOITER -> LOITER_MODE_BIT
-  [2] = 13, -- NAV_BLOCKED.RTH -> RTH_MODE_BIT
+  {bit = 7, file = "passthrough.wav"},  -- PASSTHROUGH_MODE_BIT (GYRO OFF)
 }
 
 -- Arithmetic bit test, not native bitwise operators -- same convention as
@@ -182,13 +144,6 @@ local function flightModeFile(value)
   return "normal.wav"
 end
 
-local function effectiveFlightMode(flags, navBlocked)
-  local value = math.floor(flags)
-  local bit = NAV_BLOCKED_MODE_BIT[navBlocked]
-  if bit and not flightModeHasBit(value, bit) then value = value + 2 ^ bit end
-  return value
-end
-
 local SMARTFUEL_THRESHOLDS = {
   [0] = {100, 10},
   [5] = {50, 5},
@@ -204,12 +159,8 @@ local AUDIO_SESSION_KEYS = {
   "isArmed",
   "pidProfile",
   "rateProfile",
-  "tvProfile",
   "batteryProfile",
-  "governorMode",
-  "governorState",
   "flightModeFlags",
-  "navBlocked",
   "gpsFixType",
   "systemStatus",
   "systemConfig",
@@ -266,10 +217,6 @@ end
 
 local function playStatus(file)
   playFile("status", "alerts/" .. file)
-end
-
-local function playGovernor(file)
-  playFile("events", "gov/" .. file)
 end
 
 local function playFlightMode(file)
@@ -564,26 +511,8 @@ local function announceBatteryProfile(now)
   end
 end
 
-local function announceGovernor(now)
-  if not events.governor then return end
-  if session.connected ~= true or session.isArmed ~= true then return end
-  local mode = tonumber(session.governorMode)
-  if mode == nil or mode == 0 then return end
-
-  local value = tonumber(session.governorState)
-  local last = tonumber(previous.governorState)
-  if value == nil or last == nil or value == last then return end
-  local file = GOVERNOR_FILES[math.floor(value)]
-  if not file then return end
-  if not canSpeak(now) then holdPrevious.governorState = true; return end
-  markSpoken(now, SPEAK_WAV_SECONDS)
-  playGovernor(file)
-end
-
--- Unlike announceGovernor(), not armed-gated: mode selection (Angle,
--- Trainer, etc.) is useful information before arming too, matching this
--- project's own last-known-good telemetry.lua, which never checked
--- isArmed for this announcement either.
+-- Not armed-gated: a mode switch (GYRO OFF) is useful information before
+-- arming too.
 local function inSetup()
   return session.systemStatus ~= nil and session.systemStatus.overrideActive == true
 end
@@ -606,9 +535,7 @@ local function announceFlightMode()
   local value = tonumber(session.flightModeFlags)
   local last = tonumber(previous.flightModeFlags)
   if value == nil or last == nil then return end
-  local blocked = tonumber(session.navBlocked) or 0
-  local lastBlocked = tonumber(previous.navBlocked) or 0
-  if value == last and blocked == lastBlocked then
+  if value == last then
     pendingModeSince = nil
     return
   end
@@ -625,28 +552,11 @@ local function announceFlightMode()
     end
   end
   pendingModeSince = nil
-  value = effectiveFlightMode(value, blocked)
-  last = effectiveFlightMode(last, lastBlocked)
-
   -- Only speak when what would be said actually changes, not on every flag
-  -- change (e.g. AutoTrim toggled underneath a higher-priority mode).
+  -- change (e.g. the running latch, bit 8).
   local file = flightModeFile(value)
-  local unavailable = blocked ~= 0
-  local spoken = file ~= flightModeFile(last) or unavailable ~= (lastBlocked ~= 0)
-  if spoken then
+  if file ~= flightModeFile(last) then
     playFlightMode(file)
-    if unavailable then playFlightMode("unavailable.wav") end
-  end
-
-  -- Traditional on says "Traditional"; off re-announces the mode now being
-  -- flown (unless the main mode changed at the same time, already spoken).
-  local traditional = flightModeHasBit(value, TRADITIONAL_MODE_BIT)
-  if traditional ~= flightModeHasBit(last, TRADITIONAL_MODE_BIT) then
-    if traditional then
-      playFlightMode("traditional.wav")
-    elseif not spoken then
-      playFlightMode(file)
-    end
   end
 end
 
@@ -732,27 +642,8 @@ local function announceSystemAlerts(now)
   end
 end
 
--- Autotrim: captured (COLLECTING -> SAVE_PENDING), then kept on disarm
--- (SAVE_PENDING -> IDLE while disarmed) or reverted because the switch went
--- off first (SAVE_PENDING -> IDLE while still armed). See gripora-firmware's
--- flight/autotrim.c.
-local function announceAutotrim()
-  if not events.status_autotrim then return end
-  local status = session.systemStatus
-  local value = status and status.autoTrim
-  local last = previous.autoTrim
-  if value == nil or last == nil or value == last then return end
-
-  local AUTOTRIM = systemStatusCodec.AUTOTRIM
-  if value == AUTOTRIM.SAVE_PENDING then
-    playAlert("trimcaptured.wav")
-  elseif value == AUTOTRIM.IDLE and last == AUTOTRIM.SAVE_PENDING then
-    playAlert(status.armed and "trimcancelled.wav" or "trimsaved.wav")
-  end
-end
-
 -- Stabilized roll/pitch/yaw hit its mixer limit (the FC holds the flag for
--- 500 ms). Rate-limited, and off by default: it can be chatty on 3D models.
+-- 500 ms). Rate-limited, and off by default: it can be chatty.
 local function announceControlLimit(now)
   if not events.status_saturation then return end
   local status = session.systemStatus
@@ -942,7 +833,7 @@ end
 -- The flight controller link went away. Announced once per loss, and only when
 -- the model was armed in the tick before it went: unplugging the pack on the
 -- bench, or powering down after landing, is the normal end of a session and
--- says nothing, while the same drop with the rotors turning is the one event a
+-- says nothing, while the same drop with the car armed is the one event a
 -- pilot must not have to notice for himself (issue #2311).
 --
 -- The armed state is read from `lastSeenArmed`, not from `session`: the session
@@ -1282,18 +1173,14 @@ local function rememberCurrent()
   if not holdPrevious.isArmed then previous.isArmed = session.isArmed end
   if not holdPrevious.pidProfile then previous.pidProfile = session.pidProfile end
   if not holdPrevious.rateProfile then previous.rateProfile = session.rateProfile end
-  if not holdPrevious.tvProfile then previous.tvProfile = session.tvProfile end
   if not holdPrevious.batteryProfile then previous.batteryProfile = session.batteryProfile end
-  if not holdPrevious.governorState then previous.governorState = session.governorState end
   if not flightModeHeld then
     previous.flightModeFlags = session.flightModeFlags
-    previous.navBlocked = session.navBlocked
   end
   previous.setup = inSetup()
   previous.gpsFixType = session.gpsFixType
   previous.adjFunction = session.adjFunction
   previous.adjValue = session.adjValue
-  previous.autoTrim = session.systemStatus and session.systemStatus.autoTrim
   for key in pairs(holdPrevious) do holdPrevious[key] = nil end
 end
 
@@ -1375,13 +1262,10 @@ function audio_events.wakeup()
   announceArmed(now)
   announceProfile(now, "pidProfile", events.pid_profile, "profile.wav")
   announceProfile(now, "rateProfile", events.rate_profile, "rates.wav")
-  announceProfile(now, "tvProfile", events.tv_profile, "tv.wav")
   announceBatteryProfile(now)
-  announceGovernor(now)
   announceFlightMode()
   announceGpsFix()
   announceSystemAlerts(now)
-  announceAutotrim()
   announceControlLimit(now)
   announceVoltage(now)
   announceEscTemp(now)

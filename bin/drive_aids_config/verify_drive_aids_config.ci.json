@@ -1,7 +1,7 @@
 {
   "id": "drive-aids-config",
-  "name": "The drive aids config codec matches the firmware's nine-field layout",
-  "step": "Check the drive aids config codec and ABS page",
+  "name": "The drive aids config codec matches the firmware's ABS and traction control layout",
+  "step": "Check the drive aids config codec and Drive Aids page",
   "script": "bin/drive_aids_config/verify_drive_aids_config.lua",
-  "rationale": "The ABS page (Flight Tuning -> Drive Aids -> ABS) saves by writing back what it\nread. The command ids, the order of the nine U8 fields and their ranges and defaults\nare pinned here against the firmware handler (gripora-firmware msp.c,\nMSP2_GRIPORA_DRIVE_AIDS_CONFIG 0x5F3F / MSP2_GRIPORA_SET_DRIVE_AIDS_CONFIG 0x5F40,\npg/drive_aids.h): the firmware refuses the whole write if any value is out of\nrange. Later aids append fields, so a longer reply must still decode its first\nnine and the write must stay nine bytes; a shorter reply is refused. The harness\nalso checks that the page builds every field, refuses saves while armed, does not\nreboot, follows the current PID profile (the settings are stored per profile),\nand that its menu row and icon exist."
+  "rationale": "The Drive Aids page (Tuning -> Drive Aids) saves by writing back what it\nread. The command ids, the order of the nine ABS U8 fields and the traction control\nfields after them (U8 tc_mode, U16 tc_ramp_time; 12 bytes), and their ranges and\ndefaults are pinned here against the firmware handler (gripora-firmware msp.c,\nMSP2_GRIPORA_DRIVE_AIDS_CONFIG 0x5F3F / MSP2_GRIPORA_SET_DRIVE_AIDS_CONFIG 0x5F40,\npg/drive_aids.h): the firmware refuses the whole write if any value is out of\nrange. A nine-byte reply is older firmware without traction control and is written\nback as nine bytes; a longer reply must still decode the known twelve and the write\nmust stay twelve; a reply shorter than nine is refused. The harness also checks that\nthe page builds every field, refuses saves while armed, does not reboot, follows the\ncurrent PID profile (the settings are stored per profile), and that its menu row\nand icon exist."
 }

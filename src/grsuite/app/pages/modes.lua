@@ -51,6 +51,23 @@ local MODE_NAME_BY_ID = {
   [52] = "BEEPER MUTE",
   [66] = "DRIVE AIDS OFF",
 }
+-- Display order, gripora-configurator's src/js/FlightMode.js MODE_GROUPS:
+-- arming, the driving modes (GYRO OFF, DRIVE AIDS OFF), GPS, beeper and
+-- lights, logging, camera, user outputs; anything else after them in the
+-- FC's own order. Built once at load, so sorting costs nothing per frame.
+local MODE_ORDER = {}
+do
+  local ordered = {
+    "ARM", "PREARM", "FAILSAFE",
+    "GYRO OFF", "DRIVE AIDS OFF",
+    "GPS BEEP SATELLITE COUNT",
+    "BEEPER", "BEEPER MUTE", "LEDLOW",
+    "BLACKBOX", "BLACKBOX ERASE", "TELEMETRY",
+    "CAMERA CONTROL 1", "CAMERA CONTROL 2", "CAMERA CONTROL 3",
+    "USER1", "USER2", "USER3", "USER4",
+  }
+  for i, name in ipairs(ordered) do MODE_ORDER[name] = i end
+end
 local AUX_CHANNEL_COUNT = 20
 local RANGE_MIN = 875
 local RANGE_MAX = 2125
@@ -259,9 +276,10 @@ local function open(opts)
       local name = modeNames[i]
       if (not name or name == "") and MODE_NAME_BY_ID[id] then name = MODE_NAME_BY_ID[id] end
       if not name or name == "" then name = "Mode " .. tostring(id) end
-      modes[i] = {id = id, name = name, ranges = {}}
-      idToModeIndex[id] = i
+      modes[i] = {id = id, name = name, ranges = {}, order = (MODE_ORDER[name] or 1000) * 1000 + i}
     end
+    table.sort(modes, function(a, b) return a.order < b.order end)
+    for i = 1, #modes do idToModeIndex[modes[i].id] = i end
 
     for slot = 1, #modeRanges do
       local range = modeRanges[slot]

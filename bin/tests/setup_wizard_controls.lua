@@ -124,9 +124,12 @@ do
   check("no style matches 250/0", St.matchingStyle(rc, pid) == nil)
   local threeD = St.STYLES[3]
   St.applyStyle(threeD, rc, pid)
-  check("3D: roll 500 deg/s", St.rateOf(rc, "roll") == 500 and rc.rcRates_1 == 100)
+  check("3D: yaw 300 deg/s", St.rateOf(rc, "yaw") == 300 and rc.rcRates_3 == 60)
   check("3D: yaw expo 60%", St.expoOf(rc, "yaw") == 60)
-  check("3D: relax 7 on pitch, level 15 on yaw", pid.bounceback_1 == 7 and pid.iterm_relax_level_2 == 15)
+  check("3D: relax 7 and level 15 on yaw", pid.bounceback_2 == 7 and pid.iterm_relax_level_2 == 15)
+  -- Only yaw is stabilised: roll and pitch are left as they were.
+  check("3D: roll and pitch rates untouched", rc.rcRates_1 == 50 and rc.rcExpo_2 == 0)
+  check("3D: pitch relax not written", pid.bounceback_1 == nil)
   check("3D is recognised afterwards", St.matchingStyle(rc, pid) == threeD)
   rc.rcRates_3 = 70
   check("an edited rate is no longer a preset", St.matchingStyle(rc, pid) == nil)

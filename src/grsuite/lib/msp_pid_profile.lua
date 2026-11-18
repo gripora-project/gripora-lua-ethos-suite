@@ -205,7 +205,7 @@ local SIMULATOR_RESPONSE = {
   0, 0, 0, 0, -- angle roll/pitch, trainer roll/pitch: inherit shared limits
   100,  -- fw_spa_gain
   0,    -- fw_spa_curve (off)
-  150, 0, -- fw_spa_speed_max (U16 LE: 150 km/h)
+  60, 0, -- fw_spa_speed_max (U16 LE: 60 km/h)
   25,   -- angle_level_damping
   100,  -- snap_relax_strength
   60,   -- snap_relax_threshold
@@ -274,7 +274,7 @@ local FIELD_META = {
   fw_tpa_curve = {min = 0, max = 8, default = 0},
   fw_spa_gain = {min = 25, max = 200, default = 100, suffix = "%"},
   fw_spa_curve = {min = 0, max = 8, default = 0},
-  fw_spa_speed_max = {min = 10, max = 600, default = 150, suffix = "km/h"},
+  fw_spa_speed_max = {min = 10, max = 300, default = 60, suffix = "km/h"},
   master_gain_0 = {min = 0, max = 200, default = 100, suffix = "%"},
   master_gain_1 = {min = 0, max = 200, default = 100, suffix = "%"},
   master_gain_2 = {min = 0, max = 200, default = 100, suffix = "%"},

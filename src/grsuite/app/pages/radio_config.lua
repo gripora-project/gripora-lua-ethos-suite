@@ -48,15 +48,9 @@ local function open(opts)
     {title = "@i18n(app.modules.radio_config.min_throttle)@", spec = {key = "rc_min_throttle"}},
   })
 
-  fieldLayout.buildSingle(runtime,
-    "@i18n(app.modules.radio_config.roll_deadband)@ @i18n(app.modules.radio_config.deadband)@",
-    {key = "rc_roll_deadband"})
-  fieldLayout.buildSingle(runtime,
-    "@i18n(app.modules.radio_config.pitch_deadband)@ @i18n(app.modules.radio_config.deadband)@",
-    {key = "rc_pitch_deadband"})
-  fieldLayout.buildSingle(runtime,
-    "@i18n(app.modules.radio_config.yaw_deadband)@ @i18n(app.modules.radio_config.deadband)@",
-    {key = "rc_yaw_deadband"})
+  -- Steering only, as on gripora-configurator's Receiver tab; the roll and
+  -- pitch deadbands are written back unchanged.
+  fieldLayout.buildSingle(runtime, "@i18n(app.modules.radio_config.steering_deadband)@", {key = "rc_yaw_deadband"})
 
   runtime:loadInitial()
 end

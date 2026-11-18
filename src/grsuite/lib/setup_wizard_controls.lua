@@ -220,9 +220,12 @@ M.STEPPED_TRIM_STEP = 2
 M.STEPPED_TRIM_US = 200
 
 -- dir -1 steps the trim down (the range's first sub-range), +1 up.
+-- Only the yaw (steering) buttons appear in the guide; their names are the
+-- FrSky VX10's, whose steering trim is T1. The roll and pitch entries keep
+-- their weights (and so every window) where they were, but are not shown.
 M.TRIM_BUTTONS = {
-  {button = "T4 Left", axis = "yaw", dir = -1, weight = 30},
-  {button = "T4 Right", axis = "yaw", dir = 1, weight = 40},
+  {button = "T1 CCW", axis = "yaw", dir = -1, weight = 30},
+  {button = "T1 CW", axis = "yaw", dir = 1, weight = 40},
   {button = "T2 Down", axis = "pitch", dir = 1, weight = 50},
   {button = "T2 Up", axis = "pitch", dir = -1, weight = 60},
   {button = "T1 Left", axis = "roll", dir = -1, weight = 70},

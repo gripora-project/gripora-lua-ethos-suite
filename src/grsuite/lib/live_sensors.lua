@@ -257,7 +257,6 @@ local function sensorValue(widget, name)
     if limit and limit > 0 and current then return current / limit * 100, "%" end
     return nil, "%"
   end
-  if name == "governor" then return widget.governorState end
   if name == "pid_profile" then return widget.pidProfile end
   if name == "rate_profile" then return widget.rateProfile end
   if name == "battery_profile" then return widget.batteryProfile end

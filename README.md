@@ -7,10 +7,10 @@
 
 # Gripora Lua Suite for Ethos
 
-GRSuite puts a [Gripora](https://github.com/gripora-project/gripora-firmware) flight controller's
-settings on a FrSky Ethos radio. At the field you can set up a model, retune it, read its logs and
-check its status without a computer. Gripora is open-source flight controller firmware for
-fixed-wing aircraft.
+GRSuite puts a [Gripora](https://github.com/gripora-project/gripora-firmware) controller's
+settings on a FrSky Ethos radio. At the track you can set up a car, retune it, read its logs and
+check its status without a computer. Gripora is open-source stability-control firmware for RC
+cars: gyro steering stabilisation and drive aids such as ABS and traction control.
 
 **[User guide](https://doc.gripora.org/ethos-suite/)** ·
 **[Installing](https://doc.gripora.org/ethos-suite/installing/)** ·
@@ -19,7 +19,7 @@ fixed-wing aircraft.
 | | |
 | --- | --- |
 | ![The dashboard widget](https://raw.githubusercontent.com/gripora-project/gripora-docs/main/docs/assets/images/ethos-suite/home-dashboard.png) | ![The app's main menu](https://raw.githubusercontent.com/gripora-project/gripora-docs/main/docs/assets/images/ethos-suite/root-menu.png) |
-| ![The PID page](https://raw.githubusercontent.com/gripora-project/gripora-docs/main/docs/assets/images/ethos-suite/pids.png) | ![A flight log graph](https://raw.githubusercontent.com/gripora-project/gripora-docs/main/docs/assets/images/ethos-suite/logs-graph.png) |
+| ![The PID page](https://raw.githubusercontent.com/gripora-project/gripora-docs/main/docs/assets/images/ethos-suite/pids.png) | ![A run log graph](https://raw.githubusercontent.com/gripora-project/gripora-docs/main/docs/assets/images/ethos-suite/logs-graph.png) |
 
 
 ## What it installs
@@ -27,19 +27,19 @@ fixed-wing aircraft.
 - **The Gripora app**, opened from the radio's System menu. Its pages read settings from the
   flight controller over telemetry, let you change them and save them back.
 - **A dashboard widget** for the model's home screen: arming state, battery, fuel, RPM, profile
-  and flight count, with a choice of [themes](docs/dashboard-themes.md).
+  and run count, with a choice of [themes](docs/dashboard-themes.md).
 - **A background task** that keeps the link to the flight controller and plays callouts and
   alerts.
 
 
 ## What the app does
 
-- **Flight tuning:** PIDs, rates, flight feel, filters, gain curves, flight modes and thrust
-  vectoring
-- **Tune Advisor:** reads your recent flights and suggests one gain change at a time
-- **Setup:** ports, receiver, telemetry and controls; sensors and GPS navigation; mixer, curves
-  and servos; power, ESCs, motors and the governor
-- **Tools:** a setup wizard, profile copy and select, diagnostics and flight logs
+- **Tuning:** the steering gyro (PIDs, rates, driving feel), drive aids (ABS, traction control), and the advanced
+  controller settings (filters, PID controller, bandwidth, gain curves, rate response)
+- **Setup:** ports, receiver, telemetry, modes and adjustments; sensors; mixer, curves and
+  servos; power, ESCs and motors, including the drive settings (ESC behaviour, tyre size, gyro
+  fade-in with speed)
+- **Tools:** a car setup wizard, profile copy and select, diagnostics and run logs
 - **Settings:** audio callouts, dashboard themes and radio preferences
 
 The [user guide](https://doc.gripora.org/ethos-suite/) has a screen for every menu.

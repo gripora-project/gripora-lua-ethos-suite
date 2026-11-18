@@ -90,12 +90,6 @@
     "needs_translation": true
   },
   {
-    "file": "events/alerts/tv.wav",
-    "english": "Thrust Vector",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
     "file": "events/alerts/gpsfix.wav",
     "english": "GPS Fix",
     "translation": null,
@@ -130,78 +124,6 @@
     "english": "RX Batt Voltage Warning",
     "translation": "Ostrzezenie napiecia RX",
     "needs_translation": false
-  },
-  {
-    "file": "events/gov/off.wav",
-    "english": "Governor - Off",
-    "translation": "Governor - Off",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/idle.wav",
-    "english": "Governor - Idle",
-    "translation": "Governor - Idle",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/spoolup.wav",
-    "english": "Governor - Spoolup",
-    "translation": "Governor - Spoolup",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/recovery.wav",
-    "english": "Governor - Recovery",
-    "translation": "Governor - Recovery",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/active.wav",
-    "english": "Governor - Active",
-    "translation": "Governor - Active",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/thr-off.wav",
-    "english": "Governor - Throttle Off",
-    "translation": "Governor - Throttle Off",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/lost-hs.wav",
-    "english": "Governor - Lost Headspeed",
-    "translation": "Governor - Utracony Headspeed",
-    "needs_translation": false
-  },
-  {
-    "file": "events/gov/autorot.wav",
-    "english": "Governor - Auto Rotation",
-    "translation": "Governor - Auto Rotation",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/bailout.wav",
-    "english": "Governor - Bailout",
-    "translation": "Governor - Bailout",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/disabled.wav",
-    "english": "Governor - Disabled",
-    "translation": "Governor - Disabled",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/disarmed.wav",
-    "english": "Governor - Disarmed",
-    "translation": "Governor - Disarmed",
-    "needs_translation": true
-  },
-  {
-    "file": "events/gov/unknown.wav",
-    "english": "Governor - Unknown",
-    "translation": "Governor - Unknown",
-    "needs_translation": true
   },
   {
     "file": "adjfunctions/pitch.wav",
@@ -522,42 +444,6 @@
     "needs_translation": true
   },
   {
-    "file": "events/mode/angle.wav",
-    "english": "Angle",
-    "translation": "Angle",
-    "needs_translation": false
-  },
-  {
-    "file": "events/mode/attitude.wav",
-    "english": "Attitude",
-    "translation": "Attitude",
-    "needs_translation": false
-  },
-  {
-    "file": "events/mode/atthold.wav",
-    "english": "Att Hold",
-    "translation": "Att Hold",
-    "needs_translation": false
-  },
-  {
-    "file": "events/mode/autotrim.wav",
-    "english": "Auto Trim",
-    "translation": "Auto Trim",
-    "needs_translation": false
-  },
-  {
-    "file": "events/mode/trainer.wav",
-    "english": "Trainer",
-    "translation": "Trainer",
-    "needs_translation": false
-  },
-  {
-    "file": "events/mode/traditional.wav",
-    "english": "Traditional",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
     "file": "events/mode/setup.wav",
     "english": "Setup",
     "translation": "Setup",
@@ -565,37 +451,7 @@
   },
   {
     "file": "events/mode/passthrough.wav",
-    "english": "Passthrough",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/mode/manual.wav",
-    "english": "Manual",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/mode/gpsrescue.wav",
-    "english": "GPS Rescue",
-    "translation": "GPS Rescue",
-    "needs_translation": false
-  },
-  {
-    "file": "events/mode/rth.wav",
-    "english": "RTH",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/mode/gpsloiter.wav",
-    "english": "GPS Loiter",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/mode/unavailable.wav",
-    "english": "Unavailable",
+    "english": "Gyro off",
     "translation": null,
     "needs_translation": true
   },
@@ -650,66 +506,6 @@
   {
     "file": "events/alerts/bbfull.wav",
     "english": "Blackbox full",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimnoseup.wav",
-    "english": "Trim nose up",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimnosedown.wav",
-    "english": "Trim nose down",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimrollright.wav",
-    "english": "Trim roll right",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimrollleft.wav",
-    "english": "Trim roll left",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimyawright.wav",
-    "english": "Trim rudder right",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimyawleft.wav",
-    "english": "Trim rudder left",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimok.wav",
-    "english": "Trim OK",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimcaptured.wav",
-    "english": "Trim captured",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimsaved.wav",
-    "english": "Trim saved",
-    "translation": null,
-    "needs_translation": true
-  },
-  {
-    "file": "events/alerts/trimcancelled.wav",
-    "english": "Trim cancelled",
     "translation": null,
     "needs_translation": true
   },

@@ -23,9 +23,9 @@ Requires a running background task and a flight controller connection.
 
 | Setting | What it does |
 | --- | --- |
-| Flight Count | TODO: explain behaviour, displayed units, range and conditions. |
-| Last Flight Time | TODO: explain behaviour, displayed units, range and conditions. |
-| Total Flight Time | TODO: explain behaviour, displayed units, range and conditions. |
+| Run Count | TODO: explain behaviour, displayed units, range and conditions. |
+| Last Run Time | TODO: explain behaviour, displayed units, range and conditions. |
+| Total Run Time | TODO: explain behaviour, displayed units, range and conditions. |
 
 ## Notes
 

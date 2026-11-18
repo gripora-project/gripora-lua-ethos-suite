@@ -13,6 +13,8 @@
 -- and the firmware refuses the whole write if any is out of range, so the
 -- FIELD_META ranges are pinned to its checks.
 -- The settings are stored per PID profile; both messages act on the current one.
+-- Traction control (API 33.x): U8 tc_mode, U16 tc_ramp_time follow the nine ABS
+-- bytes (12 in all); a nine-byte reply is older firmware and is written back as nine.
 
 local function scriptDir()
   local src = debug.getinfo(1, "S").source
@@ -80,8 +82,11 @@ local ORDER = {
   "abs_mode", "abs_freq", "abs_floor", "abs_hold", "abs_trigger",
   "abs_dyn_freq", "abs_dyn_hold", "abs_corner_freq", "abs_corner_hold",
 }
--- DYNAMIC, 12 Hz, floor 35 %, hold 25 ms, trigger 20 %, 18 Hz, 5 ms, 4 Hz, 10 ms
+-- DYNAMIC, 12 Hz, floor 35 %, hold 25 ms, trigger 20 %, 18 Hz, 5 ms, 4 Hz, 10 ms:
+-- the nine ABS bytes older firmware replies.
 local REPLY = {2, 12, 35, 25, 20, 18, 5, 4, 10}
+-- The same plus traction control: RAMP, 750 ms (U16 LE 0x02EE).
+local REPLY_TC = {2, 12, 35, 25, 20, 18, 5, 4, 10, 1, 0xEE, 0x02}
 
 -- ---------------------------------------------------------------------------
 print("case 1: commands and field order match the firmware handler")
@@ -100,6 +105,7 @@ local EXPECT = {
   abs_freq = {2, 33, 10}, abs_floor = {0, 100, 40}, abs_hold = {0, 100, 20},
   abs_trigger = {5, 100, 30}, abs_dyn_freq = {2, 33, 15}, abs_dyn_hold = {0, 100, 0},
   abs_corner_freq = {0, 10, 0}, abs_corner_hold = {0, 100, 0},
+  tc_ramp_time = {50, 2000, 500},
 }
 for key, e in pairs(EXPECT) do
   local m = codec.FIELD_META[key]
@@ -109,6 +115,9 @@ end
 local choices = codec.FIELD_META.abs_mode.choices
 check("mode choices Off/Static/Dynamic = 0/1/2",
   #choices == 3 and choices[1][2] == 0 and choices[2][2] == 1 and choices[3][2] == 2)
+local tcChoices = codec.FIELD_META.tc_mode.choices
+check("TC mode choices Off/Ramp = 0/1",
+  #tcChoices == 2 and tcChoices[1][2] == 0 and tcChoices[2][2] == 1)
 
 -- ---------------------------------------------------------------------------
 print("case 3: decode/encode round-trip")
@@ -117,9 +126,9 @@ local sim = codec.buildReadMessage(function() end, function() end).simulatorResp
 local simData, simErrored = read(sim)
 check("simulatorResponse decodes", simData ~= nil and not simErrored)
 if simData then
-  local defaults = simData.abs_mode == 0
+  local defaults = simData.abs_mode == 0 and simData.tc_mode == 0 and simData.has_tc == true
   for key, e in pairs(EXPECT) do defaults = defaults and simData[key] == e[3] end
-  check("simulatorResponse is the firmware defaults", defaults)
+  check("simulatorResponse is the firmware defaults (12 bytes, with TC)", #sim == 12 and defaults)
 end
 
 local data, errored = read(REPLY)
@@ -132,22 +141,38 @@ if data then
   check("write uses 0x5F40", msg.command == 0x5F40, msg.command)
   local same = #msg.payload == 9
   for i = 1, 9 do same = same and msg.payload[i] == REPLY[i] end
-  check("encode is exactly the nine reply bytes", same, table.concat(msg.payload, ","))
+  check("a nine-byte reply encodes exactly the nine reply bytes", same, table.concat(msg.payload, ","))
+  check("a nine-byte reply has no TC (older firmware)", data.has_tc == false and data.tc_mode == nil)
+end
+
+data, errored = read(REPLY_TC)
+check("a 12-byte reply reaches onData", data ~= nil and not errored)
+if data then
+  check("TC fields decoded", data.has_tc == true and data.tc_mode == 1 and data.tc_ramp_time == 750,
+    tostring(data.tc_mode) .. "/" .. tostring(data.tc_ramp_time))
+  local payload = codec.encode(data)
+  local same = #payload == 12
+  for i = 1, 12 do same = same and payload[i] == REPLY_TC[i] end
+  check("a 12-byte reply encodes exactly the twelve reply bytes", same, table.concat(payload, ","))
 end
 local empty = codec.encode({})
 check("encode of an empty table is 9 bytes of defaults",
   #empty == 9 and empty[1] == 0 and empty[2] == 10 and empty[5] == 30, table.concat(empty, ","))
 
 -- ---------------------------------------------------------------------------
-print("case 4: a longer reply (later aids appended) reads the first nine")
+print("case 4: a longer reply (later aids appended) reads the known twelve")
 
-local long = copy(REPLY); long[10] = 7; long[11] = 99
+local long = copy(REPLY_TC); long[13] = 7; long[14] = 99
 data, errored = read(long)
-check("11-byte reply reaches onData", data ~= nil and not errored)
+check("14-byte reply reaches onData", data ~= nil and not errored)
 if data then
-  check("abs_corner_hold is byte 9, not an appended byte", data.abs_corner_hold == 10, data.abs_corner_hold)
-  check("write stays nine bytes", #codec.encode(data) == 9, #codec.encode(data))
+  check("abs_corner_hold is byte 9", data.abs_corner_hold == 10, data.abs_corner_hold)
+  check("tc_ramp_time is bytes 11-12, not an appended byte", data.tc_ramp_time == 750, data.tc_ramp_time)
+  check("write stays twelve bytes", #codec.encode(data) == 12, #codec.encode(data))
 end
+-- A 10- or 11-byte reply cannot hold the TC fields: ABS only.
+data = read({2, 12, 35, 25, 20, 18, 5, 4, 10, 1})
+check("10-byte reply decodes ABS only", data ~= nil and data.has_tc == false and #codec.encode(data) == 9)
 
 -- ---------------------------------------------------------------------------
 print("case 5: a short reply is refused")
@@ -172,6 +197,9 @@ if page then
   for i = 1, #ORDER do
     check("page builds " .. ORDER[i], page:find('key = "' .. ORDER[i] .. '"', 1, true) ~= nil)
   end
+  check("page builds tc_mode", page:find('key = "tc_mode"', 1, true) ~= nil)
+  check("page builds tc_ramp_time", page:find('key = "tc_ramp_time"', 1, true) ~= nil)
+  check("page title is Drive Aids", page:find('PAGE_TITLE = "@i18n(app.modules.drive_aids.name)@"', 1, true) ~= nil)
 end
 
 local tool = readFile(SUITE .. "/app/tool.lua")
@@ -181,6 +209,7 @@ if row then
   local icon = row:match('lcd%.loadMask%("([^"]+)"%)')
   check("menu row icon exists", icon ~= nil and readFile(SUITE .. "/" .. icon) ~= nil, icon)
   check("menu row is in the Drive Aids group", row:find("app.menu_section_drive_aids", 1, true) ~= nil)
+  check("menu tile is titled Drive Aids", row:find("app.modules.drive_aids.name", 1, true) ~= nil)
 end
 
 -- ---------------------------------------------------------------------------

@@ -398,12 +398,12 @@ check("a link that is down reads nothing",
 
 -- The extremes are recorded by the session's flight record (lib/flight_stats.lua, #2344),
 -- from the same sensor values the dashboard shows (lib/live_sensors.lua).
-local statsState = {connected = true, isArmed = true, governorState = 4, mcuId = "esc-load",
+local statsState = {connected = true, isArmed = true, systemStatus = {running = true}, mcuId = "esc-load",
   escCurrentLimit = 80, current = 40}
 local record = requireModule("lib/flight_stats.lua").new()
 local liveSensors = requireModule("lib/live_sensors.lua")
 record:update(statsState, liveSensors.read) -- the armed edge
-record:update(statsState, liveSensors.read) -- governor active: in flight
+record:update(statsState, liveSensors.read) -- the FC's running latch: in a run
 check("inflight presentation stats record esc_load",
   record.stats.esc_load and record.stats.esc_load.max == 50,
   "got " .. tostring(record.stats.esc_load and record.stats.esc_load.max))

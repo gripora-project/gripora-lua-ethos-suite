@@ -46,7 +46,7 @@ Each servo has the same settings and the same ranges.
 
 | Setting | What it does |
 | --- | --- |
-| Name | A short name for the servo, up to 8 characters (letters, digits, spaces and punctuation), such as `L AIL`. For reference only: nothing in flight uses it. Only with firmware that has servo names. |
+| Name | A short name for the servo, up to 8 characters (letters, digits, spaces and punctuation), such as `STEER`. For reference only: nothing while driving uses it. Only with firmware that has servo names. |
 | Center | Pulse width at the middle of the travel, 1000–2000 µs. Default 1500. |
 | Minimum | Travel limit below the center, as an offset from it: −1000 to 0 µs. Default −600. |
 | Maximum | Travel limit above the center, as an offset from it: 0 to 1000 µs. Default 600. |
@@ -71,7 +71,7 @@ Servos tab.
 
 - Save in a servo's editor writes that servo, and its name when it changed, and
   commits them to EEPROM. It does not
-  restart the flight controller. Servo settings are aircraft-wide, independent of
+  restart the flight controller. Servo settings are car-wide, independent of
   the selected PID or rate profile.
 - The Tool button is disabled until the page has loaded its values.
 - In the servo editor, the Tool button switches servo override on for that servo

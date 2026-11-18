@@ -113,48 +113,19 @@ local function run()
   check("with both words present the config rule still shows",
     rule ~= nil and rule.id == "reboot_required")
 
-  -- Out of trim: System Config bits 23-28, two bits per axis (roll, pitch,
-  -- yaw), 1 = right / nose up, 2 = left / nose down. Decoded by the real
-  -- codec so a shifted field shows up here.
+  -- Reserved bits: System Config bits 23-29 were the aircraft trim monitor and
+  -- "GPS can't navigate" (removed from the firmware, read as 0). Decoded by the
+  -- real codec, a word with them set raises no banner.
   local codec = assert(loadfile(SRC .. "/lib/system_status.lua"))()
-  local function trimBanners(roll, pitch, yaw)
-    local raw = (roll << 23) | (pitch << 25) | (yaw << 27)
-    local config = codec.decodeConfig(raw)
-    local ids = {}
-    for _, r in ipairs(alerts.RULES) do
-      if r.id:find("^trim_") and alerts.isActive(r, nil, config) then ids[#ids + 1] = r.id end
-    end
-    table.sort(ids)
-    return table.concat(ids, ",")
-  end
-  check("in trim raises no trim banner", trimBanners(0, 0, 0) == "")
-  check("trim directions decode per axis",
-    trimBanners(1, 2, 1) == "trim_pitch_down,trim_roll_right,trim_yaw_right", trimBanners(1, 2, 1))
-  check("opposite trim directions decode per axis",
-    trimBanners(2, 1, 2) == "trim_pitch_up,trim_roll_left,trim_yaw_left", trimBanners(2, 1, 2))
-
-  local trimAudio = true
+  rule = alerts.topBanner(nil, codec.decodeConfig((0x7F << 23)))
+  check("reserved config bits 23-29 raise no banner", rule == nil, rule and rule.id)
+  local stale = {}
   for _, r in ipairs(alerts.RULES) do
-    if r.id:find("^trim_") then
-      trimAudio = trimAudio and r.setting == "status_trim" and r.enterSound ~= nil
-        and r.exitSound == "trimok.wav" and r.level == alerts.LEVEL.WARNING
-        and r.group == "trim"
+    if r.id:find("^trim_") or r.id == "gps_nav_unsupported" or r.id:find("_unavailable$") then
+      stale[#stale + 1] = r.id
     end
   end
-  check("trim rules are amber, switched by status_trim, grouped, and announce enter and exit", trimAudio)
-
-  rule = alerts.topBanner({}, codec.decodeConfig((2 << 25) | (1 << 14)))
-  check("a trim banner ranks below reboot required",
-    rule ~= nil and rule.id == "reboot_required")
-
-  -- GPS can't navigate: System Config bit 29, banner only.
-  rule = alerts.topBanner(nil, codec.decodeConfig(1 << 29))
-  check("config bit 29 raises the GPS nav banner",
-    rule ~= nil and rule.id == "gps_nav_unsupported" and rule.level == alerts.LEVEL.WARNING
-      and rule.enterSound == nil)
-  rule = alerts.topBanner(nil, codec.decodeConfig(1 << 28))
-  check("bit 28 alone is not the GPS nav banner",
-    rule == nil or rule.id ~= "gps_nav_unsupported")
+  check("no aircraft-only rules (trim monitor, GPS nav)", #stale == 0, table.concat(stale, ","))
 end
 
 local function selfTest()

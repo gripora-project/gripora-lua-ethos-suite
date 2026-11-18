@@ -1,4 +1,5 @@
--- Behaviour check for the dashboard's flight phases (issue #2352): the tracker's five phases,
+-- Behaviour check for the dashboard's run phases (issue #2352; the phases keep the inherited
+-- names preflight/inflight/postflight: before, during and after a run): the tracker's five phases,
 -- the layout each one draws with, and the holds that depend on them.
 --
 -- Run it:
@@ -6,7 +7,7 @@
 --
 -- What it drives, and why:
 --   * lib/flight_stats.lua, real: the session's flight phase is fed the session fields it reads
---     (connected, isArmed, governorState, throttlePercent) tick by tick, and the phase it returns
+--     (connected, isArmed, systemStatus, throttlePercent) tick by tick, and the phase it returns
 --     is checked (#2344 moved it out of the dashboard). There is no radio channel here (CATEGORY_CHANNEL is nil), so flight is read from
 --     the telemetry throttle, the path a radio without a resolved RX map takes.
 --   * flight_stats.layoutPhase: armed draws preflight and offline draws postflight, because themes
@@ -77,13 +78,14 @@ local flightStats = requireModule("lib/flight_stats.lua")
 
 -- A widget as the tracker sees it. `tick` feeds one state and returns the phase.
 local function newWidget()
-  local widget = {connected = false, isArmed = false, governorState = 0, throttlePercent = 0}
+  local widget = {connected = false, isArmed = false, throttlePercent = 0}
   local tracker = flightStats.new()
-  local function tick(connected, armed, throttle, governor)
+  -- `running` (optional): the FC's system_status running latch; nil = no system_status.
+  local function tick(connected, armed, throttle, running)
     widget.connected = connected
     widget.isArmed = armed
     widget.throttlePercent = throttle or 0
-    widget.governorState = governor or 0
+    widget.systemStatus = (running ~= nil) and {running = running} or nil
     -- Phases only: no sensor values are read here.
     return tracker:update(widget, function() return nil end)
   end
@@ -123,11 +125,20 @@ do
   check("disconnect without a flight: preflight, not offline", tick(false, false, 0) == "preflight")
 end
 
-print("governor counts as flight")
+print("throttle is signed around neutral")
 do
   local tick = newWidget()
   tick(true, true, 0)
-  check("armed with the governor active (state 4): inflight", tick(true, true, 0, 4) == "inflight")
+  check("armed at neutral (0 %): armed, not inflight", tick(true, true, 5) == "armed")
+  check("reverse (-40 %) counts as a run", tick(true, true, -40) == "inflight")
+end
+
+print("the FC's running latch decides when system_status is there")
+do
+  local tick = newWidget()
+  tick(true, true, 0, false)
+  check("latch clear, throttle up: still armed", tick(true, true, 60, false) == "armed")
+  check("latch set, throttle at neutral: inflight", tick(true, true, 0, true) == "inflight")
 end
 
 -- ---------------------------------------------------------------------------

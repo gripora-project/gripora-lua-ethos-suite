@@ -14,9 +14,8 @@
 --     are spoken one after another, separated by the speaking gate, each
 --     without being repeated;
 --   * a single change is still spoken at once, with no added delay;
---   * a governor change waits behind a profile announcement and is spoken once;
 --   * a change still waiting when the link drops is not spoken after a reconnect;
---   * a thrust vector profile change waits behind the rate profile and is spoken once.
+--   * a rate profile change waits behind the PID profile and is spoken once.
 --
 -- A check that cannot fail proves nothing, so the last check strips the gate
 -- from a copy of the task and requires the profile call to land in the same
@@ -182,20 +181,11 @@ do
 end
 
 do
-  local rig = newRig({pid_profile = true, governor = true})
-  seed(rig, {connected = true, isArmed = true, pidProfile = 1, governorMode = 1, governorState = 1})
-  runTo(rig, 0.50, 2.50, {connected = true, isArmed = true, pidProfile = 2, governorMode = 1, governorState = 2})
-  check("a governor change waits behind a profile announcement and is spoken once",
-    rig.timeline() == "0.50 profile.wav; 0.50 num:2; 1.75 spoolup.wav",
-    "got: " .. rig.timeline())
-end
-
-do
-  local rig = newRig({rate_profile = true, tv_profile = true})
-  seed(rig, {connected = true, isArmed = true, rateProfile = 1, tvProfile = 1})
-  runTo(rig, 0.50, 3.00, {connected = true, isArmed = true, rateProfile = 2, tvProfile = 2})
-  local expected = "0.50 rates.wav; 0.50 num:2; 1.75 tv.wav; 1.75 num:2"
-  check("thrust vector profile change waits behind rate profile and is spoken once",
+  local rig = newRig({pid_profile = true, rate_profile = true})
+  seed(rig, {connected = true, isArmed = true, pidProfile = 1, rateProfile = 1})
+  runTo(rig, 0.50, 3.00, {connected = true, isArmed = true, pidProfile = 2, rateProfile = 2})
+  local expected = "0.50 profile.wav; 0.50 num:2; 1.75 rates.wav; 1.75 num:2"
+  check("a rate profile change waits behind the PID profile and is spoken once",
     rig.timeline() == expected, "got: " .. rig.timeline())
 end
 

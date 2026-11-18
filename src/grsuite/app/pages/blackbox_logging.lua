@@ -29,6 +29,5 @@ return blackboxPage.new({
     {label = "@i18n(app.modules.blackbox.log_esc)@", bit = 19, featureBit = blackboxPage.FEATURE_BIT_ESC_SENSOR},
     {label = "@i18n(app.modules.blackbox.log_bec)@", bit = 20, featureBit = blackboxPage.FEATURE_BIT_ESC_SENSOR},
     {label = "@i18n(app.modules.blackbox.log_esc2)@", bit = 21, featureBit = blackboxPage.FEATURE_BIT_ESC_SENSOR},
-    {label = "@i18n(app.modules.blackbox.log_governor)@", bit = 22, featureBit = blackboxPage.FEATURE_BIT_GOVERNOR},
   },
 })

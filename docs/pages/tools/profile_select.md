@@ -1,7 +1,7 @@
 ---
 title: "Select Profile"
 sidebar_label: "Select Profile"
-sidebar_position: 20
+sidebar_position: 30
 documentation_status: draft
 source: app/pages/profile_select.lua
 ---
@@ -25,14 +25,12 @@ Requires a running background task and a flight controller connection.
 | --- | --- |
 | PID profile | TODO: explain behaviour, displayed units, range and conditions. |
 | Rate Profile | TODO: explain behaviour, displayed units, range and conditions. |
-| TV Profile | TODO: explain behaviour, displayed units, range and conditions. |
 
 ## Notes
 
-- Save writes the rate, the PID and the Thrust Vector profile in that order. If the
-  flight controller refuses one of the writes, a *Save failed* dialog is shown and the
-  page stays unsaved, so *Save* remains available for a second attempt (rotorflight-lua-ethos-suite
-  Issue #2498).
+- Save writes the rate and then the PID profile. If the flight controller refuses one of
+  the writes, a *Save failed* dialog is shown and the page stays unsaved, so *Save* remains
+  available for a second attempt (rotorflight-lua-ethos-suite Issue #2498).
 
 TODO: Verify persistence, reboot behaviour, profile scope and any restrictions in
 this page and its shared helpers. Codec defaults may be UI fallbacks rather than

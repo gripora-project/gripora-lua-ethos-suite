@@ -32,7 +32,7 @@ Requires a running background task and a flight controller connection.
 
 ## Notes
 
-Saving an individual rule commits its changes to EEPROM. Rules are aircraft-wide, not PID-profile settings. No reboot is requested by this page.
+Saving an individual rule commits its changes to EEPROM. Rules are car-wide, not PID-profile settings. No reboot is requested by this page.
 
 **Move and Delete act immediately:** moving writes both affected slots and queues an EEPROM commit; confirming Delete clears the slot and queues an EEPROM commit. They do not wait for the editor's Save action. Rule order affects how operations combine.
 

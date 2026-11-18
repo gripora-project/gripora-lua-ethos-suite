@@ -18,7 +18,7 @@
 -- ("attempt to call a nil value") the instant anyone actually opened a
 -- submenu. Fixed before it ever shipped to a submenu tile.
 --
--- Entries may carry an optional `group` label (e.g. "Flight Tuning"),
+-- Entries may carry an optional `group` label (e.g. "Steering"),
 -- rendered as its own line whenever it changes going down the entry
 -- list -- matching the original's home screen, which groups its flat
 -- tile list under section labels the same way (see

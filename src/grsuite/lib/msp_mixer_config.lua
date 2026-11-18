@@ -26,9 +26,9 @@ local mspcodec = requireModule("lib/mspcodec.lua")
 local READ_COMMAND = 42
 
 -- Fixture reply used automatically when running in the Ethos simulator
--- (see tasks/msp/queue.lua): regular airplane, SBUS 16, F.Bus 24, no bus
--- output port, 50 Hz.
-local SIMULATOR_RESPONSE = {0, 0, 16, 24, 0, 50, 0}
+-- (see tasks/msp/queue.lua): car, SBUS 16, F.Bus 24, no bus output port,
+-- 50 Hz, gyro not reversed.
+local SIMULATOR_RESPONSE = {0, 0, 16, 24, 0, 50, 0, 0}
 
 local msp_mixer_config = {
   READ_COMMAND = READ_COMMAND,
@@ -49,6 +49,9 @@ function msp_mixer_config.decode(buf)
   -- Left nil on a short reply, so encode() falls back to the short form
   -- rather than writing a rate of 0, which the firmware refuses.
   if #buf >= 7 then data.servo_pwm_rate = mspcodec.readU16(buf) end
+  -- API 33.0: yaw_gyro_reverse (0/1), the steering loop's yaw rate negated
+  -- (firmware pidConfig_t). Left nil on older firmware.
+  if #buf >= 8 then data.yaw_gyro_reverse = mspcodec.readU8(buf) end
   return data
 end
 
@@ -85,6 +88,9 @@ function msp_mixer_config.encode(data)
     mspcodec.writeU8(payload, data.sbus_out_channels)
     mspcodec.writeU8(payload, data.fbus_master_channels)
     mspcodec.writeU16(payload, data.servo_pwm_rate)
+    -- API 33.0: an optional U8 yaw_gyro_reverse after the rate, sent only
+    -- when it was read, so the value read is written back unchanged.
+    if data.yaw_gyro_reverse ~= nil then mspcodec.writeU8(payload, data.yaw_gyro_reverse ~= 0 and 1 or 0) end
   end
   return payload
 end

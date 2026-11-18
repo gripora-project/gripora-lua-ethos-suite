@@ -113,29 +113,20 @@ local session = {
   smartfuelVoltageFallPerSecond = nil,
   smartfuelChargeDropPerSecond = nil,
   fuelPercent = nil,
-  governorMode = nil, -- always nil: MSP_GOVERNOR_CONFIG (heli engine-RPM governor mode) no longer
-                       -- exists on gripora-firmware's wire at all; every consumer (dashboard,
-                       -- ActiveLook, audio_events.lua's announceGovernor()) already treats nil the
-                       -- same as "unknown/inactive", so this is left declared but never populated
-                       -- rather than threading a removal through every reader.
-  governorState = nil, -- live telemetry sensor value ("governor"), unrelated to the config command
-                        -- above -- still fetched in wakeup(), see below.
   flightModeFlags = nil, -- live telemetry sensor value ("flight_mode"), a bitmask -- see
                           -- tasks/audio_events.lua's announceFlightMode() for the bit->mode mapping.
   -- Decoded "system_status" / "system_config" sensors (lib/system_status.lua).
-  -- The fields below them (gpsFixType, navBlocked, isArmed, the profile
+  -- The fields below them (gpsFixType, isArmed, the profile
   -- numbers) are unpacked from these for existing readers.
   systemStatus = nil,
   systemConfig = nil,
   gpsFixType = nil, -- 0 = no fix, 1 = fix, 2 = fix + home captured -- see
                      -- tasks/audio_events.lua's announceGpsFix().
-  navBlocked = nil, -- lib/system_status.lua NAV_BLOCKED: LOITER/RTH switched on but can't fly
   gpsSats = nil, -- "GPS Sats" telemetry sensor; nil until the FC broadcasts it
   mspTransport = nil,
   telemetrySlots = nil, -- 40-entry S.Port sensor-slot array, see lib/msp_telemetry_config.lua
   pidProfile = nil,
   rateProfile = nil,
-  tvProfile = nil,
   batteryProfile = nil,
   adjFunction = nil,
   adjValue = nil,
@@ -167,7 +158,7 @@ local session = {
   armedUnconfirmed = false,
   -- Why-can't-arm bitmask, read from the FC's own "armdisableflags"
   -- telemetry sensor -- see widgets/dashboard/context.lua's
-  -- armingDisableFlagsToString() for how the dashboard's governor/armflags
+  -- armingDisableFlagsToString() for how the dashboard's armflags
   -- objects turn this into a human-readable reason list.
   armDisableFlags = nil,
   -- Physical RX channel index for each logical control (MSP_RX_MAP, cmd
@@ -392,7 +383,7 @@ end
 -- changes, rather than hitting the bus directly. Telemetry-driven fields
 -- (voltage, current, rpm, link quality, profiles, arm flags, ...) can flip
 -- several times within the same wakeup() tick -- updateProfiles() alone can
--- change five fields in one call, and updateGovernor()/updateFlightMode()
+-- change five fields in one call, and updateFlightMode()
 -- run in that same scheduled block too -- and each change used to trigger
 -- its own full ~30-field table rebuild + bus dispatch. publish() now just
 -- marks `dirty`; wakeup() flushes at most once per tick (see its own end),
@@ -430,18 +421,14 @@ local function flush()
     tempMcu = session.tempMcu,
     becVoltage = session.becVoltage,
     fuelPercent = session.fuelPercent,
-    governorMode = session.governorMode,
-    governorState = session.governorState,
     flightModeFlags = session.flightModeFlags,
     systemStatus = systemStatusCodec.copy(session.systemStatus),
     systemConfig = systemStatusCodec.copy(session.systemConfig),
     gpsFixType = session.gpsFixType,
-    navBlocked = session.navBlocked,
     gpsSats = session.gpsSats,
     mspTransport = session.mspTransport,
     pidProfile = session.pidProfile,
     rateProfile = session.rateProfile,
-    tvProfile = session.tvProfile,
     batteryProfile = session.batteryProfile,
     adjFunction = session.adjFunction,
     adjValue = session.adjValue,
@@ -977,20 +964,16 @@ local function setConnected(value, mspQueue, protocol)
     session.smartfuelVoltageFallPerSecond = nil
     session.smartfuelChargeDropPerSecond = nil
     session.fuelPercent = nil
-    session.governorMode = nil
-    session.governorState = nil
     session.rxMap = nil
     session.flightModeFlags = nil
     session.systemStatus = nil
     session.systemConfig = nil
     session.gpsFixType = nil
-    session.navBlocked = nil
     session.gpsSats = nil
     gpsSeenHealthy = false
     session.telemetrySlots = nil
     session.pidProfile = nil
     session.rateProfile = nil
-    session.tvProfile = nil
     session.batteryProfile = nil
     session.adjFunction = nil
     session.adjValue = nil
@@ -1105,7 +1088,6 @@ local function validConfig(config)
   return validProfile(config.pidProfile)
     and validProfile(config.rateProfile)
     and validProfile(config.batteryProfile)
-    and validProfile(config.tvProfile)
 end
 
 local function updateProfiles(protocol)
@@ -1116,7 +1098,6 @@ local function updateProfiles(protocol)
     session.systemConfig = config
     session.pidProfile = config.pidProfile
     session.rateProfile = config.rateProfile
-    session.tvProfile = config.tvProfile
 
     -- The only 1-based battery profile value in the suite: the FC packs it as
     -- getCurrentBatteryProfileIndex() + 1. Converted here, once, so
@@ -1204,15 +1185,6 @@ local function updateBecVoltage(protocol)
   end
 end
 
-local function updateGovernor(protocol)
-  if not telemetrySensors then return end
-  local governorState = telemetrySensors.getValue(protocol, "governor")
-  if governorState ~= session.governorState then
-    session.governorState = governorState
-    publish()
-  end
-end
-
 local function updateFlightMode(protocol)
   if not telemetrySensors then return end
   local flightModeFlags = telemetrySensors.getValue(protocol, "flight_mode")
@@ -1236,10 +1208,10 @@ local function updateGpsSats(protocol)
 end
 
 -- Live state from the FC's "system_status" telemetry sensor
--- (lib/system_status.lua). isArmed, gpsFixType and navBlocked are unpacked
+-- (lib/system_status.lua). isArmed and gpsFixType are unpacked
 -- for existing readers. A missing reading keeps the last known state rather
 -- than guessing -- notably isArmed, which app/pages/configuration.lua's save
--- flow relies on to never send MSP_REBOOT while the aircraft could be armed.
+-- flow relies on to never send MSP_REBOOT while the car could be armed.
 --
 -- gpsCommsLost is added here: the FC clears "GPS present" along with "GPS
 -- healthy" when the module stops talking, so the loss can only be seen as
@@ -1277,7 +1249,6 @@ local function updateSystemStatus(protocol, mspQueue)
     end
   end
   session.gpsFixType = status.gpsFix
-  session.navBlocked = status.navBlocked
   publish()
 end
 
@@ -1576,7 +1547,6 @@ local function wakeup(mspQueue, protocol, transport, simSensors)
 
     if shouldRunScheduled("profiles", PROFILE_INTERVAL, now) then
       updateProfiles(sensorProtocol)
-      updateGovernor(sensorProtocol)
       updateFlightMode(sensorProtocol)
       updateGpsSats(sensorProtocol)
     end

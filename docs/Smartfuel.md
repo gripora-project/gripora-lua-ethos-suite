@@ -231,8 +231,8 @@ the virtual sensors so widgets and callouts use the new data path cleanly.
 
 `Smart Fuel` is published as usable remaining percentage from the active source.
 For electric models, the configured reserve/consumption warning percentage is
-treated as empty and remapped to `0%`, because reaching reserve means the pilot
-should land rather than continue discharging the pack.
+treated as empty and remapped to `0%`, because reaching reserve means the driver
+should stop rather than continue discharging the pack.
 
 For example, with a `30%` reserve, a raw source value of `30%` is published as
 `0%` Smart Fuel, while a raw source value of `100%` is still published as

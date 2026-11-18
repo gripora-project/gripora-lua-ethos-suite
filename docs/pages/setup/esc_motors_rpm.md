@@ -1,7 +1,7 @@
 ---
 title: "RPM"
 sidebar_label: "RPM"
-sidebar_position: 30
+sidebar_position: 60
 documentation_status: draft
 source: app/pages/esc_motors_rpm.lua
 ---
@@ -25,10 +25,10 @@ Requires a running background task and a flight controller connection.
 | --- | --- |
 | RPM Sensor | TODO: explain behaviour, displayed units, range and conditions. |
 | DShot RPM Telemetry | TODO: explain behaviour, displayed units, range and conditions. |
-| Main Motor Ratio (Pinion) | TODO: explain behaviour, displayed units, range and conditions. |
-| Main Motor Ratio (Main) | TODO: explain behaviour, displayed units, range and conditions. |
-| Tail Motor Ratio (Rear) | TODO: explain behaviour, displayed units, range and conditions. |
-| Tail Motor Ratio (Front) | TODO: explain behaviour, displayed units, range and conditions. |
+| Motor 1 Gear Ratio (Motor) | TODO: explain behaviour, displayed units, range and conditions. |
+| Motor 1 Gear Ratio (Wheel) | TODO: explain behaviour, displayed units, range and conditions. |
+| Motor 2 Gear Ratio (Motor) | TODO: explain behaviour, displayed units, range and conditions. |
+| Motor 2 Gear Ratio (Wheel) | TODO: explain behaviour, displayed units, range and conditions. |
 | Motor Pole Count | TODO: explain behaviour, displayed units, range and conditions. |
 
 ## Notes

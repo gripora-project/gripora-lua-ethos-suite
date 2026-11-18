@@ -1,21 +1,21 @@
--- Setup Wizard step: Airframe. Opened by app/pages/setup_wizard.lua.
+-- Setup Wizard step: Model. Opened by app/pages/setup_wizard.lua.
 --
 -- The radio's copy of gripora-configurator's StepAirframe.svelte and the
--- Mixer tab's model setup dialog: choose a model type and its options, and
--- the wizard writes the whole mix (lib/setup_wizard_mix.lua, a port of
--- Mixer.buildWizardRules()) and the model type. One question per screen,
--- with a picture of the result so far:
+-- Mixer tab's car setup (CarOptionsForm.svelte): Car or Custom. Car writes
+-- the car mixer preset (lib/setup_wizard_mix.lua, a port of carMixer.js):
+-- steering on S1 and a reversible ESC on M1, with optional rear steering on
+-- S2 and a second ESC on M2. Custom keeps the rules as they are; they are
+-- edited in Mixer Rules. One question per screen, with a picture of the car:
 --
---   current   what the model has now; Next keeps it, or Change
---   type      regular, flying wing, V-tail, delta, rudder-elevator trainer
---   ailerons / tail / wingYaw / flaps / follow / motors / diff
---             only the questions the type asks
---   review    the servos this sets, a warning when the board has fewer
+--   current   what the car has now; Car (set it up) or Custom, Next keeps it
+--   rear      rear steering: none, opposite to the front wheels, the same way
+--   amount    how far the rear wheels turn compared with the front ones
+--   second    a second ESC?
+--   review    the outputs this sets, a warning when the board has fewer
 --             servo outputs, and Apply
 --
--- Custom mixes stay on the Mixer Rules page, as in the configurator. Thrust
--- vectoring is left to the Configurator: applying a type here replaces the
--- whole rule table, thrust vector rules included, and the review says so.
+-- Applying also makes sure the stabilized throttle keeps its negative half
+-- (brake and reverse), as the configurator's setup dialog does.
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local ui = requireModule("app/setup_wizard_ui.lua")
@@ -27,64 +27,41 @@ local surfacesLib = requireModule("lib/setup_wizard_surfaces.lua")
 
 local T = {
   title = "@i18n(app.modules.setup_wizard.air_title)@",
+  intro = "@i18n(app.modules.setup_wizard.air_intro)@",
   current = "@i18n(app.modules.setup_wizard.air_current_fmt)@",
   custom = "@i18n(app.modules.setup_wizard.air_custom)@",
+  edited = "@i18n(app.modules.setup_wizard.air_edited)@",
   none = "@i18n(app.modules.setup_wizard.air_no_surfaces)@",
-  change = "@i18n(app.modules.setup_wizard.air_change)@",
-  typeQ = "@i18n(app.modules.setup_wizard.air_q_type)@",
-  aileronsQ = "@i18n(app.modules.setup_wizard.air_q_ailerons)@",
-  tailQ = "@i18n(app.modules.setup_wizard.air_q_tail)@",
-  wingYawQ = "@i18n(app.modules.setup_wizard.air_q_wing_yaw)@",
-  flapsQ = "@i18n(app.modules.setup_wizard.air_q_flaps)@",
-  followQ = "@i18n(app.modules.setup_wizard.air_q_follow)@",
-  motorsQ = "@i18n(app.modules.setup_wizard.air_q_motors)@",
-  diffQ = "@i18n(app.modules.setup_wizard.air_q_diff)@",
+  car = "@i18n(app.modules.setup_wizard.air_type_car)@",
+  customType = "@i18n(app.modules.setup_wizard.air_type_custom)@",
+  options = "@i18n(app.modules.setup_wizard.air_options)@",
+  rearQ = "@i18n(app.modules.setup_wizard.air_q_rear)@",
+  rearNone = "@i18n(app.modules.setup_wizard.air_rear_none)@",
+  rearOpposite = "@i18n(app.modules.setup_wizard.air_rear_opposite)@",
+  rearSame = "@i18n(app.modules.setup_wizard.air_rear_same)@",
+  rearHelp = "@i18n(app.modules.setup_wizard.air_rear_help)@",
+  amountQ = "@i18n(app.modules.setup_wizard.air_q_amount_fmt)@",
+  secondQ = "@i18n(app.modules.setup_wizard.air_q_second_esc)@",
   review = "@i18n(app.modules.setup_wizard.air_review_fmt)@",
   tooFew = "@i18n(app.modules.setup_wizard.air_too_few_fmt)@",
-  tvGone = "@i18n(app.modules.setup_wizard.air_tv_removed)@",
   apply = "@i18n(app.modules.setup_wizard.air_apply)@",
   applied = "@i18n(app.modules.setup_wizard.air_applied)@",
   yes = "@i18n(app.modules.setup_wizard.btn_yes)@",
   no = "@i18n(app.modules.setup_wizard.btn_no)@",
-  motor = "@i18n(app.modules.setup_wizard.air_motor_fmt)@",
+  esc = "@i18n(app.modules.setup_wizard.air_esc_fmt)@",
 }
 
-local TYPE_NAMES = {
-  [0] = "@i18n(app.modules.setup_wizard.air_type_regular)@",
-  [1] = "@i18n(app.modules.setup_wizard.air_type_flying_wing)@",
-  [2] = "@i18n(app.modules.setup_wizard.air_type_vtail)@",
-  [3] = "@i18n(app.modules.setup_wizard.air_type_delta)@",
-  [4] = "@i18n(app.modules.setup_wizard.air_type_trainer)@",
-  [5] = "@i18n(app.modules.setup_wizard.air_type_custom)@",
-}
+-- The rear steering amount moves in these steps (the configurator's slider
+-- steps by 5).
+local AMOUNT_STEP = 5
 
-local CHOICE_NAMES = {
-  none = "@i18n(app.modules.setup_wizard.air_none)@",
-  single = "@i18n(app.modules.setup_wizard.air_ail_single)@",
-  independent = "@i18n(app.modules.setup_wizard.air_ail_independent)@",
-  elevatorOnly = "@i18n(app.modules.setup_wizard.air_tail_elevator)@",
-  elevatorRudder = "@i18n(app.modules.setup_wizard.air_tail_elevator_rudder)@",
-  rudder = "@i18n(app.modules.setup_wizard.air_yaw_rudder)@",
-}
-
-local FLAP_CHOICES = {
-  {key = "none", text = "@i18n(app.modules.setup_wizard.air_none)@"},
-  {key = 1, text = "@i18n(app.modules.setup_wizard.air_flaps_one)@"},
-  {key = 2, text = "@i18n(app.modules.setup_wizard.air_flaps_two)@"},
-  {key = 0, text = "@i18n(app.modules.setup_wizard.air_flaperons)@"},
-}
-
--- The model's surfaces as "S1 Aileron, S2 Aileron, ...", from a rule table.
+-- The car's outputs as "S1 Steering, M1 ESC, ...", from a rule table.
 local function describe(wiz, rules)
   local parts = {}
   for _, s in ipairs(surfacesLib.surfacesFromRules(rules, 26)) do
     parts[#parts + 1] = "S" .. (s.servo + 1) .. " " .. wiz.kindName(s.kind)
   end
-  local motors = 0
-  for _, r in ipairs(rules) do
-    if r.oper == 1 and r.input == 4 and r.output >= mix.MOTOR_OUTPUT_OFFSET then motors = motors + 1 end
-  end
-  for m = 1, motors do parts[#parts + 1] = string.format(T.motor, m) end
+  for _, m in ipairs(mix.escOutputs(rules)) do parts[#parts + 1] = string.format(T.esc, m) end
   return #parts > 0 and table.concat(parts, ", ") or T.none
 end
 
@@ -93,89 +70,33 @@ local function new(wiz)
   local scr = ui.new(wiz)
 
   local screen = "current"
-  local modelType = nil         -- MODEL_TYPES entry being set up
   local options = nil
-  local questions = {}          -- screens for this type, in order
-  local qi = 0
 
   local function go(name)
     screen = name
     wiz.rebuild()
   end
 
-  -- The question screens a type asks, given the answers so far.
-  local function questionList()
-    local list = {}
-    if modelType.ailerons and modelType.ailerons.options then list[#list + 1] = "ailerons" end
-    if modelType.tailControl and modelType.tailControl.options then list[#list + 1] = "tail" end
-    if modelType.wingYaw and modelType.wingYaw.options then list[#list + 1] = "wingYaw" end
-    list[#list + 1] = "flaps"
-    if options.flaps and options.flapServos == 2 and options.ailerons == "independent" then
-      list[#list + 1] = "follow"
-    end
-    list[#list + 1] = "motors"
-    if options.motors == 2 then list[#list + 1] = "diff" end
-    return list
+  local function startCar()
+    -- Start from what the car has, when the rules are the car preset.
+    options = mix.carOptionsFromRules(wiz.rules()) or mix.carOptions(nil)
+    go("rear")
   end
 
-  local function nextQuestion()
-    questions = questionList()
-    qi = qi + 1
-    go(questions[qi] or "review")
-  end
-
-  local function prevQuestion()
-    qi = qi - 1
-    if qi < 1 then
-      qi = 0
-      go("type")
-    else
-      go(questions[qi])
-    end
-  end
-
-  local function chooseType(tp)
-    modelType = tp
-    options = mix.defaultOptions(tp)
-    qi = 0
-    nextQuestion()
-  end
-
-  local function answer(field, value)
-    return function()
-      options[field] = value
-      nextQuestion()
-    end
+  local function chooseCustom()
+    wiz.setModelType(mix.MODEL_TYPE_CUSTOM)
+    wiz.rebuild()
   end
 
   local function preview()
-    local rules = mix.buildRules(options)
-    local layout = art.layout(surfacesLib.surfacesFromRules(rules, 26), nil)
-    -- The type being chosen, not the one on the FC: a delta and a flying
-    -- wing have the same surfaces and differ only in the picture.
-    layout.modelType = modelType.value
-    return layout, rules
+    local rules = mix.buildCarRules(options)
+    return art.layout(surfacesLib.surfacesFromRules(rules, 26), nil), rules
   end
 
-  -- A question's row: Back to the previous question, then the answers,
-  -- which are the way forward (the focus starts on the answer it has).
-  local function question(specs)
-    return scr:row(prevQuestion, specs, false)
-  end
-
-  local function optionButtons(field, opts)
-    local specs = {}
-    for _, o in ipairs(opts) do
-      specs[#specs + 1] = {text = CHOICE_NAMES[o] or o, press = answer(field, o), primary = options[field] == o}
-    end
-    return question(specs)
-  end
-
-  local function yesNo(field)
-    return question({
-      {text = T.no, press = answer(field, false), primary = not options[field]},
-      {text = T.yes, press = answer(field, true), primary = options[field] == true},
-    })
+  -- A question's row: Back to the previous screen, then the answers, which
+  -- are the way forward (the focus starts on the answer it has).
+  local function question(back, specs)
+    return scr:row(function() go(back) end, specs, false)
   end
 
   function self.build()
@@ -183,91 +104,93 @@ local function new(wiz)
     local cfg = wiz.mixConfig()
 
     if screen == "current" then
-      local value = cfg and cfg.model_type or 0
-      local body = string.format(T.current, TYPE_NAMES[value] or TYPE_NAMES[0], describe(wiz, wiz.rules()))
-      scr:text(T.title, body, value == mix.MODEL_TYPE_CUSTOM and T.custom or nil)
-      scr:picture(art.layout(wiz.surfaces(), nil))
-      local hasSurfaces = #wiz.surfaces() > 0
-      -- Next keeps the mix; with nothing mixed yet the focus is on Change.
-      return scr:row(nil, {{text = T.change, primary = not hasSurfaces, press = function() go("type") end}})
-
-    elseif screen == "type" then
-      scr:text(T.title, T.typeQ)
-      local specs = {}
-      for _, tp in ipairs(mix.MODEL_TYPES) do
-        specs[#specs + 1] = {text = TYPE_NAMES[tp.value], press = function() chooseType(tp) end,
-          primary = cfg and cfg.model_type == tp.value}
+      local isCar = (cfg and cfg.model_type or mix.MODEL_TYPE_CAR) == mix.MODEL_TYPE_CAR
+      local rules = wiz.rules() or {}
+      local note
+      if not isCar then
+        note = T.custom
+      elseif #wiz.surfaces() > 0 and not mix.carOptionsFromRules(rules) then
+        note = T.edited
       end
-      -- The grid first: the encoder visits fields in the order they are made.
-      local focus = scr:grid(specs, 2)
-      local back = scr:row(function() go("current") end, nil, false)
-      return focus or back
+      local body = T.intro .. " " .. string.format(T.current, isCar and T.car or T.customType, describe(wiz, rules))
+      scr:text(T.title, body, note)
+      scr:picture(art.layout(wiz.surfaces(), nil))
+      -- Next keeps the mix; with nothing mixed yet the focus is on Car.
+      local hasSurfaces = #wiz.surfaces() > 0
+      return scr:row(nil, {
+        {text = isCar and hasSurfaces and T.options or T.car, primary = not hasSurfaces, press = startCar},
+        {text = T.customType, small = true, disabled = not isCar, press = chooseCustom},
+      })
+
+    elseif screen == "rear" then
+      local layout = preview()
+      scr:text(T.car, T.rearQ, T.rearHelp, true)
+      scr:picture(layout)
+      local function rear(on, mode)
+        return function()
+          options = mix.carOptions({rearSteering = on, rearMode = mode or options.rearMode,
+            rearPercent = options.rearPercent, secondEsc = options.secondEsc})
+          go(on and "amount" or "second")
+        end
+      end
+      return question("current", {
+        {text = T.rearNone, small = true, primary = not options.rearSteering, press = rear(false)},
+        {text = T.rearOpposite, small = true, primary = options.rearSteering and options.rearMode == "opposite",
+          press = rear(true, "opposite")},
+        {text = T.rearSame, small = true, primary = options.rearSteering and options.rearMode == "same",
+          press = rear(true, "same")},
+      })
+
+    elseif screen == "amount" then
+      local layout = preview()
+      scr:text(T.car, string.format(T.amountQ, options.rearPercent), nil, true)
+      scr:picture(layout)
+      local function nudge(delta)
+        return function()
+          options = mix.carOptions({rearSteering = true, rearMode = options.rearMode,
+            rearPercent = options.rearPercent + delta, secondEsc = options.secondEsc})
+          go("amount")
+        end
+      end
+      return scr:row(function() go("rear") end, {
+        {text = "-", weight = 0.5, disabled = options.rearPercent <= mix.REAR_PERCENT_MIN, press = nudge(-AMOUNT_STEP)},
+        {text = "+", weight = 0.5, disabled = options.rearPercent >= mix.REAR_PERCENT_MAX, press = nudge(AMOUNT_STEP)},
+      }, {text = "@i18n(app.modules.setup_wizard.btn_next)@", press = function() go("second") end})
+
+    elseif screen == "second" then
+      local layout = preview()
+      scr:text(T.car, T.secondQ, nil, true)
+      scr:picture(layout)
+      local function second(on)
+        return function()
+          options = mix.carOptions({rearSteering = options.rearSteering, rearMode = options.rearMode,
+            rearPercent = options.rearPercent, secondEsc = on})
+          go("review")
+        end
+      end
+      return question(options.rearSteering and "amount" or "rear", {
+        {text = T.no, primary = not options.secondEsc, press = second(false)},
+        {text = T.yes, primary = options.secondEsc, press = second(true)},
+      })
 
     elseif screen == "review" then
       local layout, rules = preview()
       local used = mix.servosUsed(rules)
       local warn
       if used > wiz.servoCount() then warn = string.format(T.tooFew, used, wiz.servoCount()) end
-      for _, r in ipairs(wiz.rules() or {}) do
-        if r.oper ~= 0 and r.input >= 27 and r.input <= 29 then
-          warn = (warn and (warn .. " ") or "") .. T.tvGone
-          break
-        end
-      end
-      scr:text(TYPE_NAMES[modelType.value], string.format(T.review, describe(wiz, rules)), warn, true)
+      scr:text(T.car, string.format(T.review, describe(wiz, rules)), warn, true)
       scr:picture(layout)
-      return scr:row(prevQuestion, nil, {text = T.apply, press = function()
-        wiz.setMix(mix.ruleTable(options), modelType.value)
+      return scr:row(function() go("second") end, nil, {text = T.apply, press = function()
+        wiz.setMix(mix.ruleTable(options), mix.MODEL_TYPE_CAR)
+        wiz.ensureSignedThrottle()
         go("applied")
       end})
-
-    elseif screen == "applied" then
-      scr:text(T.title, T.applied .. " " .. describe(wiz, wiz.rules()))
-      scr:picture(art.layout(wiz.surfaces(), nil))
-      return scr:row(function() go("review") end)
     end
 
-    -- A question.
-    local layout = preview()
-    scr:picture(layout)
-    if screen == "ailerons" then
-      scr:text(TYPE_NAMES[modelType.value], T.aileronsQ, nil, true)
-      return optionButtons("ailerons", modelType.ailerons.options)
-    elseif screen == "tail" then
-      scr:text(TYPE_NAMES[modelType.value], T.tailQ, nil, true)
-      return optionButtons("tailControl", modelType.tailControl.options)
-    elseif screen == "wingYaw" then
-      scr:text(TYPE_NAMES[modelType.value], T.wingYawQ, nil, true)
-      return optionButtons("wingYaw", modelType.wingYaw.options)
-    elseif screen == "flaps" then
-      scr:text(TYPE_NAMES[modelType.value], T.flapsQ, nil, true)
-      local specs = {}
-      local current = options.flaps and options.flapServos or "none"
-      for _, c in ipairs(FLAP_CHOICES) do
-        -- Flaperons are the ailerons drooping: only with two of them.
-        if c.key ~= 0 or options.ailerons == "independent" then
-          specs[#specs + 1] = {text = c.text, small = true, primary = current == c.key, press = function()
-            options.flaps = c.key ~= "none"
-            options.flapServos = (c.key == "none") and 1 or c.key
-            nextQuestion()
-          end}
-        end
-      end
-      return question(specs)
-    elseif screen == "follow" then
-      scr:text(TYPE_NAMES[modelType.value], T.followQ, nil, true)
-      return yesNo("flapsFollowAilerons")
-    elseif screen == "motors" then
-      scr:text(TYPE_NAMES[modelType.value], T.motorsQ, nil, true)
-      local specs = {}
-      for n = 0, 2 do
-        specs[#specs + 1] = {text = tostring(n), primary = options.motors == n, press = answer("motors", n)}
-      end
-      return question(specs)
-    else -- diff
-      scr:text(TYPE_NAMES[modelType.value], T.diffQ, nil, true)
-      return yesNo("diffThrustYaw")
-    end
+    -- applied
+    scr:text(T.title, T.applied .. " " .. describe(wiz, wiz.rules()))
+    scr:picture(art.layout(wiz.surfaces(), nil))
+    return scr:row(function() go("review") end)
   end
 
   function self.paint() scr:paint() end

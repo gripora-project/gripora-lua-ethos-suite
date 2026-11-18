@@ -7,7 +7,9 @@
 -- really changed. Pilot mode switches are still announced.
 
 local ROOT = "src/grsuite/"
-local ANGLE, PASSTHROUGH = 2 ^ 1, 2 ^ 7
+-- Gripora reports two modes: FAILSAFE (bit 0) and GYRO OFF (the PASSTHROUGH
+-- bit 7, spoken from passthrough.wav). ANGLE (bit 1) is removed from the firmware.
+local ANGLE, FAILSAFE, PASSTHROUGH = 2 ^ 1, 2 ^ 0, 2 ^ 7
 
 local failures, checks = 0, 0
 local function check(label, ok, detail)
@@ -103,23 +105,23 @@ end
 
 do
   local said = run(concat({{0}}, hold({ANGLE, false}, 8)))
-  check("a pilot ANGLE switch on the bench is announced", said == "angle", said)
+  check("the removed ANGLE bit is not announced", said == "", said)
 end
 
 do
   local said = run(concat({{0}}, hold({PASSTHROUGH, false}, 8)))
-  check("the PASSTHROUGH mode is announced as Passthrough", said == "passthrough", said)
+  check("a pilot GYRO OFF switch on the bench is announced (passthrough.wav)", said == "passthrough", said)
 end
 
 do
-  local said = run(concat({{0, false, true}}, {{ANGLE, false, true}}))
-  check("armed, a mode switch is announced at once", said == "angle", said)
+  local said = run(concat({{0, false, true}}, {{PASSTHROUGH, false, true}}))
+  check("armed, a mode switch is announced at once", said == "passthrough", said)
 end
 
 do
-  -- Pilot switches to ANGLE while the wizard holds the model in setup.
-  local said = run(concat({{0}}, hold({PASSTHROUGH, true}, 8), hold({ANGLE, false}, 8)))
-  check("leaving setup into a different mode announces it", said == "setup,angle", said)
+  -- Failsafe comes up while the wizard holds the car in setup.
+  local said = run(concat({{0}}, hold({PASSTHROUGH, true}, 8), hold({FAILSAFE, false}, 8)))
+  check("leaving setup into a different mode announces it", said == "setup,failsafe", said)
 end
 
 print()

@@ -86,49 +86,13 @@ local APP_SESSION_PACKAGE_KEYS = {
 }
 
 -- This tool's top-level tile list, and the submenu tree it opens into.
--- Both mirror the real menu tree in rotorflight-lua-ethos-suite's own
--- app/modules/manifest.lua -- reviewed directly rather than re-derived,
--- so pages land in the same place a pilot already familiar with that
--- suite would expect, without reusing any of that project's actual
--- module code. `group` renders as a section label above its tile row
--- (see app/menu_container.lua) -- matching that suite's own section
--- labels ("Configuration", "System").
---
--- **Root screen is "Configuration", not a flat tile list** -- corrected
--- after a live screenshot of the original's own actual root showed two
--- section groups: "Configuration" (Flight Tuning, Setup) and "System"
--- (Tools, Logs, Settings, Developer), not PIDs/Rates/Governor/Advanced
--- sitting directly at the top level the way an earlier version of this
--- rebuild had them (before the manifest was reviewed this closely).
--- ROOT_ENTRIES now has all 6 of the original's own root tiles, matching
--- its section grouping/order exactly -- "Flight Tuning" is one of two
--- with a real destination (MENUS.flight_tuning_menu, which holds what
--- used to be ROOT_ENTRIES itself: PIDs/Rates/Governor/Advanced,
--- unchanged relative order); "Setup" is the other, now that
--- MENUS.setup_menu has its own first real entry (Configuration -- see
--- app/pages/configuration.lua). The remaining 4 (Tools, Logs, Settings,
--- Developer) are **scaffolded, not built**: each opens an empty tile
--- screen (just the header + Back, via its own zero-entry MENUS.*_menu
--- below) rather than a dead/crashing tile or a placeholder page file,
--- since none of those modules exist in this rebuild yet -- add real
--- entries to the matching *_menu table below as each one actually gets
--- built, same structure-only convention as everywhere else in this
--- file. (The original's own Logs/Developer tiles are single leaf pages,
--- not submenus -- using an empty submenu placeholder for those two as
--- well, rather than a dummy page file, keeps every still-scaffolded tile
--- uniform until there's real content behind it. Setup's own remaining 10
--- entries -- Radio Config, Telemetry, Accelerometer, Alignment, Ports,
--- Mixer, Servos, Controls, Power, ESC & Motors, Governor -- are
--- similarly still unbuilt; MENUS.setup_menu just isn't *entirely* empty
--- any more.)
--- Tile titles reuse the exact same i18n tag each page uses for its own
--- PAGE_TITLE (e.g. app/pages/pids.lua) rather than a separate literal --
--- i18n tags resolve via build-time text substitution (see
--- .vscode/scripts/resolve_i18n_tags.py), so every occurrence of the same
--- tag always resolves identically; two different literals for "the same
--- name" could silently drift out of sync with each other.
+-- `group` renders as a section label above its tile row (see
+-- app/menu_container.lua). The root has two groups: "Configuration"
+-- (Tuning, Setup) and "System" (Tools, Logs, Settings). Tile titles reuse
+-- the same i18n tag each page uses for its own PAGE_TITLE, so a tile and
+-- its page can never drift apart.
 local ROOT_ENTRIES = {
-  {title = "@i18n(app.menu_section_flight_tuning)@", icon = lcd.loadMask("app/gfx/flight_tuning.png"), menuId = "flight_tuning_menu", group = "@i18n(app.header_configuration)@"},
+  {title = "@i18n(app.menu_section_tuning)@", icon = lcd.loadMask("app/gfx/flight_tuning.png"), menuId = "tuning_menu", group = "@i18n(app.header_configuration)@"},
   {title = "@i18n(app.modules.hardware_setup.name)@", icon = lcd.loadMask("app/gfx/hardware.png"), menuId = "setup_menu", group = "@i18n(app.header_configuration)@"},
   {title = "@i18n(app.menu_section_tools)@", icon = lcd.loadMask("app/gfx/tools.png"), menuId = "tools_menu", group = "@i18n(app.header_system)@", offline = true},
   {title = "@i18n(app.modules.logs.name)@", icon = lcd.loadMask("app/gfx/logs.png"), script = "app/pages/logs.lua", group = "@i18n(app.header_system)@", offline = true},
@@ -149,9 +113,8 @@ local MENUS = {
       {title = "@i18n(app.modules.radio_config.name)@", icon = lcd.loadMask("app/gfx/radio_config.png"), script = "app/pages/radio_config.lua", group = "@i18n(app.menu_section_board_radio)@"},
       {title = "@i18n(app.modules.telemetry.name)@", icon = lcd.loadMask("app/gfx/telemetry.png"), script = "app/pages/telemetry.lua", group = "@i18n(app.menu_section_board_radio)@"},
       {title = "@i18n(app.menu_section_controls)@", icon = lcd.loadMask("app/gfx/controls.png"), menuId = "controls_menu", group = "@i18n(app.menu_section_board_radio)@"},
-      {title = "@i18n(app.modules.accelerometer.name)@", icon = lcd.loadMask("app/gfx/accelerometer.png"), script = "app/pages/accelerometer.lua", group = "@i18n(app.menu_section_sensors_gps)@"},
-      {title = "@i18n(app.modules.alignment.name)@", icon = lcd.loadMask("app/gfx/alignment.png"), script = "app/pages/alignment.lua", group = "@i18n(app.menu_section_sensors_gps)@"},
-      {title = "@i18n(app.modules.gps_nav_config.name)@", icon = lcd.loadMask("app/gfx/gps_nav_config.png"), script = "app/pages/gps_nav_config.lua", group = "@i18n(app.menu_section_sensors_gps)@"},
+      {title = "@i18n(app.modules.accelerometer.name)@", icon = lcd.loadMask("app/gfx/accelerometer.png"), script = "app/pages/accelerometer.lua", group = "@i18n(app.menu_section_sensors)@"},
+      {title = "@i18n(app.modules.alignment.name)@", icon = lcd.loadMask("app/gfx/alignment.png"), script = "app/pages/alignment.lua", group = "@i18n(app.menu_section_sensors)@"},
       {title = "@i18n(app.modules.mixer.name)@", icon = lcd.loadMask("app/gfx/mixer_config.png"), script = "app/pages/mixer_config.lua", group = "@i18n(app.menu_section_mixer_servos)@"},
       -- The actual mixer rule table (MSP_MIXER_RULES/MSP_SET_MIXER_RULE)
       -- -- distinct from Mixer above (MSP_MIXER_INPUT, per-axis gain
@@ -169,7 +132,6 @@ local MENUS = {
       {title = "@i18n(app.modules.servos.name)@", icon = lcd.loadMask("app/gfx/servos.png"), script = "app/pages/servos.lua", group = "@i18n(app.menu_section_mixer_servos)@"},
       {title = "@i18n(app.modules.power.name)@", icon = lcd.loadMask("app/gfx/power.png"), menuId = "power_menu", group = "@i18n(app.menu_section_power_motors)@"},
       {title = "@i18n(app.modules.esc_motors.name)@", icon = lcd.loadMask("app/gfx/esc_motors.png"), menuId = "esc_motors_menu", group = "@i18n(app.menu_section_power_motors)@"},
-      {title = "@i18n(app.modules.governor.name)@", icon = lcd.loadMask("app/gfx/governor.png"), script = "app/pages/governor.lua", group = "@i18n(app.menu_section_power_motors)@"},
     },
   },
   controls_menu = {
@@ -226,6 +188,9 @@ local MENUS = {
     entries = {
       {title = "@i18n(app.modules.esc_motors.motor_override)@", icon = lcd.loadMask("app/gfx/esc_motors_motor_override.png"), script = "app/pages/motor_override.lua"},
       {title = "@i18n(app.modules.esc_motors.throttle)@", icon = lcd.loadMask("app/gfx/esc_motors_throttle.png"), script = "app/pages/esc_motors_throttle.lua"},
+      -- How the ESC reverses, tyre size and the steering gyro's speed fade-in
+      -- (gripora-configurator's Drive panel on the Motors tab).
+      {title = "@i18n(app.modules.drive.name)@", icon = lcd.loadMask("app/gfx/esc_motors.png"), script = "app/pages/esc_motors_drive.lua"},
       {title = "@i18n(app.modules.esc_motors.telemetry)@", icon = lcd.loadMask("app/gfx/esc_motors_telemetry.png"), script = "app/pages/esc_motors_telemetry.lua"},
       -- Lit only on SRXL2 ESC telemetry (14): the firmware forces that protocol
       -- whenever a serial port carries the SRXL2 ESC function, which is when
@@ -341,63 +306,30 @@ local MENUS = {
       {title = "@i18n(app.modules.msp_exp.name)@", icon = lcd.loadMask("app/gfx/developer_msp_exp.png"), script = "app/pages/developer_msp_exp.lua"},
     },
   },
-  -- Matches the original's own `flight_tuning_menu` manifest entry, minus
-  -- Governor -- gripora-firmware has no MSP_GOVERNOR_CONFIG any more
-  -- (heli engine-RPM governor; see lib/msp_pid_profile.lua's header for
-  -- the wider gripora-vs-rotorflight wire-format divergence this
-  -- surfaced). Gripora's own Throttle Range Governor is a different
-  -- concept entirely and gets its own entry once ported. This used to be
-  -- ROOT_ENTRIES itself, flattened onto the tool's true root -- see that
-  -- variable's own comment above for why it moved one level deeper. Its
-  -- entries carry `group` labels; the first ("Flight Tuning") becomes the
-  -- screen header.
-  flight_tuning_menu = {
-    title = "@i18n(app.menu_section_flight_tuning)@",
+  -- Tuning. Only the steering (yaw) is stabilised, so the first group is the
+  -- steering tuning (its label becomes the screen header), then the drive
+  -- aids, then the advanced controller settings -- the same split as
+  -- gripora-configurator's Tuning tabs (Profiles, Rates).
+  tuning_menu = {
+    title = "@i18n(app.menu_section_tuning)@",
     entries = {
-      {title = "@i18n(app.modules.pids.name)@", icon = lcd.loadMask("app/gfx/pids.png"), script = "app/pages/pids.lua", group = "@i18n(app.menu_section_flight_tuning)@"},
-      {title = "@i18n(app.modules.rates.name)@", icon = lcd.loadMask("app/gfx/rates.png"), script = "app/pages/rates.lua", group = "@i18n(app.menu_section_flight_tuning)@"},
-      -- Flight Feel (Master Gain, I-term Decay, I-term Relax) is where pilots start
-      -- tuning, so it sits beside PIDs and Rates rather than under Advanced
-      -- (see app/pages/master_gains.lua's own header).
-      {title = "@i18n(app.modules.master_gains.name)@", icon = lcd.loadMask("app/gfx/master_gains.png"), script = "app/pages/master_gains.lua", group = "@i18n(app.menu_section_flight_tuning)@"},
-      -- Reads what the FC measured in flight and suggests changes to the pages above.
-      {title = "@i18n(app.modules.tune_advisor.name)@", icon = lcd.loadMask("app/gfx/tune_advisor.png"), script = "app/pages/tune_advisor.lua", group = "@i18n(app.menu_section_flight_tuning)@"},
-      -- Drive aids (ABS first; traction control and the rest join this group).
-      {title = "@i18n(app.modules.drive_aids.abs_name)@", icon = lcd.loadMask("app/gfx/esc_motors_throttle.png"), script = "app/pages/drive_aids_abs.lua", group = "@i18n(app.menu_section_drive_aids)@"},
-      -- Advanced used to be a submenu of its own; it is now a group on this
-      -- screen so every tuning page is one tap from Flight Tuning.
+      {title = "@i18n(app.modules.pids.name)@", icon = lcd.loadMask("app/gfx/pids.png"), script = "app/pages/pids.lua", group = "@i18n(app.menu_section_steering)@"},
+      {title = "@i18n(app.modules.rates.name)@", icon = lcd.loadMask("app/gfx/rates.png"), script = "app/pages/rates.lua", group = "@i18n(app.menu_section_steering)@"},
+      -- Driving Feel (Master Gain, I-term Decay, I-term Relax) is where
+      -- tuning starts (see app/pages/master_gains.lua's own header).
+      {title = "@i18n(app.modules.master_gains.name)@", icon = lcd.loadMask("app/gfx/master_gains.png"), script = "app/pages/master_gains.lua", group = "@i18n(app.menu_section_steering)@"},
+      -- Drive aids: ABS and traction control on one page.
+      {title = "@i18n(app.modules.drive_aids.name)@", icon = lcd.loadMask("app/gfx/esc_motors_throttle.png"), script = "app/pages/drive_aids_abs.lua", group = "@i18n(app.menu_section_drive_aids)@"},
       {title = "@i18n(app.modules.filters.name)@", icon = lcd.loadMask("app/gfx/filters.png"), script = "app/pages/filters.lua", group = "@i18n(app.menu_section_advanced)@"},
       {title = "@i18n(app.modules.pid_controller.name)@", icon = lcd.loadMask("app/gfx/pid_controller.png"), script = "app/pages/pid_controller.lua", group = "@i18n(app.menu_section_advanced)@"},
       {title = "@i18n(app.modules.pid_bandwidth.name)@", icon = lcd.loadMask("app/gfx/pid_bandwidth.png"), script = "app/pages/pid_bandwidth.lua", group = "@i18n(app.menu_section_advanced)@"},
-      -- Gain curve assignment, split off Flight Feel as an advanced shaping
+      -- Gain curve assignment, split off Driving Feel as an advanced shaping
       -- tool (see app/pages/gain_curves.lua).
       {title = "@i18n(app.modules.gain_curves.name)@", icon = lcd.loadMask("app/gfx/curves.png"), script = "app/pages/gain_curves.lua", group = "@i18n(app.menu_section_advanced)@"},
       {title = "@i18n(app.modules.rates_advanced.name)@", icon = lcd.loadMask("app/gfx/rates_advanced.png"), script = "app/pages/rates_advanced.lua", group = "@i18n(app.menu_section_advanced)@"},
-      {title = "@i18n(app.modules.autolevel.name)@", icon = lcd.loadMask("app/gfx/autolevel.png"), menuId = "autolevel_menu", group = "@i18n(app.menu_section_advanced)@"},
-      -- Thrust Vector is always available in the firmware; its output is
-      -- switched on in flight by the THRUST VECTOR mode.
-      {title = "@i18n(app.modules.thrust_vector.name)@", icon = lcd.loadMask("app/gfx/thrust_vector.png"), menuId = "thrust_vector_menu", group = "@i18n(app.menu_section_advanced)@"},
     },
   },
-  thrust_vector_menu = {
-    title = "@i18n(app.modules.thrust_vector.name)@",
-    entries = {
-      {title = "@i18n(app.modules.pids.name)@", icon = lcd.loadMask("app/gfx/pids.png"), script = "app/pages/thrust_vector_pids.lua"},
-      {title = "@i18n(app.modules.master_gains.name)@", icon = lcd.loadMask("app/gfx/master_gains.png"), script = "app/pages/thrust_vector_master_gains.lua"},
-      {title = "@i18n(app.modules.gain_curves.name)@", icon = lcd.loadMask("app/gfx/curves.png"), script = "app/pages/thrust_vector_gain_curves.lua"},
-      {title = "@i18n(app.modules.pid_controller.name)@", icon = lcd.loadMask("app/gfx/pid_controller.png"), script = "app/pages/thrust_vector_pid_controller.lua"},
-      {title = "@i18n(app.modules.pid_bandwidth.name)@", icon = lcd.loadMask("app/gfx/pid_bandwidth.png"), script = "app/pages/thrust_vector_pid_bandwidth.lua"},
-      {title = "@i18n(app.modules.thrust_vector.hold)@", icon = lcd.loadMask("app/gfx/autolevel_attitude_hold.png"), script = "app/pages/thrust_vector_hold.lua"},
-    },
-  },
-  autolevel_menu = {
-    title = "@i18n(app.modules.autolevel.name)@",
-    entries = {
-      {title = "@i18n(app.modules.autolevel.acro_trainer)@", icon = lcd.loadMask("app/gfx/autolevel_trainer.png"), script = "app/pages/autolevel_trainer.lua"},
-      {title = "@i18n(app.modules.autolevel.angle_mode)@", icon = lcd.loadMask("app/gfx/autolevel_angle.png"), script = "app/pages/autolevel_angle.lua"},
-      {title = "@i18n(app.modules.autolevel.att_hold)@", icon = lcd.loadMask("app/gfx/autolevel_attitude_hold.png"), script = "app/pages/autolevel_attitude_hold.lua"},
-    },
-  },
+
 }
 
 -- nav itself is also lazy, not just navigation.lua's own loadfile() --
