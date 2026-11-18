@@ -1,19 +1,22 @@
 -- MSP2_GRIPORA_DRIVE_AIDS_CONFIG helper (0x5F3F read / 0x5F40 write): the
 -- drive aids settings of the current PID profile, firmware pg/drive_aids.h.
--- ABS and traction control; later aids append their fields.
+-- ABS, traction control and launch control; later aids append their fields.
 --
 -- Read reply (gripora-firmware msp.c, MSP2_GRIPORA_DRIVE_AIDS_CONFIG):
 --   U8 abs_mode, abs_freq, abs_floor, abs_hold, abs_trigger, abs_dyn_freq,
 --   abs_dyn_hold, abs_corner_freq, abs_corner_hold                = 9 bytes
 --   U8 tc_mode, U16 tc_ramp_time (ms)                             = 12 bytes
--- Older firmware replies the nine ABS bytes only: the TC fields are then left
--- nil (has_tc false) and the write sends nine bytes. A longer reply is a later
+--   U8 lc_mode, U8 lc_throttle (%), U16 lc_ramp_time (ms)         = 16 bytes
+-- Older firmware replies the nine ABS bytes only, or twelve without launch
+-- control: the fields it did not send are then left nil (has_tc / has_lc
+-- false) and the write sends the same 9 or 12 bytes. A longer reply is a later
 -- firmware that appended more: only these are read. Shorter than nine is
 -- refused.
--- The write (MSP2_GRIPORA_SET_DRIVE_AIDS_CONFIG) sends the same 9 or 12 bytes;
--- the firmware takes the TC fields only from a request of 12 bytes or more,
--- leaves fields it was not sent unchanged and refuses the whole write if any
--- value is out of range, so FIELD_META's ranges match its checks.
+-- The write (MSP2_GRIPORA_SET_DRIVE_AIDS_CONFIG) sends the same 9, 12 or 16
+-- bytes; the firmware takes the TC fields only from a request of 12 bytes or
+-- more and the LC fields from 16 or more, leaves fields it was not sent
+-- unchanged and refuses the whole write if any value is out of range, so
+-- FIELD_META's ranges match its checks.
 -- The settings are stored per PID profile; both messages act on the current
 -- profile. They are read live by the firmware: no reboot after saving.
 
@@ -28,6 +31,7 @@ local READ_COMMAND = 0x5F3F
 local WRITE_COMMAND = 0x5F40
 local FIELD_COUNT = 9
 local TC_REPLY_LENGTH = 12
+local LC_REPLY_LENGTH = 16
 
 -- Wire order.
 local FIELDS = {
@@ -49,6 +53,15 @@ local TC_MODE_CHOICES = {
   {"@i18n(api.DRIVE_AIDS_CONFIG.tbl_ramp)@", TC_MODE_RAMP},
 }
 
+-- driveLcMode_e
+local LC_MODE_OFF = 0
+local LC_MODE_SWITCH = 1
+
+local LC_MODE_CHOICES = {
+  {"@i18n(api.DRIVE_AIDS_CONFIG.tbl_off)@", LC_MODE_OFF},
+  {"@i18n(api.DRIVE_AIDS_CONFIG.tbl_switch)@", LC_MODE_SWITCH},
+}
+
 local ABS_MODE_CHOICES = {
   {"@i18n(api.DRIVE_AIDS_CONFIG.tbl_off)@", ABS_MODE_OFF},
   {"@i18n(api.DRIVE_AIDS_CONFIG.tbl_static)@", ABS_MODE_STATIC},
@@ -68,15 +81,19 @@ local FIELD_META = {
   abs_corner_hold = {min = 0, max = 100, default = 0, suffix = "ms"},
   tc_mode = {choices = TC_MODE_CHOICES},
   tc_ramp_time = {min = 50, max = 2000, default = 500, suffix = "ms", step = 10},
+  lc_mode = {choices = LC_MODE_CHOICES},
+  lc_throttle = {min = 10, max = 100, default = 50, suffix = "%"},
+  lc_ramp_time = {min = 100, max = 5000, default = 1000, suffix = "ms", step = 10},
 }
 
-local SIMULATOR_RESPONSE = {0, 10, 40, 20, 30, 15, 0, 0, 0, 0, 244, 1}
+local SIMULATOR_RESPONSE = {0, 10, 40, 20, 30, 15, 0, 0, 0, 0, 244, 1, 0, 50, 232, 3}
 
 local msp_drive_aids_config = {
   READ_COMMAND = READ_COMMAND,
   WRITE_COMMAND = WRITE_COMMAND,
   FIELD_COUNT = FIELD_COUNT,
   TC_REPLY_LENGTH = TC_REPLY_LENGTH,
+  LC_REPLY_LENGTH = LC_REPLY_LENGTH,
   FIELDS = FIELDS,
   FIELD_META = FIELD_META,
   ABS_MODE_OFF = ABS_MODE_OFF,
@@ -86,6 +103,9 @@ local msp_drive_aids_config = {
   TC_MODE_OFF = TC_MODE_OFF,
   TC_MODE_RAMP = TC_MODE_RAMP,
   TC_MODE_CHOICES = TC_MODE_CHOICES,
+  LC_MODE_OFF = LC_MODE_OFF,
+  LC_MODE_SWITCH = LC_MODE_SWITCH,
+  LC_MODE_CHOICES = LC_MODE_CHOICES,
 }
 
 -- Returns the fields, or nil, a reason, and true when the reply was REFUSED.
@@ -104,12 +124,18 @@ function msp_drive_aids_config.decode(buf)
     data.tc_mode = mspcodec.readU8(buf)
     data.tc_ramp_time = mspcodec.readU16(buf)
   end
+  data.has_lc = length >= LC_REPLY_LENGTH
+  if data.has_lc then
+    data.lc_mode = mspcodec.readU8(buf)
+    data.lc_throttle = mspcodec.readU8(buf)
+    data.lc_ramp_time = mspcodec.readU16(buf)
+  end
   return data
 end
 
 -- A missing ABS field is written as its firmware default. The TC fields are
--- sent only when the reply carried them (has_tc), so older firmware gets the
--- nine bytes it knows.
+-- sent only when the reply carried them (has_tc), and the LC fields only after
+-- them (has_lc), so older firmware gets the 9 or 12 bytes it knows.
 function msp_drive_aids_config.encode(data)
   data = data or {}
   local payload = {}
@@ -122,6 +148,11 @@ function msp_drive_aids_config.encode(data)
   if data.has_tc then
     mspcodec.writeU8(payload, data.tc_mode or TC_MODE_OFF)
     mspcodec.writeU16(payload, data.tc_ramp_time or FIELD_META.tc_ramp_time.default)
+    if data.has_lc then
+      mspcodec.writeU8(payload, data.lc_mode or LC_MODE_OFF)
+      mspcodec.writeU8(payload, data.lc_throttle or FIELD_META.lc_throttle.default)
+      mspcodec.writeU16(payload, data.lc_ramp_time or FIELD_META.lc_ramp_time.default)
+    end
   end
   return payload
 end

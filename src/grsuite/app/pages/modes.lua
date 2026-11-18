@@ -50,16 +50,17 @@ local MODE_NAME_BY_ID = {
   [43] = "USER4",
   [52] = "BEEPER MUTE",
   [66] = "DRIVE AIDS OFF",
+  [67] = "LAUNCH",
 }
 -- Display order, gripora-configurator's src/js/FlightMode.js MODE_GROUPS:
--- arming, the driving modes (GYRO OFF, DRIVE AIDS OFF), GPS, beeper and
+-- arming, the driving modes (GYRO OFF, DRIVE AIDS OFF, LAUNCH), GPS, beeper and
 -- lights, logging, camera, user outputs; anything else after them in the
 -- FC's own order. Built once at load, so sorting costs nothing per frame.
 local MODE_ORDER = {}
 do
   local ordered = {
     "ARM", "PREARM", "FAILSAFE",
-    "GYRO OFF", "DRIVE AIDS OFF",
+    "GYRO OFF", "DRIVE AIDS OFF", "LAUNCH",
     "GPS BEEP SATELLITE COUNT",
     "BEEPER", "BEEPER MUTE", "LEDLOW",
     "BLACKBOX", "BLACKBOX ERASE", "TELEMETRY",

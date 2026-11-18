@@ -2,9 +2,10 @@
 -- current PID profile, the Traction Control section of gripora-configurator's
 -- Drive aids panel. Same MSP message and codec as app/pages/drive_aids_abs.lua
 -- (MSP2_GRIPORA_DRIVE_AIDS_CONFIG, lib/msp_drive_aids_config.lua); this page
--- builds only the two TC fields, and the codec writes the ABS fields back as
--- read. Per PID profile, like ABS: the header shows "Traction Control
--- #<profile>" and the page reloads when the profile changes. No reboot.
+-- builds only the two TC fields, and the codec writes the ABS and launch
+-- control (app/pages/drive_aids_lc.lua) fields back as read. Per PID profile,
+-- like ABS: the header shows "Traction Control #<profile>" and the page
+-- reloads when the profile changes. No reboot.
 --
 -- Greyed out: the ramp time unless Mode is Ramp, and both fields on firmware
 -- whose reply has no traction control (has_tc false; the save then sends the

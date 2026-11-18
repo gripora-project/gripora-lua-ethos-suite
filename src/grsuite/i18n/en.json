@@ -88,6 +88,12 @@
         "max_length": 6,
         "needs_translation": false,
         "translation": "Static"
+      },
+      "tbl_switch": {
+        "english": "Switch",
+        "max_length": 6,
+        "needs_translation": false,
+        "translation": "Switch"
       }
     },
     "ESC_SENSOR_CONFIG": {
@@ -1623,6 +1629,36 @@
           "max_length": 10,
           "needs_translation": false,
           "translation": "Full Brake"
+        },
+        "lc_mode": {
+          "english": "Mode",
+          "max_length": 4,
+          "needs_translation": false,
+          "translation": "Mode"
+        },
+        "lc_name": {
+          "english": "Launch Control",
+          "max_length": 14,
+          "needs_translation": false,
+          "translation": "Launch Control"
+        },
+        "lc_ramp_time": {
+          "english": "Ramp Time",
+          "max_length": 9,
+          "needs_translation": false,
+          "translation": "Ramp Time"
+        },
+        "lc_throttle": {
+          "english": "Start Throttle",
+          "max_length": 14,
+          "needs_translation": false,
+          "translation": "Start Throttle"
+        },
+        "lc_tile": {
+          "english": "Launch",
+          "max_length": 6,
+          "needs_translation": false,
+          "translation": "Launch"
         },
         "name": {
           "english": "Drive Aids",
@@ -8379,6 +8415,12 @@
           "max_length": 150,
           "needs_translation": false,
           "translation": "Turns the gyro off: steering and throttle pass straight from the transmitter, with no gyro correction. Put it on a switch you can reach while driving."
+        },
+        "mod_help_launch": {
+          "english": "Stages a launch for launch control: turn it on at the line, and the first pull of the trigger launches the car. Set it up under Tuning, Launch.",
+          "max_length": 143,
+          "needs_translation": false,
+          "translation": "Stages a launch for launch control: turn it on at the line, and the first pull of the trigger launches the car. Set it up under Tuning, Launch."
         },
         "mod_intro": {
           "english": "Put modes on switches: press Assign, then flick the switch to the position that turns the mode on. Only ARM is required; you can change modes later on the Modes page.",

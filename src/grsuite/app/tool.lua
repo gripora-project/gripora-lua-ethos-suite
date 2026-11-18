@@ -318,11 +318,13 @@ local MENUS = {
       -- Driving Feel (Master Gain, I-term Decay, I-term Relax) is where
       -- tuning starts (see app/pages/master_gains.lua's own header).
       {title = "@i18n(app.modules.master_gains.name)@", icon = lcd.loadMask("app/gfx/master_gains.png"), script = "app/pages/master_gains.lua", group = "@i18n(app.menu_section_steering)@"},
-      -- Drive aids: one page per aid. Both edit the same MSP message
+      -- Drive aids: one page per aid. All edit the same MSP message
       -- (MSP2_GRIPORA_DRIVE_AIDS_CONFIG); each builds only its own fields. The
-      -- Traction Control tile is titled "Traction" to fit the X18's tiles.
+      -- Traction Control and Launch Control tiles are titled "Traction" and
+      -- "Launch" to fit the X18's tiles.
       {title = "@i18n(app.modules.drive_aids.abs_name)@", icon = lcd.loadMask("app/gfx/esc_motors.png"), script = "app/pages/drive_aids_abs.lua", group = "@i18n(app.menu_section_drive_aids)@"},
       {title = "@i18n(app.modules.drive_aids.tc_tile)@", icon = lcd.loadMask("app/gfx/esc_motors_throttle.png"), script = "app/pages/drive_aids_tc.lua", group = "@i18n(app.menu_section_drive_aids)@"},
+      {title = "@i18n(app.modules.drive_aids.lc_tile)@", icon = lcd.loadMask("app/gfx/esc_motors_rpm.png"), script = "app/pages/drive_aids_lc.lua", group = "@i18n(app.menu_section_drive_aids)@"},
       {title = "@i18n(app.modules.filters.name)@", icon = lcd.loadMask("app/gfx/filters.png"), script = "app/pages/filters.lua", group = "@i18n(app.menu_section_advanced)@"},
       {title = "@i18n(app.modules.pid_controller.name)@", icon = lcd.loadMask("app/gfx/pid_controller.png"), script = "app/pages/pid_controller.lua", group = "@i18n(app.menu_section_advanced)@"},
       {title = "@i18n(app.modules.pid_bandwidth.name)@", icon = lcd.loadMask("app/gfx/pid_bandwidth.png"), script = "app/pages/pid_bandwidth.lua", group = "@i18n(app.menu_section_advanced)@"},

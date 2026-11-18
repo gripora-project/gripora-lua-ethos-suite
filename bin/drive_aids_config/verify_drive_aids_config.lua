@@ -1,5 +1,5 @@
 -- Behaviour check for the drive aids config codec (lib/msp_drive_aids_config.lua)
--- and the ABS page and menu row that use it.
+-- and the ABS, Traction and Launch pages and menu rows that use it.
 --
 -- Run it:
 --     lua5.4 bin/drive_aids_config/verify_drive_aids_config.lua
@@ -15,6 +15,8 @@
 -- The settings are stored per PID profile; both messages act on the current one.
 -- Traction control (API 33.x): U8 tc_mode, U16 tc_ramp_time follow the nine ABS
 -- bytes (12 in all); a nine-byte reply is older firmware and is written back as nine.
+-- Launch control: U8 lc_mode, U8 lc_throttle, U16 lc_ramp_time follow (16 in all);
+-- a twelve-byte reply is firmware without it and is written back as twelve.
 
 local function scriptDir()
   local src = debug.getinfo(1, "S").source
@@ -87,6 +89,8 @@ local ORDER = {
 local REPLY = {2, 12, 35, 25, 20, 18, 5, 4, 10}
 -- The same plus traction control: RAMP, 750 ms (U16 LE 0x02EE).
 local REPLY_TC = {2, 12, 35, 25, 20, 18, 5, 4, 10, 1, 0xEE, 0x02}
+-- The same plus launch control: SWITCH, 60 %, 1500 ms (U16 LE 0x05DC).
+local REPLY_LC = {2, 12, 35, 25, 20, 18, 5, 4, 10, 1, 0xEE, 0x02, 1, 60, 0xDC, 0x05}
 
 -- ---------------------------------------------------------------------------
 print("case 1: commands and field order match the firmware handler")
@@ -106,6 +110,7 @@ local EXPECT = {
   abs_trigger = {5, 100, 30}, abs_dyn_freq = {2, 33, 15}, abs_dyn_hold = {0, 100, 0},
   abs_corner_freq = {0, 10, 0}, abs_corner_hold = {0, 100, 0},
   tc_ramp_time = {50, 2000, 500},
+  lc_throttle = {10, 100, 50}, lc_ramp_time = {100, 5000, 1000},
 }
 for key, e in pairs(EXPECT) do
   local m = codec.FIELD_META[key]
@@ -118,6 +123,10 @@ check("mode choices Off/Static/Dynamic = 0/1/2",
 local tcChoices = codec.FIELD_META.tc_mode.choices
 check("TC mode choices Off/Ramp = 0/1",
   #tcChoices == 2 and tcChoices[1][2] == 0 and tcChoices[2][2] == 1)
+local lcChoices = codec.FIELD_META.lc_mode.choices
+check("LC mode choices Off/Switch = 0/1",
+  #lcChoices == 2 and lcChoices[1][2] == 0 and lcChoices[2][2] == 1)
+check("LC reply length is 16", codec.LC_REPLY_LENGTH == 16, codec.LC_REPLY_LENGTH)
 
 -- ---------------------------------------------------------------------------
 print("case 3: decode/encode round-trip")
@@ -127,8 +136,9 @@ local simData, simErrored = read(sim)
 check("simulatorResponse decodes", simData ~= nil and not simErrored)
 if simData then
   local defaults = simData.abs_mode == 0 and simData.tc_mode == 0 and simData.has_tc == true
+    and simData.lc_mode == 0 and simData.has_lc == true
   for key, e in pairs(EXPECT) do defaults = defaults and simData[key] == e[3] end
-  check("simulatorResponse is the firmware defaults (12 bytes, with TC)", #sim == 12 and defaults)
+  check("simulatorResponse is the firmware defaults (16 bytes, with TC and LC)", #sim == 16 and defaults)
 end
 
 local data, errored = read(REPLY)
@@ -154,22 +164,42 @@ if data then
   local same = #payload == 12
   for i = 1, 12 do same = same and payload[i] == REPLY_TC[i] end
   check("a 12-byte reply encodes exactly the twelve reply bytes", same, table.concat(payload, ","))
+  check("a 12-byte reply has no LC (firmware before launch control)", data.has_lc == false and data.lc_mode == nil)
+end
+
+data, errored = read(REPLY_LC)
+check("a 16-byte reply reaches onData", data ~= nil and not errored)
+if data then
+  check("LC fields decoded",
+    data.has_lc == true and data.lc_mode == 1 and data.lc_throttle == 60 and data.lc_ramp_time == 1500,
+    tostring(data.lc_mode) .. "/" .. tostring(data.lc_throttle) .. "/" .. tostring(data.lc_ramp_time))
+  check("TC still decoded before LC", data.tc_mode == 1 and data.tc_ramp_time == 750)
+  local payload = codec.encode(data)
+  local same = #payload == 16
+  for i = 1, 16 do same = same and payload[i] == REPLY_LC[i] end
+  check("a 16-byte reply encodes exactly the sixteen reply bytes", same, table.concat(payload, ","))
 end
 local empty = codec.encode({})
 check("encode of an empty table is 9 bytes of defaults",
   #empty == 9 and empty[1] == 0 and empty[2] == 10 and empty[5] == 30, table.concat(empty, ","))
 
 -- ---------------------------------------------------------------------------
-print("case 4: a longer reply (later aids appended) reads the known twelve")
+print("case 4: a longer reply (later aids appended) reads the known sixteen")
 
-local long = copy(REPLY_TC); long[13] = 7; long[14] = 99
+local long = copy(REPLY_LC); long[17] = 7; long[18] = 99
 data, errored = read(long)
-check("14-byte reply reaches onData", data ~= nil and not errored)
+check("18-byte reply reaches onData", data ~= nil and not errored)
 if data then
   check("abs_corner_hold is byte 9", data.abs_corner_hold == 10, data.abs_corner_hold)
-  check("tc_ramp_time is bytes 11-12, not an appended byte", data.tc_ramp_time == 750, data.tc_ramp_time)
-  check("write stays twelve bytes", #codec.encode(data) == 12, #codec.encode(data))
+  check("tc_ramp_time is bytes 11-12", data.tc_ramp_time == 750, data.tc_ramp_time)
+  check("lc_ramp_time is bytes 15-16, not an appended byte", data.lc_ramp_time == 1500, data.lc_ramp_time)
+  check("write stays sixteen bytes", #codec.encode(data) == 16, #codec.encode(data))
 end
+-- 13..15 bytes cannot hold the LC fields: ABS and TC only.
+local partial = copy(REPLY_TC); partial[13] = 1; partial[14] = 60
+data = read(partial)
+check("14-byte reply decodes ABS and TC only",
+  data ~= nil and data.has_tc == true and data.has_lc == false and #codec.encode(data) == 12)
 -- A 10- or 11-byte reply cannot hold the TC fields: ABS only.
 data = read({2, 12, 35, 25, 20, 18, 5, 4, 10, 1})
 check("10-byte reply decodes ABS only", data ~= nil and data.has_tc == false and #codec.encode(data) == 9)
@@ -205,12 +235,13 @@ end
 -- they build every field.
 checkPage("drive_aids_abs.lua", "abs_name", ORDER)
 checkPage("drive_aids_tc.lua", "tc_name", {"tc_mode", "tc_ramp_time"})
+checkPage("drive_aids_lc.lua", "lc_name", {"lc_mode", "lc_throttle", "lc_ramp_time"})
 
 local tool = readFile(SUITE .. "/app/tool.lua")
 local function menuRow(pattern)
   return tool and tool:match("[^\n]*" .. pattern .. "[^\n]*")
 end
-for _, file in ipairs({"drive_aids_abs.lua", "drive_aids_tc.lua"}) do
+for _, file in ipairs({"drive_aids_abs.lua", "drive_aids_tc.lua", "drive_aids_lc.lua"}) do
   local row = menuRow("app/pages/" .. file:gsub("%.", "%%."))
   check("menu row present for " .. file, row ~= nil)
   if row then
