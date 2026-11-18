@@ -1,0 +1,5 @@
+# Strings that are names, the same in every language, so
+# bin/i18n/check_translations.py does not report them. A word that only
+# appears often is not a name: route it through i18n instead.
+ActiveLook
+BLHeli_S
