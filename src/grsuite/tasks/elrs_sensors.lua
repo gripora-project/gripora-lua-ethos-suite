@@ -140,7 +140,7 @@ local function decControl(data, pos)
   y, c, pos = elrsDecode.decS12S12(data, pos)
   resolveAndPush(0x1031, p, "Pitch Control", UNIT_DEGREE, 2, -4500, 4500)
   resolveAndPush(0x1032, r, "Roll Control", UNIT_DEGREE, 2, -4500, 4500)
-  resolveAndPush(0x1033, 3 * y, "Yaw Control", UNIT_DEGREE, 2, -9000, 9000)
+  resolveAndPush(0x1033, 3 * y, "Steering Control", UNIT_DEGREE, 2, -9000, 9000)
   resolveAndPush(0x1034, c, "Coll Control", UNIT_DEGREE, 2, -4500, 4500)
   return nil, pos
 end

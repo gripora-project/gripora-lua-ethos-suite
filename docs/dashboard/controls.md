@@ -70,7 +70,7 @@ has focus, the same as the toolbar's keys.
 | Row | Shows |
 | --- | --- |
 | Link | Telemetry link type (S.Port or CRSF), plus link quality when the link reports it. |
-| Mode | Failsafe, Gyro Off, or Normal, from the FC's Flight Mode sensor. The first that applies, in the order the firmware's own CRSF flight-mode text uses. |
+| Mode | Failsafe, Gyro Off, or Normal, from the FC's Drive Mode sensor. The first that applies, in the order the firmware's own CRSF flight-mode text uses. |
 | Arming | **Ready** (green), **Blocked** (amber), or **Armed** (red). When blocked, each reason is listed at the bottom of the column. `-` until the FC reports its arming flags (or System Status). |
 | Profile | Active PID, rate and battery profile numbers. |
 | BEC Voltage | BEC voltage, when the sensor reports it. |

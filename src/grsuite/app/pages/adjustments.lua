@@ -73,7 +73,7 @@ local ADJUST_FUNCTIONS = {
   -- (pg/mixer.h, flight/mixer.c applyRoleWeight()). Signed, -1000..1000: a
   -- negative value flips every tagged rule together.
   {id = 112, name = "Flap Compensation Gain", min = -1000, max = 1000},
-  {id = 113, name = "Differential Thrust Yaw Gain", min = -1000, max = 1000},
+  {id = 113, name = "Diff. Thrust Steering Gain", min = -1000, max = 1000},
 }
 
 local FUNCTION_OPTIONS = {}

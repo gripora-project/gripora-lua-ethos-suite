@@ -65,7 +65,7 @@ local SENSORS = {
   attpitch         = {uid = 0x5024, name = "Pitch Attitude",   unit = UNIT_DEGREE,        dec = 1,   min = -1800, max = 3600},
   groundspeed      = {uid = 0x5025, name = "Ground Speed",     unit = UNIT_KNOT,          dec = 1,   min = -1800, max = 3600},
   motor2speed      = {uid = 0x5027, name = "Motor 2 Speed",    unit = UNIT_RPM,           dec = nil, min = 0,     max = 65535},
-  flight_mode      = {uid = 0x5028, name = "Flight Mode",      unit = nil,                dec = 0,   min = 0,     max = 65536},
+  flight_mode      = {uid = 0x5028, name = "Drive Mode",       unit = nil,                dec = 0,   min = 0,     max = 65536},
   system_status    = {uid = 0x5031, name = "System Status",    unit = nil,                dec = 0,   min = 0,     max = 2147483647},
   system_config    = {uid = 0x5032, name = "System Config",    unit = nil,                dec = 0,   min = 0,     max = 2147483647},
   gps_sats         = {uid = 0x5033, name = "GPS Sats",         unit = nil,                dec = 0,   min = 0,     max = 50},
