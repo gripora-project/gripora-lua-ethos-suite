@@ -434,7 +434,7 @@ in the default telemetry list). The most urgent state wins:
 | ABS | ABS releasing the brake | `activecolor` (orange) |
 | TC | Traction control holding the throttle back | `activecolor` (orange) |
 | LAUNCH | Launching | `activecolor` (orange) |
-| LAUNCH | Launch staged, waiting for the throttle | `stagedcolor` (yellow) |
+| LAUNCH | Launch staged, waiting for the throttle | `stagedcolor` (yellow; dark amber on a light theme) |
 | DRIFT | DRIFT mode | `modecolor` (blue) |
 | AIDS OFF | The DRIVE AIDS OFF switch is on | `offcolor` (red) |
 | ABS / TC | Braking with ABS set up / driving with traction control set up | `oncolor` (green) |
@@ -448,7 +448,7 @@ drive aids. The other parameters are those of the Arm Flags widget; `thresholds`
 ```
     offcolor            : color    -- GYRO OFF and AIDS OFF (default: red)
     activecolor         : color    -- An aid acting right now (default: orange)
-    stagedcolor         : color    -- Launch staged (default: yellow)
+    stagedcolor         : color    -- Launch staged (default: yellow; dark amber on a light theme)
     modecolor           : color    -- DRIFT (default: blue)
     oncolor             : color    -- Aids running (default: green)
     novalue             : string   -- Text shown while the sensor is missing (default: "-")
