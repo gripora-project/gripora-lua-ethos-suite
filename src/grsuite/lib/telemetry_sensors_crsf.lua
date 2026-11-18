@@ -80,4 +80,12 @@ return {
   armdisableflags = {
     {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x1203},
   },
+  -- gripora-firmware telemetry/crsf.c DRIVE_STATUS (U16, decoded by lib/drive_status.lua) and
+  -- DRIVE_SPEED (S16, 0.1 km/h, negative while reversing).
+  drive_status = {
+    {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x1205},
+  },
+  drive_speed = {
+    {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x1206},
+  },
 }

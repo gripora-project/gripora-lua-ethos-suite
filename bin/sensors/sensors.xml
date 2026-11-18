@@ -49,6 +49,25 @@
         <Sensor name="cell_count" label="Cell Count" round="true" type="range" min="1" max="12" unit="" default="6" /> 
     </Group>
 
+    <Group name="Drive State">
+        <Sensor name="drive_speed" label="Wheel Speed" round="true" rand="5" type="range" min="-30" max="120" multiplier="10" unit="km/h" default="40" />
+        <Sensor name="drive_status" label="Drive Aids" type="select" default="8193">
+            <Option value="8192" label="Off (disarmed)" />
+            <Option value="8193" label="Aids on" />
+            <Option value="8195" label="ABS braking" />
+            <Option value="8199" label="ABS releasing" />
+            <Option value="8201" label="TC driving" />
+            <Option value="8217" label="TC holding back" />
+            <Option value="9249" label="Launch staged" />
+            <Option value="9281" label="Launching" />
+            <Option value="8705" label="DRIFT" />
+            <Option value="10240" label="DRIVE AIDS OFF" />
+            <Option value="8448" label="GYRO OFF" />
+            <Option value="12289" label="Aids on, reversing" />
+            <Option value="1" label="No speed source" />
+        </Sensor>
+    </Group>
+
     <Group name="Adjustment Functions">
         <Sensor name="adj_f" round="true" label="Adjust Function" type="number" default="0" min="0" max="200" />
         <Sensor name="adj_v" round="true" label="Adjust Value" type="number" default="0" min="0" max="2000"/>

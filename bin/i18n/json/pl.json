@@ -10958,6 +10958,27 @@
       "needs_translation": true,
       "max_length": 16,
       "reverse_text": false
+    },
+    "sensor_drive_status": {
+      "english": "Drive Status",
+      "translation": "Drive Status",
+      "needs_translation": true,
+      "reverse_text": false,
+      "max_length": 12
+    },
+    "sensor_drive_speed": {
+      "english": "Drive Speed",
+      "translation": "Drive Speed",
+      "needs_translation": true,
+      "reverse_text": false,
+      "max_length": 11
+    },
+    "group_drive": {
+      "english": "Drive",
+      "translation": "Drive",
+      "needs_translation": true,
+      "reverse_text": false,
+      "max_length": 5
     }
   },
   "api": {
@@ -12091,6 +12112,41 @@
         "needs_translation": true,
         "max_length": 13,
         "reverse_text": false
+      },
+      "top_speed": {
+        "english": "Top Speed",
+        "translation": "Top Speed",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 9
+      },
+      "speed": {
+        "english": "Speed",
+        "translation": "Speed",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 5
+      },
+      "drive_aids": {
+        "english": "Drive Aids",
+        "translation": "Drive Aids",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 10
+      },
+      "roll": {
+        "english": "Roll",
+        "translation": "Roll",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 4
+      },
+      "pitch": {
+        "english": "Pitch",
+        "translation": "Pitch",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 5
       }
     },
     "governor": {
@@ -12107,6 +12163,80 @@
         "needs_translation": false,
         "max_length": 8,
         "reverse_text": false
+      }
+    },
+    "armstate": {
+      "ARMED": {
+        "english": "ARMED",
+        "translation": "UZBROJONY",
+        "needs_translation": false,
+        "max_length": 5,
+        "reverse_text": false
+      },
+      "DISARMED": {
+        "english": "DISARMED",
+        "translation": "ROBROJONY",
+        "needs_translation": false,
+        "max_length": 8,
+        "reverse_text": false
+      }
+    },
+    "driveaids": {
+      "GYRO_OFF": {
+        "english": "GYRO OFF",
+        "translation": "GYRO OFF",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 8
+      },
+      "ABS": {
+        "english": "ABS",
+        "translation": "ABS",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 3
+      },
+      "TC": {
+        "english": "TC",
+        "translation": "TC",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 2
+      },
+      "LAUNCH": {
+        "english": "LAUNCH",
+        "translation": "LAUNCH",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 6
+      },
+      "DRIFT": {
+        "english": "DRIFT",
+        "translation": "DRIFT",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 5
+      },
+      "AIDS_OFF": {
+        "english": "AIDS OFF",
+        "translation": "AIDS OFF",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 8
+      },
+      "AIDS_ON": {
+        "english": "AIDS ON",
+        "translation": "AIDS ON",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 7
+      },
+      "OFF": {
+        "english": "OFF",
+        "translation": "OFF",
+        "needs_translation": true,
+        "reverse_text": false,
+        "max_length": 3
       }
     }
   }

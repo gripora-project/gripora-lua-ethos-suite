@@ -10468,6 +10468,13 @@
       "reverse_text": false,
       "translation": "Depuración"
     },
+    "group_drive": {
+      "english": "Drive",
+      "max_length": 5,
+      "needs_translation": true,
+      "reverse_text": false,
+      "translation": "Drive"
+    },
     "group_esc1": {
       "english": "ESC 1",
       "max_length": 5,
@@ -10761,6 +10768,20 @@
       "needs_translation": false,
       "reverse_text": false,
       "translation": "DBG7"
+    },
+    "sensor_drive_speed": {
+      "english": "Drive Speed",
+      "max_length": 11,
+      "needs_translation": true,
+      "reverse_text": false,
+      "translation": "Drive Speed"
+    },
+    "sensor_drive_status": {
+      "english": "Drive Status",
+      "max_length": 12,
+      "needs_translation": true,
+      "reverse_text": false,
+      "translation": "Drive Status"
     },
     "sensor_esc1_bec_curr": {
       "english": "ESC1 BEC Curr",
@@ -11163,6 +11184,22 @@
     }
   },
   "widgets": {
+    "armstate": {
+      "ARMED": {
+        "english": "ARMED",
+        "max_length": 5,
+        "needs_translation": false,
+        "reverse_text": false,
+        "translation": "ARMADO"
+      },
+      "DISARMED": {
+        "english": "DISARMED",
+        "max_length": 8,
+        "needs_translation": false,
+        "reverse_text": false,
+        "translation": "DESARMADO"
+      }
+    },
     "battery": {
       "msg_battery_selected": {
         "english": "Selected battery:",
@@ -11326,6 +11363,13 @@
         "needs_translation": false,
         "reverse_text": false,
         "translation": "Corriente Máx"
+      },
+      "drive_aids": {
+        "english": "Drive Aids",
+        "max_length": 10,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "Drive Aids"
       },
       "esc_max_temp": {
         "english": "ESC Temp Max",
@@ -11614,6 +11658,13 @@
         "reverse_text": false,
         "translation": "Gyro Off"
       },
+      "pitch": {
+        "english": "Pitch",
+        "max_length": 5,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "Pitch"
+      },
       "profile": {
         "english": "Profile",
         "max_length": 7,
@@ -11642,6 +11693,13 @@
         "reverse_text": false,
         "translation": "Reset run"
       },
+      "roll": {
+        "english": "Roll",
+        "max_length": 4,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "Roll"
+      },
       "rpm": {
         "english": "RPM",
         "max_length": 3,
@@ -11662,6 +11720,13 @@
         "needs_translation": false,
         "reverse_text": false,
         "translation": "Mín RPM"
+      },
+      "speed": {
+        "english": "Speed",
+        "max_length": 5,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "Speed"
       },
       "startup_invalid_device": {
         "english": "Invalid device connected",
@@ -11775,6 +11840,13 @@
         "reverse_text": false,
         "translation": "Tempor"
       },
+      "top_speed": {
+        "english": "Top Speed",
+        "max_length": 9,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "Top Speed"
+      },
       "total_flight_duration": {
         "english": "Total Model Run Duration",
         "max_length": 24,
@@ -11809,6 +11881,64 @@
         "needs_translation": false,
         "reverse_text": false,
         "translation": "Watts Máx"
+      }
+    },
+    "driveaids": {
+      "ABS": {
+        "english": "ABS",
+        "max_length": 3,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "ABS"
+      },
+      "AIDS_OFF": {
+        "english": "AIDS OFF",
+        "max_length": 8,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "AIDS OFF"
+      },
+      "AIDS_ON": {
+        "english": "AIDS ON",
+        "max_length": 7,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "AIDS ON"
+      },
+      "DRIFT": {
+        "english": "DRIFT",
+        "max_length": 5,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "DRIFT"
+      },
+      "GYRO_OFF": {
+        "english": "GYRO OFF",
+        "max_length": 8,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "GYRO OFF"
+      },
+      "LAUNCH": {
+        "english": "LAUNCH",
+        "max_length": 6,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "LAUNCH"
+      },
+      "OFF": {
+        "english": "OFF",
+        "max_length": 3,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "OFF"
+      },
+      "TC": {
+        "english": "TC",
+        "max_length": 2,
+        "needs_translation": true,
+        "reverse_text": false,
+        "translation": "TC"
       }
     },
     "escstatus": {

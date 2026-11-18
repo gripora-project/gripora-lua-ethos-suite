@@ -115,7 +115,10 @@ return function(decoders)
     [0x1201] = {name = "Drive Mode", unit = UNIT_RAW, prec = 0, min = 0, max = 65535, dec = decU16},
     [0x1203] = {name = "Arming Disable", unit = UNIT_RAW, prec = 0, min = 0, max = 2147483647, dec = decU32},
     [0x1204] = {name = "Rescue", unit = UNIT_RAW, prec = 0, min = 0, max = 255, dec = decU8},
-    [0x1205] = {name = "Governor", unit = UNIT_RAW, prec = 0, min = 0, max = 255, dec = decU8},
+    -- Drive status (lib/drive_status.lua) and wheel speed, in the old governor appIds. The status
+    -- is a U16 on the wire: the heli governor's U8 here would throw the rest of the frame off.
+    [0x1205] = {name = "Drive Status", unit = UNIT_RAW, prec = 0, min = 0, max = 65535, dec = decU16},
+    [0x1206] = {name = "Drive Speed", unit = UNIT_KILOMETER_PER_HOUR, prec = 1, min = -32768, max = 32767, dec = decS16},
     [0x1220] = {name = "ADJ", unit = UNIT_RAW, prec = 0, dec = decAdjFunc},
     [0x1230] = {name = "System Status", unit = UNIT_RAW, prec = 0, min = 0, max = 2147483647, dec = decU32},
     [0x1231] = {name = "System Config", unit = UNIT_RAW, prec = 0, min = 0, max = 2147483647, dec = decU32},

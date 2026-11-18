@@ -585,6 +585,8 @@ context.tasks.telemetry.sensorTable = {
   temp_esc = {unit_string = "°C", localizations = localizeTemperature},
   bec_voltage = {unit_string = "V"},
   altitude = {unit_string = "m"},
+  drive_speed = {unit_string = "km/h"},
+  drive_status = {},
   watts = {unit_string = "W"},
   esc_load = {unit_string = "%"},
 }

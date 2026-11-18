@@ -65,7 +65,8 @@ local CREATE_LIST = {
   [0x5120] = {name = "Model ID", unit = UNIT_RAW},
   [0x5121] = {name = "Drive Mode", unit = UNIT_RAW},
   [0x5123] = {name = "Arm Dis Flags", unit = UNIT_RAW},
-  [0x5125] = {name = "Gov State", unit = UNIT_RAW},
+  [0x5125] = {name = "Drive Status", unit = UNIT_RAW},
+  [0x5126] = {name = "Drive Speed", unit = UNIT_KILOMETER_PER_HOUR, decimals = 1},
   [0x5140] = {name = "System Status", unit = UNIT_RAW},
   [0x5141] = {name = "System Config", unit = UNIT_RAW},
   [0x5110] = {name = "Adj Function", unit = UNIT_RAW},
@@ -120,6 +121,8 @@ local RENAME_LIST = {
   [0x0400] = {name = "MCU Temp", onlyIfName = "Temp1"},
   [0x0401] = {name = "ESC Temp", onlyIfName = "Temp1"},
   [0x0402] = {name = "BEC Temp", onlyIfName = "Temp1"},
+  -- Same appId, a car sensor now: an older suite created it as the heli governor state.
+  [0x5125] = {name = "Drive Status", onlyIfName = "Gov State"},
 }
 
 -- Returns true if a sensor was newly created, false if one already existed.

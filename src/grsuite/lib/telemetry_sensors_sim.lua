@@ -66,4 +66,11 @@ return {
   armdisableflags = {
     {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5015},
   },
+  -- tasks/sim_sensors.lua's SENSORS.drive_status / drive_speed, same uids.
+  drive_status = {
+    {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5034},
+  },
+  drive_speed = {
+    {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5035},
+  },
 }
