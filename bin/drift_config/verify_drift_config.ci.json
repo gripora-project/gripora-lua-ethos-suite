@@ -1,0 +1,7 @@
+{
+  "id": "drift-config",
+  "name": "The drift config codec matches the firmware's drift mode layout",
+  "step": "Check the drift config codec and Drift page",
+  "script": "bin/drift_config/verify_drift_config.lua",
+  "rationale": "The Drift page (Tuning -> Drift) saves by writing back what it read. The command ids\n(gripora-firmware msp.c, MSP2_GRIPORA_DRIFT_CONFIG 0x5F42 / MSP2_GRIPORA_SET_DRIFT_CONFIG 0x5F43,\npg/drift.h), the four-byte layout (U8 gain %, U16 allow deg/s, U8 limit %), and the ranges and\ndefaults are pinned here: the firmware refuses the whole write if any value is out of range. A\nlonger reply must still decode the known four and the write must stay four; a shorter reply is\nrefused. Firmware without drift mode answers the command as unsupported: that must load the page\nwith its fields greyed out and write nothing, while a timeout stays a failed read. The harness\nalso checks that the page builds every field, refuses saves while armed, does not reboot and\nfollows the current PID profile, that it sits in the Steering group of the Tuning menu with an\nicon that exists, and that DRIFT (mode id 68) is on the Modes page and in the setup wizard's\nmodes step."
+}

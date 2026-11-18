@@ -1619,6 +1619,43 @@
           "translation": "舵机"
         }
       },
+      "drift": {
+        "allow": {
+          "english": "Allowed Rate",
+          "max_length": 12,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Allowed Rate"
+        },
+        "gain": {
+          "english": "Counter Gain",
+          "max_length": 12,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Counter Gain"
+        },
+        "limit": {
+          "english": "Counter Limit",
+          "max_length": 13,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Counter Limit"
+        },
+        "name": {
+          "english": "Drift",
+          "max_length": 5,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "Drift"
+        },
+        "note": {
+          "english": "The DRIFT switch (Modes page) turns it on.",
+          "max_length": 42,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "The DRIFT switch (Modes page) turns it on."
+        }
+      },
       "drive": {
         "esc_auto": {
           "english": "Automatic",
@@ -8894,6 +8931,13 @@
           "needs_translation": true,
           "reverse_text": false,
           "translation": "Arms the motor. Nothing else works without it."
+        },
+        "mod_help_drift": {
+          "english": "For drifting: the steering wheel steers the wheels directly and the gyro only catches over-rotation. Set it up under Tuning, Drift.",
+          "max_length": 131,
+          "needs_translation": true,
+          "reverse_text": false,
+          "translation": "For drifting: the steering wheel steers the wheels directly and the gyro only catches over-rotation. Set it up under Tuning, Drift."
         },
         "mod_help_drive_aids_off": {
           "english": "Turns ABS, traction and launch control off: throttle and brake go straight to the ESC. The gyro still steers.",
