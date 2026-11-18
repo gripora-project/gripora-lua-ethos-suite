@@ -8,14 +8,14 @@
 --
 -- layout() runs when a screen is built; draw() runs from paint and only does
 -- arithmetic and drawing on what layout() worked out, so it allocates
--- nothing. The Sensors step's 3D car is app/plane3d.lua.
+-- nothing. The Sensors step's 3D car is app/car3d.lua.
 
 if package.loaded["grsuite.app.setup_wizard_art"] then
   return package.loaded["grsuite.app.setup_wizard_art"]
 end
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
-local plane3d = requireModule("app/plane3d.lua")
+local car3d = requireModule("app/car3d.lua")
 
 local floor = math.floor
 local sin, cos = math.sin, math.cos
@@ -116,9 +116,9 @@ function art.done(l, x, y, w, h, colors)
   art.tick(x + w - r - 6, y + h - r - 6, r)
 end
 
--- The 3D pictures' background work (plane3d.service()): the wizard calls
+-- The 3D pictures' background work (car3d.service()): the wizard calls
 -- it from every wakeup.
-art.service = plane3d.service
+art.service = car3d.service
 
 -- A rectangle (half sizes hw x hh) centred on cx, cy and turned by angle
 -- (radians, clockwise on screen), as two triangles.
