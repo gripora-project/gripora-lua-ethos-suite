@@ -1598,6 +1598,8 @@ local function create()
     tempMcu = nil,
     becVoltage = nil,
     fuelPercent = nil,
+    driveStatus = nil,
+    driveSpeed = nil,
     rxMap = nil,
     mspTransport = nil,
     pidProfile = nil,
@@ -1709,6 +1711,8 @@ local function update(widget, snapshot)
   widget.tempMcu = snapshot.tempMcu
   widget.becVoltage = snapshot.becVoltage
   widget.fuelPercent = snapshot.fuelPercent
+  widget.driveStatus = snapshot.driveStatus
+  widget.driveSpeed = snapshot.driveSpeed
   widget.rxMap = snapshot.rxMap
   widget.mspTransport = snapshot.mspTransport
   widget.pidProfile = snapshot.pidProfile

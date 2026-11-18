@@ -93,6 +93,23 @@ local LIVE_SENSOR_CANDIDATES = {
     altitude = {
       {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x0100},
     },
+    drive_status = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5125},
+    },
+    drive_speed = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5126},
+    },
+    -- gripora-firmware smartport.c ATTITUDE (0x0730) packs roll and pitch, which Ethos shows as
+    -- sub-ids 0 and 1; the heading is the "Heading" sensor lib/frsky_sensors.lua makes.
+    attroll = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x0730, subId = 0},
+    },
+    attpitch = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x0730, subId = 1},
+    },
+    attyaw = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5210},
+    },
   },
   crsf = {
     -- subId=2 is the dedicated Link Quality field on firmware that broadcasts
@@ -163,8 +180,39 @@ local LIVE_SENSOR_CANDIDATES = {
     altitude = {
       {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x10B2},
     },
+    drive_status = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x1205},
+    },
+    drive_speed = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x1206},
+    },
+    -- The custom-telemetry attitude sensors tasks/elrs_sensors.lua creates, then the ones Ethos
+    -- makes from a native CRSF attitude frame.
+    attroll = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x1102},
+      "Roll",
+    },
+    attpitch = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x1101},
+      "Pitch",
+    },
+    attyaw = {
+      {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x1103},
+      "Yaw",
+    },
   },
 }
+
+-- The Ethos simulator reports itself as S.Port (tasks/session.lua): its attitude sensors are the
+-- ones tasks/sim_sensors.lua makes, at the end of the S.Port lists so real hardware never
+-- reaches them.
+local version = type(system) == "table" and system.getVersion and system.getVersion()
+if type(version) == "table" and version.simulation == true then
+  local sport = LIVE_SENSOR_CANDIDATES.sport
+  sport.attroll[#sport.attroll + 1] = {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5023}
+  sport.attpitch[#sport.attpitch + 1] = {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5024}
+  sport.attyaw[#sport.attyaw + 1] = {category = CATEGORY_TELEMETRY_SENSOR, appId = 0x5022}
+end
 
 local function liveProtocol(state)
   local protocol = state and state.mspTransport
@@ -264,6 +312,15 @@ local function sensorValue(widget, name)
   if name == "temp_esc" then return widget.tempEsc or liveSensorValue(protocol, name), "°C" end
   if name == "bec_voltage" then return widget.becVoltage or liveSensorValue(protocol, name), "V" end
   if name == "altitude" then return liveSensorValue(protocol, name), "m" end
+  -- The car's wheel speed in km/h, negative while reversing (the session leaves it nil while
+  -- the firmware has no speed source), and the drive status word (lib/drive_status.lua).
+  if name == "drive_speed" then
+    if widget.driveSpeed ~= nil then return widget.driveSpeed, "km/h" end
+    if widget.driveStatus ~= nil then return nil, "km/h" end
+    return liveSensorValue(protocol, name), "km/h"
+  end
+  if name == "drive_status" then return widget.driveStatus or liveSensorValue(protocol, name) end
+  if name == "attroll" or name == "attpitch" or name == "attyaw" then return liveSensorValue(protocol, name), "°" end
   if name == "armflags" then
     if widget.isArmed == true then return 1 end
     if widget.isArmed == false then return 0 end

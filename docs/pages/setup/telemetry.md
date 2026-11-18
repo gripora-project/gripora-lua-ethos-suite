@@ -50,6 +50,12 @@ Requires a running background task and a flight controller connection.
   so the tap and the save agree on the number. One case is still refused at the
   tap: a switch that turns off a conflicting child while all 40 slots are in use,
   even when the save would accept the result.
+- **Drive group.** *Drive Status* (93: the drive aids, GYRO OFF, DRIFT,
+  LAUNCH, DRIVE AIDS OFF, reversing, speed known) and *Drive Speed* (94: the
+  wheel speed in km/h, negative while reversing) feed the dashboard's drive
+  aids tile and the top speed. Both are in the default set from the Tool
+  button, in place of *Altitude* and *VSpeed*, as in the firmware's own
+  default list.
 - **Saving sets the flight controller's CRSF telemetry mode to Custom.** The
   suite reads custom CRSF telemetry only, so in Native mode it would see no
   sensors. This page has no control for the mode.

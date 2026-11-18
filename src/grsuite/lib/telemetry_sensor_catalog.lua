@@ -82,6 +82,10 @@ local SENSOR_LIST = {
   [88] = {name = "@i18n(telemetry.sensor_model_id)@", group = "status"},
   [89] = {name = "@i18n(telemetry.sensor_flight_mode)@", group = "status"},
   [91] = {name = "@i18n(telemetry.sensor_arming_disable)@", group = "status"},
+  -- Car drive state, in the slots of the removed heli governor sensors (93, 94):
+  -- the drive aids and driving modes (lib/drive_status.lua), and the wheel speed.
+  [93] = {name = "@i18n(telemetry.sensor_drive_status)@", group = "drive"},
+  [94] = {name = "@i18n(telemetry.sensor_drive_speed)@", group = "drive"},
   [99] = {name = "@i18n(telemetry.sensor_adj)@", group = "status"},
   [100] = {name = "@i18n(telemetry.sensor_dbg0)@", group = "debug"},
   [101] = {name = "@i18n(telemetry.sensor_dbg1)@", group = "debug"},
@@ -106,6 +110,7 @@ local GROUP_TITLE = {
   esc1 = "@i18n(telemetry.group_esc1)@",
   esc2 = "@i18n(telemetry.group_esc2)@",
   rpm = "@i18n(telemetry.group_rpm)@",
+  drive = "@i18n(telemetry.group_drive)@",
   barometer = "@i18n(telemetry.group_barometer)@",
   gyro = "@i18n(telemetry.group_gyro)@",
   gps = "@i18n(telemetry.group_gps)@",
@@ -118,7 +123,7 @@ local GROUP_TITLE = {
 
 local GROUP_ORDER = {
   "battery", "voltage", "current", "temps", "esc1", "esc2", "rpm",
-  "barometer", "gyro", "gps", "status", "profiles", "control",
+  "drive", "barometer", "gyro", "gps", "status", "profiles", "control",
   "system", "debug",
 }
 
@@ -150,7 +155,7 @@ local catalog = {
   },
   -- Same list as gripora-firmware's telemetry_sensors default
   -- (src/main/pg/telemetry.c) -- keep the two in sync.
-  DEFAULT_IDS = {3, 4, 5, 6, 15, 43, 50, 52, 58, 59, 60, 89, 91, 99, 120, 121},
+  DEFAULT_IDS = {3, 4, 5, 6, 15, 43, 50, 52, 60, 89, 91, 93, 94, 99, 120, 121},
   -- Ids the flight controller emits as *full* CRSF frames while
   -- crsf_telemetry_mode is NATIVE: crsfNativeSensorDefinitions in
   -- src/main/telemetry/crsf.c holds FLIGHT_MODE, BATTERY, ATTITUDE,

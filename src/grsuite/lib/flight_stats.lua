@@ -33,9 +33,13 @@ local STAT_SUFFIXES = {
   temp_esc = "TempEsc",
   bec_voltage = "BecVoltage",
   altitude = "Altitude",
+  drive_speed = "DriveSpeed",
   watts = "Watts",
 }
 
+-- headspeed, tailspeed and altitude are kept for user themes from the heli/plane suites; the
+-- built-in themes show the car's wheel speed (drive_speed: max is the top speed forward, min the
+-- fastest in reverse).
 local STAT_ALIASES = {
   headspeed = "rpm",
   smartconsumption = "consumption",
@@ -61,6 +65,7 @@ local PRESENTATION_STAT_SOURCES = {
   "temp_esc",
   "bec_voltage",
   "altitude",
+  "drive_speed",
   "watts",
   "esc_load",
 }

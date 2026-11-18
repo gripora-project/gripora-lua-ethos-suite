@@ -115,6 +115,10 @@ local session = {
   fuelPercent = nil,
   flightModeFlags = nil, -- live telemetry sensor value ("flight_mode"), a bitmask -- see
                           -- tasks/audio_events.lua's announceFlightMode() for the bit->mode mapping.
+  -- The car's drive state: the "drive_status" word (lib/drive_status.lua) and the wheel
+  -- speed in km/h, negative while reversing; nil while the firmware says it has no speed source.
+  driveStatus = nil,
+  driveSpeed = nil,
   -- Decoded "system_status" / "system_config" sensors (lib/system_status.lua).
   -- The fields below them (gpsFixType, isArmed, the profile
   -- numbers) are unpacked from these for existing readers.
@@ -422,6 +426,8 @@ local function flush()
     becVoltage = session.becVoltage,
     fuelPercent = session.fuelPercent,
     flightModeFlags = session.flightModeFlags,
+    driveStatus = session.driveStatus,
+    driveSpeed = session.driveSpeed,
     systemStatus = systemStatusCodec.copy(session.systemStatus),
     systemConfig = systemStatusCodec.copy(session.systemConfig),
     gpsFixType = session.gpsFixType,
@@ -966,6 +972,8 @@ local function setConnected(value, mspQueue, protocol)
     session.fuelPercent = nil
     session.rxMap = nil
     session.flightModeFlags = nil
+    session.driveStatus = nil
+    session.driveSpeed = nil
     session.systemStatus = nil
     session.systemConfig = nil
     session.gpsFixType = nil
@@ -1190,6 +1198,25 @@ local function updateFlightMode(protocol)
   local flightModeFlags = telemetrySensors.getValue(protocol, "flight_mode")
   if flightModeFlags ~= session.flightModeFlags then
     session.flightModeFlags = flightModeFlags
+    publish()
+  end
+end
+
+-- Drive status word and wheel speed (gripora-firmware TELEM_DRIVE_STATUS / TELEM_DRIVE_SPEED).
+-- The firmware sends speed 0 when it has no speed source; the status word says so (bit 13),
+-- and the speed is then left unknown rather than shown as a standstill.
+-- (Bit 13 is lib/drive_status.lua's SPEED_KNOWN; the bit is tested here rather than loading
+-- that module into the background task for one test.)
+local DRIVE_SPEED_KNOWN = 1 << 13
+
+local function updateDrive(protocol)
+  if not telemetrySensors then return end
+  local status = telemetrySensors.getValue(protocol, "drive_status")
+  local speed = telemetrySensors.getValue(protocol, "drive_speed")
+  if speed ~= nil and status ~= nil and (math.floor(status) & DRIVE_SPEED_KNOWN) == 0 then speed = nil end
+  if status ~= session.driveStatus or speed ~= session.driveSpeed then
+    session.driveStatus = status
+    session.driveSpeed = speed
     publish()
   end
 end
@@ -1543,6 +1570,7 @@ local function wakeup(mspQueue, protocol, transport, simSensors)
       updateMcuTemp(sensorProtocol)
       updateBecVoltage(sensorProtocol)
       updateFuel(sensorProtocol)
+      updateDrive(sensorProtocol)
     end
 
     if shouldRunScheduled("profiles", PROFILE_INTERVAL, now) then

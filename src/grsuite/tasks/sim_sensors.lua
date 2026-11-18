@@ -17,7 +17,7 @@
 --     telemetry-derived sensor sources Ethos's simulator can auto-populate
 --     at *real* appId ranges (RSSI, voltage, etc.) that could otherwise
 --     collide with auto-discovery. These sensors all live at
---     0x5002-0x5032, a range nothing else in this suite or Ethos itself
+--     0x5002-0x5035, a range nothing else in this suite or Ethos itself
 --     ever populates, so there is nothing to drop.
 --   - appId/unit/decimals/range values copied straight from that original's
 --     tasks/scheduler/telemetry/sources/sim.lua (uid/unit/dec/min/max
@@ -69,6 +69,10 @@ local SENSORS = {
   system_status    = {uid = 0x5031, name = "System Status",    unit = nil,                dec = 0,   min = 0,     max = 2147483647},
   system_config    = {uid = 0x5032, name = "System Config",    unit = nil,                dec = 0,   min = 0,     max = 2147483647},
   gps_sats         = {uid = 0x5033, name = "GPS Sats",         unit = nil,                dec = 0,   min = 0,     max = 50},
+  -- The car's drive state (gripora-firmware TELEM_DRIVE_STATUS / TELEM_DRIVE_SPEED): the status
+  -- word lib/drive_status.lua decodes, and the wheel speed in 0.1 km/h, negative in reverse.
+  drive_status     = {uid = 0x5034, name = "Drive Status",     unit = nil,                dec = 0,   min = 0,     max = 65535},
+  drive_speed      = {uid = 0x5035, name = "Drive Speed",      unit = UNIT_KILOMETER_PER_HOUR, dec = 1, min = -3000, max = 3000},
 }
 
 -- The packed system_status/system_config words (lib/system_status.lua) are
