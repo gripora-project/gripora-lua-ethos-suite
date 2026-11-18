@@ -6,6 +6,7 @@
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local grsuite = requireModule("widgets/dashboard/context.lua")
+local driveStatus = requireModule("lib/drive_status.lua")
 local lcd = lcd
 
 local tonumber = tonumber
@@ -156,11 +157,16 @@ local function rightStackWakeup(box, telemetry)
     c.cellStr = formatCellVoltageAndCount(voltage)
     c.consumedStr = formatConsumedMah(consumed)
 
-    c.armText = grsuite.utils.getArmStateText()
-    if c.armText == "UNKNOWN" then
+    -- During a run the tile under the fuel gauge shows the drive aids and driving mode
+    -- (lib/drive_status.lua), coloured by level.
+    local state = driveStatus.state(getSensor and getSensor("drive_status"))
+    if state then
+        c.armText = driveStatus.TEXT[state]
+        c.armColor = box.rs_aidscolors[driveStatus.LEVEL[state]] or box.rs_textcolor
+    else
         c.armText = utils.getPulsingDots(box, "_govDots")
+        c.armColor = box.rs_textcolor
     end
-    c.armColor = utils.resolveThresholdColor(c.armText, box, "textcolor", "textcolor", box.rs_govthresholds)
 
     return c
 end
@@ -232,7 +238,7 @@ local function rightStackPaint(x, y, w, h, box, c)
     utils.drawBoxBackground(x, govBgY, w, govBgH, box.rs_govbgstyle)
 
     utils.box(x, govY + box.rs_govoffsety, w, govBgH,
-        "@i18n(widgets.dashboard.info_arming):upper()@", "bottom", "center", box.rs_govfont, box.rs_govtitlespacing, box.rs_titlecolor,
+        "@i18n(widgets.dashboard.drive_aids):upper()@", "bottom", "center", box.rs_govfont, box.rs_govtitlespacing, box.rs_titlecolor,
         nil, nil, nil, nil, box.rs_govtitlepaddingbottom,
         c.armText, nil, box.rs_govfont, "center", c.armColor,
         nil, nil, nil, nil, box.rs_govvaluepaddingbottom,
@@ -460,16 +466,20 @@ local function buildBoxes(W)
             rs_celloffsety = 34,
             rs_consumedoffsety = 60,
 
-            -- arming status
+            -- drive aids / driving mode
             rs_govbgoffsety = 0,
             rs_govoffsety = -3,
             rs_govfont = armFont,
             rs_govtitlespacing = armTitleSpacing,
             rs_govtitlepaddingbottom = armTitlePaddingBottom,
             rs_govvaluepaddingbottom = armValuePaddingBottom,
-            rs_govthresholds = {
-                {value = "DISARMED", textcolor = colorMode.fillcritcolor},
-                {value = "ARMED", textcolor = colorMode.fillcolor}
+            rs_aidscolors = {
+                off = colorMode.fillcritcolor,
+                active = colorMode.fillwarncolor,
+                staged = colorMode.fillwarncolor,
+                mode = colorMode.accentcolor or colorMode.textcolor,
+                on = colorMode.fillcolor,
+                idle = colorMode.textcolor,
             }
         },
 

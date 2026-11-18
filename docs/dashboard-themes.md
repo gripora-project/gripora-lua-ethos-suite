@@ -36,7 +36,9 @@ Rotorflight dashboard themes and objects are organized under:
 │   │   ├── blackbox.lua
 │   │   ├── clock.lua
 │   │   ├── craftname.lua
-│   │   ├── governor.lua
+│   │   ├── driveaids.lua
+│   │   ├── escstatus.lua
+│   │   ├── governor.lua      (alias of driveaids.lua)
 │   │   ├── pidrates.lua
 │   │   ├── session.lua
 │   │   ├── stats.lua
@@ -136,7 +138,7 @@ return {
     defaultbg    = themeColor("THEME_PRIMARY_BGCOLOR", lcd.RGB(0,0,0)),
   },
   boxes = {
-    { col = 1, row = 1, type = "text", subtype = "telemetry", source = "altitude", title = "ALT", unit = "m" },
+    { col = 1, row = 1, type = "text", subtype = "telemetry", source = "drive_speed", title = "SPEED" },
     { x_pct = 0.5, y_pct = 0.1, w_pct = 0.4, h_pct = 0.2,
       type = "gauge", subtype = "bar", source = "smartfuel", gaugemin = 0, gaugemax = 100,
       title = "Fuel", unit = "%"
@@ -196,7 +198,8 @@ Outputs static or telemetry-based text. Subtypes located in `objects/text/`:
 | `craftname`  | Shows current model name (auto).       | –                 |
 | `escstatus`  | Speed controller health in words, coloured by level (auto). | – |
 | `blackbox`   | Used/total Blackbox storage (auto).    | –                 |
-| `armflags`   | Armed status flags (auto). `governor` is kept as an alias for user themes (Gripora has no governor). | – |
+| `armflags`   | Armed status flags (auto). | – |
+| `driveaids`  | Drive aids and driving mode in one word: GYRO OFF, ABS, TC, LAUNCH, DRIFT, AIDS OFF, AIDS ON, OFF (auto, from `drive_status`). `governor` is an alias, so a heli theme's governor tile shows the drive aids. | – |
 | `session`    | Any session key (`source` required).   | e.g., `"rx_rssi"` |
 | `stats`      | Session summary stats (auto).          | –                 |
 | `clock`      | Clock display (auto).                  | –                 |
@@ -216,7 +219,13 @@ all other values cover the whole run.
 **Common Parameters:**
 
 * `value` (for `text` subtype)
-* `source`: Telemetry field name (e.g., `"volt"`, `"current"`, `"rpm"`, `"smartfuel"`, `"watts"`, `"esc_load"`). For `"esc_load"`, it displays the current as a percentage of the speed controller's own limit (reads `--` until a limit is configured).
+* `source`: Telemetry field name (e.g., `"volt"`, `"current"`, `"rpm"`, `"smartfuel"`, `"watts"`, `"esc_load"`, `"drive_speed"`). For `"esc_load"`, it displays the current as a percentage of the speed controller's own limit (reads `--` until a limit is configured).
+  `"drive_speed"` is the car's wheel speed in km/h, negative while reversing; it reads `--` when the
+  firmware has no speed source (no motor RPM, or no gear ratio and tyre size). As a `stats` source,
+  `max` is the top speed forward and `min` the fastest in reverse. `"drive_status"` is the raw drive
+  status word (shown in words by `driveaids`). `"attroll"` and `"attpitch"` are the body roll and
+  pitch in degrees. The heli and plane sources `"altitude"`, `"headspeed"` and `"tailspeed"` still
+  work in user themes, but no built-in theme uses them.
 * `decimals`, `unit`, `font`, `textcolor`, `title`, `titlefont`, `titlecolor`, `align`, `padding`, `novalue`, `transform`.
 
 **Example:**
@@ -318,7 +327,7 @@ Navigation-style widgets under `objects/navigation/`:
 
 | `subtype` | Description                 |
 | --------- | --------------------------- |
-| `ah`      | Attitude horizon display.   |
+| `ah`      | Car tilt view: the car from behind tipping by the roll angle and from the side by the pitch angle (the subtype keeps the inherited horizon's name). |
 
 ### 4.7 Function (`type = "func")`
 

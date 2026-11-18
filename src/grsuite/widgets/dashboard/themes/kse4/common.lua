@@ -68,8 +68,8 @@ local function fuelTitle()
 end
 
 local ARM_THRESHOLDS = {
-    {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor},
-    {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
+    {value = "@i18n(widgets.armstate.DISARMED)@", textcolor = colorMode.fillcritcolor},
+    {value = "@i18n(widgets.armstate.ARMED)@", textcolor = colorMode.fillcolor},
 }
 
 local FUEL_THRESHOLDS = {
@@ -122,6 +122,16 @@ function common.buildBoxes(W, phase)
         })
     end
 
+    -- During a run the arming tile shows the drive aids and driving mode instead.
+    local function driveAids(col, row, colspan, rowspan)
+        return at(col, row, colspan, rowspan, {
+            type = "text", subtype = "driveaids",
+            title = "@i18n(widgets.dashboard.drive_aids):upper()@",
+            font = opts.sfont,
+            offcolor = colorMode.fillcritcolor, activecolor = colorMode.fillwarncolor, oncolor = colorMode.fillcolor,
+        })
+    end
+
     local function fuelBar(col, row, colspan, rowspan)
         return at(col, row, colspan, rowspan, {
             type = "gauge", subtype = "bar",
@@ -157,7 +167,7 @@ function common.buildBoxes(W, phase)
             live(9, 6, 4, 3, {source = "temp_esc", transform = "floor", title = "@i18n(widgets.dashboard.esc_temp):upper()@"}),
             live(13, 6, 4, 3, {source = "throttle_percent", unit = "%", transform = "floor", title = "@i18n(widgets.dashboard.throttle):upper()@"}),
 
-            arming(1, 9, 4, 4),
+            driveAids(1, 9, 4, 4),
             fuelBar(5, 9, 12, 4),
         }
     end

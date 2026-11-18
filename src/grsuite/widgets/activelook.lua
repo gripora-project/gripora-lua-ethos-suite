@@ -5,6 +5,7 @@ local bus = requireModule("lib/bus.lua")
 local settingsStore = requireModule("lib/settings_store.lua")
 local activeConfig = requireModule("lib/activelook_config.lua")
 local flightStats = requireModule("lib/flight_stats.lua")
+local driveStatus = requireModule("lib/drive_status.lua")
 
 local os_clock = os.clock
 local floor = math.floor
@@ -106,6 +107,7 @@ local function sensor(widget, name)
   if name == "fuel" or name == "smartfuel" then return widget.fuelPercent end
   if name == "consumption" or name == "smartconsumption" then return widget.consumption end
   if name == "throttle_percent" then return widget.throttlePercent end
+  if name == "speed" then return widget.driveSpeed end
   if name == "cell_voltage" then
     local voltage = tonumber(widget.voltage)
     local cellCount = widget.batteryConfig and tonumber(widget.batteryConfig.cellCount)
@@ -147,6 +149,15 @@ local SENSOR_DEFS = {
   temp_mcu_max = {label = "Max MCU Temp", value = function(widget) return temperatureValue(widget, stat(widget, "temp_mcu", "max")) end, decimals = 0, temperature = true},
   link_min = {label = "Min Link", value = function(widget) return stat(widget, "link", "min") end, decimals = 0, suffix = "dB"},
   link_max = {label = "Max Link", value = function(widget) return stat(widget, "link", "max") end, decimals = 0, suffix = "dB"},
+  speed = {label = "@i18n(widgets.dashboard.speed)@", value = function(widget) return sensor(widget, "speed") end, decimals = 0, suffix = "km/h"},
+  speed_max = {label = "@i18n(widgets.dashboard.top_speed)@", value = function(widget) return stat(widget, "speed", "max") end, decimals = 0, suffix = "km/h"},
+  drive_aids = {
+    label = "@i18n(widgets.dashboard.drive_aids)@",
+    value = function(widget)
+      local state = driveStatus.state(widget.driveStatus)
+      return state and driveStatus.TEXT[state] or nil
+    end,
+  },
 }
 
 local function recordStat(widget, key, value)
@@ -351,6 +362,8 @@ local function update(widget, snapshot)
   widget.tempEsc = snapshot.tempEsc
   widget.tempMcu = snapshot.tempMcu
   widget.fuelPercent = snapshot.fuelPercent
+  widget.driveStatus = snapshot.driveStatus
+  widget.driveSpeed = snapshot.driveSpeed
   widget.timerLive = snapshot.timerLive or 0
   widget.timerSession = snapshot.timerSession or 0
   -- The phase comes from the session (lib/flight_stats.lua), the same one the
@@ -369,6 +382,7 @@ local function update(widget, snapshot)
     recordStat(widget, "temp_esc", widget.tempEsc)
     recordStat(widget, "temp_mcu", widget.tempMcu)
     recordStat(widget, "link", widget.linkQuality)
+    recordStat(widget, "speed", widget.driveSpeed)
   end
 end
 

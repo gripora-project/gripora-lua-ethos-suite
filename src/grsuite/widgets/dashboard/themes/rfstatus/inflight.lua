@@ -166,13 +166,11 @@ local function buildBoxes(W)
             row = 13,
             rowspan = 2,
             type = "text",
-            subtype = "armflags",
+            subtype = "driveaids",
             nosource = "-",
             titlecolor = colorMode.textcolor,
             textcolor = colorMode.textcolor,
-            thresholds = {
-                {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor}, {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
-                }
+            offcolor = colorMode.fillcritcolor, activecolor = colorMode.fillwarncolor, oncolor = colorMode.fillcolor,
         }, {col = 4, row = 13, rowspan = 2, type = "time", subtype = "flight", titlecolor = colorMode.textcolor, textcolor = colorMode.textcolor}, {col = 3, row = 13, rowspan = 2, type = "text", subtype = "telemetry", source = "rpm", nosource = "-", unit = "rpm", transform = "floor", titlecolor = colorMode.textcolor, textcolor = colorMode.textcolor},
         {col = 2, row = 13, rowspan = 2, type = "text", subtype = "telemetry", source = "link", nosource = "-", unit = "dB", transform = "floor", titlecolor = colorMode.textcolor, textcolor = colorMode.textcolor}
 

@@ -22,9 +22,11 @@ disable the unused slots.
 
 Selectable values include the run phase (PRE, RUN, POST), timer, arm status,
 ESC and MCU temperature, link, fuel, current, voltage, cell voltage, motor
-RPM, and consumed capacity. Min/max slots are available for fuel, current,
+RPM, consumed capacity, wheel speed (km/h, negative in reverse), and the drive
+aids (GYRO OFF, ABS, TC, LAUNCH, DRIFT, AIDS OFF, AIDS ON or OFF, as on the
+dashboard's drive aids tile). Min/max slots are available for fuel, current,
 voltage, RPM and link; maximum-only slots are available for ESC and MCU
-temperature.
+temperature and for speed (Top Speed).
 
 ## Run phases and statistics
 
@@ -53,7 +55,9 @@ reads sensor profiles from the configured Ethos simulator's
 the first preview save creates it. Saving preserves unrelated INI sections and
 rejects stale edits if the file changes concurrently.
 
-The preview uses Gripora slot IDs, including `rpm`, `rpm_min` and `rpm_max`.
+The preview uses Gripora slot IDs, including `rpm`, `rpm_min`, `rpm_max`,
+`speed`, `speed_max` and `drive_aids`; it reads the wheel speed and drive status
+from the `drive_speed` and `drive_status` sensor profiles.
 For profiles that return `math.random(...)`, it samples the configured range;
 it cannot read the exact random sample currently held by the simulator. The
 preview edits layouts and slots, not the widget enable switch or display

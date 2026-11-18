@@ -98,8 +98,8 @@ local function fuelTitle()
 end
 
 local ARM_THRESHOLDS = {
-    {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor},
-    {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
+    {value = "@i18n(widgets.armstate.DISARMED)@", textcolor = colorMode.fillcritcolor},
+    {value = "@i18n(widgets.armstate.ARMED)@", textcolor = colorMode.fillcolor},
 }
 
 local FUEL_THRESHOLDS = {
@@ -208,6 +208,16 @@ function common.buildBoxes(W, phase)
         })
     end
 
+    -- During a run the arming tile shows the drive aids and driving mode instead.
+    local function driveAids(col, row, colspan, rowspan, font, valuealign)
+        return readout(col, row, colspan, rowspan, {
+            type = "text", subtype = "driveaids",
+            title = "@i18n(widgets.dashboard.drive_aids):upper()@",
+            font = font, valuealign = valuealign,
+            offcolor = colorMode.fillcritcolor, activecolor = colorMode.fillwarncolor, oncolor = colorMode.fillcolor,
+        })
+    end
+
     if phase == "inflight" then
         return {
             fuelRing(1, 1, 6, 10, {font = opts.bigring, thickness = opts.bigthickness}),
@@ -215,7 +225,7 @@ function common.buildBoxes(W, phase)
             tempRing(12, 1, 5, 6, {font = opts.sfont}),
 
             tile(7, 7, 5, 4, {type = "time", subtype = "flight", title = "@i18n(widgets.dashboard.timer):upper()@"}),
-            arming(12, 7, 5, 4, opts.sfont, "center"),
+            driveAids(12, 7, 5, 4, opts.sfont, "center"),
 
             readout(1, 11, 4, 4, {source = "current", unit = "A", transform = "floor", title = "@i18n(widgets.dashboard.current):upper()@", font = opts.font}),
             readout(5, 11, 4, 4, {source = "voltage", unit = "V", decimals = 2, transform = cellVoltage, title = "@i18n(widgets.dashboard.volts_per_cell):upper()@", font = opts.font}),

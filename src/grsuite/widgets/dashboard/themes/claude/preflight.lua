@@ -180,8 +180,8 @@ local function buildBoxes(W)
             titlecolor = colorMode.titlecolor,
             bgcolor    = colorMode.paneldarkbg,
             thresholds = {
-                {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor},
-                {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
+                {value = "@i18n(widgets.armstate.DISARMED)@", textcolor = colorMode.fillcritcolor},
+                {value = "@i18n(widgets.armstate.ARMED)@", textcolor = colorMode.fillcolor},
             },
         },
 

@@ -4,13 +4,13 @@
 
 ## Current Object Type/Subtype Map
 
-- `text`: apiversion, armflags, blackbox, clock, craftname, pidrates, session, stats, telemetry, text, watts (`governor` is kept as an alias of `armflags` for user themes; Gripora has no governor)
+- `text`: apiversion, armflags, blackbox, clock, craftname, driveaids, escstatus, pidrates, session, stats, telemetry, text, watts (`governor` is kept for themes written for a heli: it is an alias of `driveaids`, so a governor tile shows the car's drive aids)
 - `gauge`: arc, bar, ring, step
 - `dial`: image, rainbow
 - `image`: image, model
 - `time`: count, flight, total
 - `func`: func
-- `navigation`: ah
+- `navigation`: ah (the car tilt view; the subtype keeps the inherited artificial horizon's name)
 
 ---
 
@@ -154,28 +154,41 @@ thresholds = {
 ```
 ---
 
-### Attitude Horizon Widget (type="navigation", subtype="ah")
+### Car Tilt View (type="navigation", subtype="ah")
+
+How far the car leans, from the attitude telemetry sensors (roll and pitch). Left: the car seen
+from behind, tipping by the roll angle over a level ground line. Right: the car seen from the side,
+nose to the right, tipping by the pitch angle. The angle in degrees is written under each. The car
+is drawn in `warncolor` from `warnangle` and in `critcolor` from `critangle`, either axis.
+
+The subtype keeps the name of the inherited artificial horizon so a theme that placed one still
+loads. The horizon's parameters (`pixelsperdeg`, `showcompass`, `showaltitude`, `showgroundspeed`
+and their colours) are ignored. The attitude sensors (64-67) are not in the default telemetry list:
+select them on **Setup -> Telemetry**. Pitch follows the firmware, positive nose down.
 
 ```
-    wakeupinterval      : number   -- Optional wakeup interval in seconds (default: 0.2)
-    pixelsperdeg        : number   -- Pixels per degree for pitch & compass (default: 2.0)
-    dynamicscalemin     : number   -- Minimum scale factor (default: 1.05)
-    dynamicscalemax     : number   -- Maximum scale factor (default: 1.95)
-    showarc             : bool     -- Show arc markers (default: true)
-    showladder          : bool     -- Show pitch ladder (default: true)
-    showcompass         : bool     -- Show compass ribbon (default: true)
-    showaltitude        : bool     -- Show altitude bar on right (default: false)
-    showgroundspeed           : bool     -- Show groundspeed bar on left (default: false)
-    arccolor            : color    -- Color for arc markings (default: white)
-    laddercolor         : color    -- Color for pitch ladder (default: white)
-    compasscolor        : color    -- Color for compass (default: white)
-    crosshaircolor      : color    -- Color for central cross marker (default: white)
-    altitudecolor       : color    -- Color for altitude bar (default: white)
-    groundspeedcolor          : color    -- Color for groundspeed bar (default: white)
-    altitudemin         : number   -- Minimum displayed altitude (default: 0)
-    altitudemax         : number   -- Maximum displayed altitude (default: 200)
-    groundspeedmin            : number   -- Minimum displayed groundspeed (default: 0)
-    groundspeedmax            : number   -- Maximum displayed groundspeed (default: 100)
+    wakeupinterval      : number   -- Optional wakeup interval in seconds
+    bgcolor             : color    -- Box background (theme fallback if nil)
+    bodycolor           : color    -- Car body (default: theme fillcolor)
+    windowcolor         : color    -- Windows (default: theme bgcolor)
+    wheelcolor          : color    -- Tyres (default: dark grey)
+    lightcolor          : color    -- Tail lights (default: red)
+    groundcolor         : color    -- Ground line (default: theme textcolor)
+    textcolor           : color    -- Angle text (default: theme textcolor)
+    warnangle           : number   -- Degrees from which the car is drawn in warncolor (default: 20)
+    critangle           : number   -- Degrees from which the car is drawn in critcolor (default: 35)
+    warncolor           : color    -- (default: theme fillwarncolor)
+    critcolor           : color    -- (default: theme fillcritcolor)
+    invertpitch         : bool     -- Tip the side view the other way (default: false)
+    showpitch           : bool     -- Show the side view (default: true); false gives the box to the rear view
+    showvalues          : bool     -- Show the angles (default: true)
+    font                : font     -- Angle text font (default: FONT_XS)
+```
+
+Example:
+
+```lua
+{col = 1, row = 1, colspan = 2, rowspan = 2, type = "navigation", subtype = "ah", warnangle = 15}
 ```
 ---
 
@@ -408,6 +421,43 @@ dial image & needle styling
 
     bgcolor                 : color    -- Widget background color (default: theme fallback)
 ```
+---
+
+### Drive Aids Widget (type="text", subtype="driveaids")
+
+The car's drive aids and driving mode in one word, from the drive status telemetry sensor (93,
+in the default telemetry list). The most urgent state wins:
+
+| Text | When | Colour parameter (default) |
+| --- | --- | --- |
+| GYRO OFF | Stabilisation bypassed (GYRO OFF mode) | `offcolor` (red) |
+| ABS | ABS releasing the brake | `activecolor` (orange) |
+| TC | Traction control holding the throttle back | `activecolor` (orange) |
+| LAUNCH | Launching | `activecolor` (orange) |
+| LAUNCH | Launch staged, waiting for the throttle | `stagedcolor` (yellow) |
+| DRIFT | DRIFT mode | `modecolor` (blue) |
+| AIDS OFF | The DRIVE AIDS OFF switch is on | `offcolor` (red) |
+| ABS / TC | Braking with ABS set up / driving with traction control set up | `oncolor` (green) |
+| AIDS ON | The aids are running | `oncolor` (green) |
+| OFF | The aids are not running (disarmed, failsafe) | `textcolor` |
+
+The inherited `governor` subtype is an alias of this one: a heli theme's governor tile shows the
+drive aids. The other parameters are those of the Arm Flags widget; `thresholds` entries
+(`{value = "<text>", textcolor = ...}`) override the colours above for a matching text.
+
+```
+    offcolor            : color    -- GYRO OFF and AIDS OFF (default: red)
+    activecolor         : color    -- An aid acting right now (default: orange)
+    stagedcolor         : color    -- Launch staged (default: yellow)
+    modecolor           : color    -- DRIFT (default: blue)
+    oncolor             : color    -- Aids running (default: green)
+    novalue             : string   -- Text shown while the sensor is missing (default: "-")
+```
+
+The built-in themes that had an arming tile during the run (Claude, RF Status, RT-RC, RT-RC Nitro,
+KSE4, KSE5, Kevd, SRB-RC) show this widget there instead; DanielRC shows it as **AIDS** under
+**LINK**.
+
 ---
 
 ### Dynamic Power (Watts) Display Widget (type="text", subtype="watts")

@@ -1,4 +1,4 @@
--- Kept only so a user theme that still names the inherited "governor" subtype
--- keeps loading: Gripora has no governor, so it draws the arming state
--- (objects/text/armflags.lua) instead. The built-in themes use "armflags".
-return assert(loadfile("widgets/dashboard/objects/text/armflags.lua"))()
+-- Kept so a theme that names the inherited "governor" subtype keeps loading. A heli theme's
+-- governor tile showed the governor state in flight; Gripora has no governor, so the tile shows
+-- the car's drive aids and driving mode instead (objects/text/driveaids.lua).
+return assert(loadfile("widgets/dashboard/objects/text/driveaids.lua"))()

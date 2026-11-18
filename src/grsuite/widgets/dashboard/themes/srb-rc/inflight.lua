@@ -182,8 +182,8 @@ local function buildBoxes(W)
             colspan = 4,
             rowspan = 3,
             type = "text",
-            subtype = "armflags",
-            title = "@i18n(widgets.dashboard.info_arming):upper()@",
+            subtype = "driveaids",
+            title = "@i18n(widgets.dashboard.drive_aids):upper()@",
             titlepos = "top",
             titlealign = "center",
             titlefont = opts.titlefont,
@@ -192,6 +192,8 @@ local function buildBoxes(W)
             titlecolor = colorMode.titlecolor,
             titlepaddingtop = opts.titlepaddingtop,
             bgcolor = "olive",
+            -- green would not read on olive
+            oncolor = "white",
         },
         {
             col = 1,

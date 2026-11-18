@@ -359,7 +359,7 @@ local function buildBoxes(W)
             subtype = "func",
             paint = pageBackgroundPaint
         },
-        {col = 1, row = 7, colspan = 4, rowspan = 3, offsetx = 30, offsety = -7, type = "text", subtype = "telemetry", source = "altitude", font = "FONT_XXS", valuealign = "left", valuepaddingleft = -200, unit = "", bgcolor = gaugeTileBg, titlecolor = colorMode.bgcolor, textcolor = colorMode.bgcolor},
+        {col = 1, row = 7, colspan = 4, rowspan = 3, offsetx = 30, offsety = -7, type = "text", subtype = "telemetry", source = "drive_speed", font = "FONT_XXS", valuealign = "left", valuepaddingleft = -200, unit = "", bgcolor = gaugeTileBg, titlecolor = colorMode.bgcolor, textcolor = colorMode.bgcolor},
         {col = 5, row = 10, colspan = 4, rowspan = 3, offsetx = 60, offsety = -7, type = "text", subtype = "telemetry", source = "watts", font = "FONT_XXS", valuealign = "left", valuepaddingleft = -200, unit = "", bgcolor = gaugeTileBg, titlecolor = colorMode.bgcolor, textcolor = colorMode.bgcolor},
         {col = 5, row = 7, colspan = 4, rowspan = 3, offsetx = 60, offsety = -7, type = "text", subtype = "telemetry", source = "current", font = "FONT_XXS", valuealign = "left", valuepaddingleft = -200, unit = "", bgcolor = gaugeTileBg, titlecolor = colorMode.bgcolor, textcolor = colorMode.bgcolor},
         {col = 1, row = 4, colspan = 4, rowspan = 3, offsetx = 30, offsety = -7, type = "text", subtype = "telemetry", source = "rpm", font = "FONT_XXS", valuealign = "left", valuepaddingleft = -200, unit = "", bgcolor = gaugeTileBg, titlecolor = colorMode.bgcolor, textcolor = colorMode.bgcolor},
@@ -467,12 +467,12 @@ local function buildBoxes(W)
             offsety = -7,
             type = "gauge",
             subtype = "bar",
-            source = "altitude",
+            source = "drive_speed",
             stattype = "max",
-            title = "Max Altitude",
-            unit = "ft",
+            title = "Top Speed",
+            unit = "km/h",
             min = 0,
-            max = 450,
+            max = 100,
             titlepos = "top",
             titlealign = "center",
             valuealign = "center",
@@ -489,11 +489,6 @@ local function buildBoxes(W)
             fillcolor = colorMode.fillcolor,
             textcolor = colorMode.textcolor,
             titlecolor = colorMode.titlecolor,
-            thresholds = {
-                {value = 199, fillcolor = colorMode.fillcolor},
-                {value = 350, fillcolor = lcd.RGB(0xE3, 0xA3, 0x00)},
-                {value = 10000, fillcolor = colorMode.fillcritcolor}
-            },
             transform = "floor"
         },
 

@@ -5,6 +5,9 @@
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local grsuite = requireModule("widgets/dashboard/context.lua")
+-- lib/drive_status.lua, loaded by the first box that shows the drive aids (only the run
+-- screen has one): this theme's cold start is already close to the instruction limit.
+local driveStatus = nil
 local lcd = lcd
 local model = model
 
@@ -352,8 +355,8 @@ local function readArmflags(telemetry, showReason)
     -- reflects current arm state -- bits 1/2 accumulate over a session
     -- (e.g. PREARM users see 5, then 7), so a whole-value check like
     -- value == 1 or 3 stops matching once either has been set.
-    if (floor(value) & 1) == 1 then return "@i18n(widgets.governor.ARMED)@" end
-    return "@i18n(widgets.governor.DISARMED)@"
+    if (floor(value) & 1) == 1 then return "@i18n(widgets.armstate.ARMED)@" end
+    return "@i18n(widgets.armstate.DISARMED)@"
 end
 
 local function formatTimeSeconds(seconds, withHours)
@@ -407,6 +410,11 @@ local function readSpec(box, spec, telemetry, slotKey)
     elseif kind == "armflags" then
         displayValue = readArmflags(telemetry, spec.showReason)
         rawValue = displayValue
+    elseif kind == "driveaids" then
+        driveStatus = driveStatus or requireModule("lib/drive_status.lua")
+        local state = driveStatus.state(telemetry and telemetry.getSensor and telemetry.getSensor("drive_status"))
+        displayValue = state and driveStatus.TEXT[state] or nil
+        rawValue = displayValue
     elseif kind == "craftname" then
         displayValue = session.craftName or (model and model.name and model.name()) or nil
         rawValue = displayValue
@@ -438,7 +446,7 @@ local function readSpec(box, spec, telemetry, slotKey)
     if type(displayValue) == "string" and displayValue:match("^%.+$") then unit = nil end
 
     local textValueForThreshold = rawValue
-    if kind == "armflags" or kind == "craftname" or kind == "time" or kind == "static" then
+    if kind == "armflags" or kind == "driveaids" or kind == "craftname" or kind == "time" or kind == "static" then
         textValueForThreshold = displayValue
     end
 
@@ -1106,8 +1114,8 @@ function common.buildCockpitBoxes()
         valuealign = "center",
         bgcolor = p.bg,
         thresholds = {
-            {value = "@i18n(widgets.governor.ARMED)@", textcolor = p.yellow},
-            {value = "@i18n(widgets.governor.DISARMED)@", textcolor = p.line}
+            {value = "@i18n(widgets.armstate.ARMED)@", textcolor = p.yellow},
+            {value = "@i18n(widgets.armstate.DISARMED)@", textcolor = p.line}
         }
     }))
 
@@ -1252,6 +1260,21 @@ function common.buildInflightBoxes()
         padding = readoutPad,
         gap = readoutGap
     }))
+    -- The drive aids and driving mode (lib/drive_status.lua): what is off in red, an aid at
+    -- work in yellow.
+    add(out, readoutBox(W, H, 0.70, 0.60, 0.25, 0.09, "AIDS", opts.leftlabelfont, opts.leftvaluefont, p.line, p.white, {
+        kind = "driveaids",
+        novalue = "-",
+        padding = readoutPad,
+        gap = readoutGap,
+        thresholds = {
+            {value = "@i18n(widgets.driveaids.GYRO_OFF)@", textcolor = hcm.fillcritcolor},
+            {value = "@i18n(widgets.driveaids.AIDS_OFF)@", textcolor = hcm.fillcritcolor},
+            {value = "@i18n(widgets.driveaids.ABS)@", textcolor = p.yellow},
+            {value = "@i18n(widgets.driveaids.TC)@", textcolor = p.yellow},
+            {value = "@i18n(widgets.driveaids.LAUNCH)@", textcolor = p.yellow}
+        }
+    }))
 
     add(out, statusPanelBox(W, H, 0.34, 0.68, 0.32, 0.17, opts.framefont, opts.framefont, p.yellow, {
         border = frameT,
@@ -1377,8 +1400,8 @@ function common.buildReportBoxes()
         valuealign = "center",
         bgcolor = p.bg,
         thresholds = {
-            {value = "@i18n(widgets.governor.ARMED)@", textcolor = p.yellow},
-            {value = "@i18n(widgets.governor.DISARMED)@", textcolor = p.line}
+            {value = "@i18n(widgets.armstate.ARMED)@", textcolor = p.yellow},
+            {value = "@i18n(widgets.armstate.DISARMED)@", textcolor = p.line}
         }
     }))
 
