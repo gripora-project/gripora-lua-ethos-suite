@@ -318,6 +318,8 @@ local MENUS = {
       -- Driving Feel (Master Gain, I-term Decay, I-term Relax) is where
       -- tuning starts (see app/pages/master_gains.lua's own header).
       {title = "@i18n(app.modules.master_gains.name)@", icon = lcd.loadMask("app/gfx/master_gains.png"), script = "app/pages/master_gains.lua", group = "@i18n(app.menu_section_steering)@"},
+      -- Drift mode (MSP2_GRIPORA_DRIFT_CONFIG), turned on by the DRIFT switch.
+      {title = "@i18n(app.modules.drift.name)@", icon = lcd.loadMask("app/gfx/drift.png"), script = "app/pages/drift.lua", group = "@i18n(app.menu_section_steering)@"},
       -- Drive aids: one page per aid. All edit the same MSP message
       -- (MSP2_GRIPORA_DRIVE_AIDS_CONFIG); each builds only its own fields. The
       -- Traction Control and Launch Control tiles are titled "Traction" and

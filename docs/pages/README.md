@@ -8,7 +8,7 @@ sidebar_label: Pages
 Reference documentation for each configuration and settings page reachable
 within the GRSuite Ethos system tool.
 
-**Coverage:** 80 reachable pages in navigation hierarchy. Drafts require review.
+**Coverage:** 81 reachable pages in navigation hierarchy. Drafts require review.
 
 The *Conditions* column names what hides, greys out or locks a page; the sentences
 and structure follow [_template.md](../_template.md).
@@ -25,6 +25,7 @@ is there. The rule is in [.agents/rules/documentation.md](../../.agents/rules/do
 | PIDs | [tuning/pids.md](tuning/pids.md) | Requires a running background task and a flight controller connection. | reviewed |
 | Rates | [tuning/rates.md](tuning/rates.md) | Requires a running background task and a flight controller connection. | reviewed |
 | Driving Feel | [tuning/master_gains.md](tuning/master_gains.md) | Requires a running background task and a flight controller connection. | reviewed |
+| Drift | [tuning/drift.md](tuning/drift.md) | Requires a running background task and a flight controller connection. | reviewed |
 | ABS | [tuning/drive_aids_abs.md](tuning/drive_aids_abs.md) | Requires a running background task and a flight controller connection. | reviewed |
 | Traction | [tuning/drive_aids_tc.md](tuning/drive_aids_tc.md) | Requires a running background task and a flight controller connection. | reviewed |
 | Launch | [tuning/drive_aids_lc.md](tuning/drive_aids_lc.md) | Requires a running background task and a flight controller connection. | reviewed |
