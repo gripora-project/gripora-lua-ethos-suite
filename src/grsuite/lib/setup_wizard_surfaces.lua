@@ -1,19 +1,16 @@
--- Pure helpers for the Setup Wizard: which servos the mix drives, how far
--- full input drives each one, and the scale that keeps full input inside a
+-- Pure helpers for the Setup Wizard: which servos steer, how far full
+-- steering drives each one, and the scale that keeps full steering inside a
 -- servo's limits.
 --
--- A port of gripora-configurator src/tabs/setup_wizard/surfaces.js, cut down
--- to a car: a servo on stabilized yaw alone is steering, anything else the mix
--- drives is "mixed". Roll and pitch keep their mixer inputs (the firmware
--- holds them at zero on a car), so a servo mixed onto them still counts.
+-- A port of gripora-configurator src/tabs/setup_wizard/surfaces.js. Keep
+-- the two in step: the cases in bin/tests/setup_wizard_surfaces.lua follow
+-- the configurator's scripts/tests/setup-wizard-surfaces.test.mjs. A car
+-- only stabilises yaw: the firmware holds stabilized roll and pitch at zero,
+-- so rules from them never move a servo and are left out, and every servo
+-- stabilized yaw moves is a steering servo (kind "steering").
 -- Differences from the JS:
 --   * rules have the shape lib/msp_mixer_rules.lua decodes: `input` and
 --     `output` where the configurator has `src` and `dst`.
---   * a surface's axes are a table keyed by axis, plus `axisOrder` (the axes
---     in the order their rules came), which stands in for the JS object's key
---     order wherever that order matters (primaryAxis()).
---   * no aircraft surface kinds (aileron, elevator, elevon, V-tail, flap and
---     flaperon) and no flap channel.
 --   * travelReach() leaves out the servo balance curve.
 --
 -- Mirrors the firmware signal chain (gripora-firmware flight/mixer.c
@@ -29,10 +26,9 @@ end
 
 local M = {}
 
--- Stabilized mixer inputs (MIXER_IN_STABILIZED_ROLL/PITCH/YAW).
+-- The stabilized mixer input that moves a steering servo
+-- (MIXER_IN_STABILIZED_YAW).
 M.AXES = {
-  {key = "roll", input = 1},
-  {key = "pitch", input = 2},
   {key = "yaw", input = 3},
 }
 
@@ -94,18 +90,11 @@ local function moves(w)
   return w ~= nil and (w.pos ~= 0 or w.neg ~= 0)
 end
 
--- A servo on stabilized yaw alone is steering; anything else is "mixed".
-function M.surfaceKind(axes)
-  if moves(axes.yaw) and not moves(axes.roll) and not moves(axes.pitch) then
-    return "steering"
-  end
-  return "mixed"
-end
-
--- Contribution of each stabilized axis to each servo output, as weight
--- fractions for positive and negative input. Only SET/ADD rules count; MUL
--- rules and conditions are ignored, since the wizard sets up the plain
--- steering mix. Returns a list sorted by servo (0-based).
+-- The steering servos: every servo output stabilized yaw moves, with the
+-- weight fractions for positive and negative input. Only SET/ADD rules
+-- count; MUL rules and conditions are ignored, since the wizard sets up the
+-- plain steering mix. `kind` is always "steering". Returns a list sorted by
+-- servo (0-based).
 function M.surfacesFromRules(rules, servoCount)
   local byServo = {}
   local servos = {}
@@ -119,15 +108,12 @@ function M.surfacesFromRules(rules, servoCount)
         and servo >= 0 and servo < servoCount then
       local entry = byServo[servo]
       if not entry then
-        entry = {servo = servo, axes = {}, axisOrder = {}}
+        entry = {servo = servo, axes = {}}
         byServo[servo] = entry
         servos[#servos + 1] = servo
       end
       local prev = entry.axes[axis.key] or {pos = 0, neg = 0}
       local set = oper == OP_SET
-      if entry.axes[axis.key] == nil then
-        entry.axisOrder[#entry.axisOrder + 1] = axis.key
-      end
       entry.axes[axis.key] = {
         pos = (set and 0 or prev.pos) + (rule.weight or 0) / 1000,
         neg = (set and 0 or prev.neg) + (rule.weightNeg or 0) / 1000,
@@ -144,18 +130,18 @@ function M.surfacesFromRules(rules, servoCount)
       if moves(w) then anyAxis = true end
     end
     if anyAxis then
-      s.kind = M.surfaceKind(s.axes)
+      s.kind = "steering"
       out[#out + 1] = s
     end
   end
   return out
 end
 
--- Servo numbers (1-based) that the mix drives but that are past the servos in
--- use (up to `slots`), so surfacesFromRules() leaves them out. The firmware
--- only sends a servo that has a PWM output or a bus channel (getServoCount()
--- in flight/servos.c), so a rear steering servo mixed onto servo 5 of a
--- board with 4 servo pins and no bus output never moves.
+-- Servo numbers (1-based) that the steering mix drives but that are past the
+-- servos in use (up to `slots`), so surfacesFromRules() leaves them out.
+-- The firmware only sends a servo that has a PWM output or a bus channel
+-- (getServoCount() in flight/servos.c), so a rear steering servo mixed onto
+-- servo 5 of a board with 4 servo pins and no bus output never moves.
 function M.servosPastCount(rules, servoCount, slots)
   local seen, out = {}, {}
   for i = 1, #rules do
@@ -171,13 +157,6 @@ function M.servosPastCount(rules, servoCount, slots)
   end
   table.sort(out)
   return out
-end
-
--- The axis the wizard uses to move a surface on its own: yaw for steering,
--- otherwise the axis of the servo's first rule.
-function M.primaryAxis(surface)
-  if surface.kind == "steering" then return "yaw" end
-  return surface.axisOrder[1]
 end
 
 -- Mixer output for this surface with the given axis held at +1 or -1 (stick

@@ -6,16 +6,16 @@
 -- app/setup_wizard_art.lua run unchanged. Every read is answered with its
 -- codec's simulator reply, except the mixer rules: the car mixer preset with
 -- rear steering (steering on S1, the ESC on M1, rear steering on S2, 50 %
--- opposite); a second run swaps in a steering servo mixed with pitch. The
+-- opposite); a second run swaps in a steering servo with pitch mixed on top. The
 -- checks read the bytes the page puts on the wire and the text its paint
 -- draws:
 --   * opening holds the setup state and clears overrides other pages left on;
 --   * the steering check holds roll and pitch at centre and flicks the
 --     steering, timed; leaving the check releases them;
 --   * the answers fix things by the Configurator's rules: one wrong servo on
---     steering alone is reversed, all wrong inverts the steering, "only some"
---     wiggles each servo and reverses the ones picked, and a wrong servo that
---     also works another axis is left alone and explained;
+--     steering is reversed, all wrong inverts the steering, "only some"
+--     wiggles each servo and reverses the ones picked, also one with pitch
+--     (held at zero on a car) mixed on top;
 --   * arming lets everything go and greys out the answers;
 --   * Save and finish writes EEPROM and leaves; Discard writes back what was
 --     loaded; leaving releases the setup state;
@@ -514,7 +514,7 @@ check("Discard writes the steering's axis throw back", #restored == 1 and restor
   and s16(restored[1].payload, 2) == 1000)
 check("and leaves", ctx.back == 1 and ctx.wakeup == nil)
 
--- A servo that also works another axis -------------------------------------
+-- A steering servo with pitch mixed on top --------------------------------
 
 replies[172] = rulePool({
   {oper = 1, input = 2, output = 1, weight = 1000, weightNeg = 1000},
@@ -523,16 +523,16 @@ replies[172] = rulePool({
 })
 openPage(CURRENT)
 press(T("dir_start"))
-check("a steering check with a mixed servo", shows("dir_check_yaw"))
+check("a steering check with pitch mixed on a servo", shows("dir_check_yaw"))
 press(T("dir_unlike"))
 press(T("dir_some"))
 press(T("dir_yes"))
 before = #sent
 press(T("dir_no"))
-check("a servo wrong on steering but mixed with pitch is not reversed", #writesOf(212, before + 1) == 0)
-check("the wizard says why", shows("dir_cant_fix_fmt"))
-press(T("btn_next"))
-check("then checks the steering again", shows("dir_check_yaw") and shows("dir_status_none"))
+local flipped = writesOf(212, before + 1)
+check("a servo wrong on steering is reversed, pitch mixed on top or not",
+  #flipped >= 1 and flipped[1].payload[1] == 0, #flipped)
+check("then checks the steering again", shows("dir_check_yaw") and shows("dir_status_reversed_fmt"))
 replies[172] = CAR_POOL
 headers[#headers].opts.onBack()
 

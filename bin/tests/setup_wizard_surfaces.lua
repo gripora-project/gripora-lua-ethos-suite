@@ -1,9 +1,9 @@
 -- Run from the repository root with Lua 5.3+: lua bin/tests/setup_wizard_surfaces.lua
--- lib/setup_wizard_surfaces.lua is a car-only port of the configurator's
--- src/tabs/setup_wizard/surfaces.js. The reach, trim and scale cases are
--- those of the configurator's scripts/tests/setup-wizard-surfaces.test.mjs,
--- with the same inputs and expected values, moved onto the steering (yaw)
--- axis; the aircraft surface kinds and the flap channel are gone here.
+-- lib/setup_wizard_surfaces.lua is a port of the configurator's
+-- src/tabs/setup_wizard/surfaces.js. These are the cases of the
+-- configurator's scripts/tests/setup-wizard-surfaces.test.mjs, with the same
+-- inputs and expected values, so a change on either side that the other lacks
+-- shows up here, plus the trim and rule-shape cases the port needs itself.
 
 local ROOT = "src/grsuite/"
 
@@ -32,44 +32,39 @@ local function servo(overrides)
   for k, v in pairs(overrides or {}) do s[k] = v end
   return s
 end
-local gains = {roll = 1, pitch = 1, yaw = 1}
+local gains = {yaw = 1}
 local function near(a, b) return math.abs(a - b) < 1e-9 end
 
--- the car preset: steering on S1 and rear steering on S2, the ESC is no servo
+-- servos moved by stabilized yaw are steering; other inputs are not servos
+-- to set up
 do
   local surfaces = S.surfacesFromRules({
     rule(SET, 3, 1, 1000), rule(SET, 3, 2, -500),
+    rule(SET, 1, 3, 1000), rule(SET, 2, 4, 1000), rule(SET, 13, 5, 1000),
     rule(SET, 4, 27, 1000), -- throttle to the ESC, not a servo
   }, 8)
   local got = {}
   for i, s in ipairs(surfaces) do got[i] = s.servo .. ":" .. s.kind end
   got = table.concat(got, " ")
-  check("car preset: kinds", got == "0:steering 1:steering", got)
-  check("car preset: steering primary axis is yaw", S.primaryAxis(surfaces[1]) == "yaw")
+  check("yaw servos are steering, roll, pitch and AUX make none", got == "0:steering 1:steering", got)
+  check("rear servo at -0.5", near(surfaces[2].axes.yaw.pos, -0.5), surfaces[2].axes.yaw.pos)
+  local keys = {}
+  for k in pairs(surfaces[1].axes) do keys[#keys + 1] = k end
+  check("only the yaw axis is kept", #keys == 1 and keys[1] == "yaw", table.concat(keys, ","))
 end
 
--- a servo on an axis the car leaves at zero, or on two axes, is mixed
-do
-  local surfaces = S.surfacesFromRules({
-    rule(SET, 2, 1, 1000), -- pitch alone
-    rule(SET, 2, 2, 1000), rule(ADD, 1, 2, 1000), -- pitch and roll
-    rule(SET, 3, 3, 1000), rule(ADD, 2, 3, 500), -- yaw with pitch on top
-  }, 8)
-  check("pitch alone is mixed", surfaces[1].kind == "mixed", surfaces[1].kind)
-  check("pitch and roll is mixed, built on pitch", surfaces[2].kind == "mixed"
-    and S.primaryAxis(surfaces[2]) == "pitch", S.primaryAxis(surfaces[2]))
-  check("steering with pitch on top is mixed, built on yaw", surfaces[3].kind == "mixed"
-    and S.primaryAxis(surfaces[3]) == "yaw", S.primaryAxis(surfaces[3]))
-  local reach = S.travelReach(surfaces[2], servo({max = 450, min = -450}), gains)
-  check("two axes sum: pos reach 1000 us", near(reach.pos.us, 1000), reach.pos.us)
-  check("two axes sum: pos fraction 1000/450", near(reach.pos.fraction, 1000 / 450), reach.pos.fraction)
-  check("two axes sum: neg fraction > 2", reach.neg.fraction > 2, reach.neg.fraction)
-end
-
--- a later SET replaces earlier rules on the same output and axis
+-- a later SET replaces earlier rules on the same output, ADD adds on
 do
   local surface = S.surfacesFromRules({rule(SET, 3, 1, 1000), rule(SET, 3, 1, 600)}, 8)[1]
   check("later SET replaces", near(surface.axes.yaw.pos, 0.6), surface.axes.yaw.pos)
+  surface = S.surfacesFromRules({rule(SET, 3, 1, 600), rule(ADD, 3, 1, 200)}, 8)[1]
+  check("ADD adds on", near(surface.axes.yaw.pos, 0.8), surface.axes.yaw.pos)
+end
+
+-- a steering servo past the servos in use is reported
+do
+  local past = S.servosPastCount({rule(SET, 3, 1, 1000), rule(SET, 3, 5, 1000), rule(SET, 1, 6, 1000)}, 4, 24)
+  check("servosPastCount: steering only", table.concat(past, ",") == "5", table.concat(past, ","))
 end
 
 -- differential weights give different reach per side
@@ -95,7 +90,7 @@ end
 -- axis gain scales the reach
 do
   local steering = S.surfacesFromRules({rule(SET, 3, 1, 1000)}, 8)[1]
-  local reach = S.travelReach(steering, servo(), {roll = 1, pitch = 1, yaw = 0.5})
+  local reach = S.travelReach(steering, servo(), {yaw = 0.5})
   check("axis gain scales reach", near(reach.pos.fraction, 0.5), reach.pos.fraction)
 end
 
@@ -146,7 +141,7 @@ do
   check("zero limit: asked to move, so it clips", reach.pos.fraction > 1 and reach.pos.fraction < 10,
     reach.pos.fraction)
   check("zero limit: the other side is unaffected", near(reach.neg.fraction, 1), reach.neg.fraction)
-  reach = S.travelReach(steering, servo({mid = 1500, min = -500, max = 0}), {roll = 1, pitch = 1, yaw = 0})
+  reach = S.travelReach(steering, servo({mid = 1500, min = -500, max = 0}), {yaw = 0})
   check("zero limit: nothing asked, nothing clips", reach.pos.fraction == 0, reach.pos.fraction)
 end
 
@@ -163,32 +158,31 @@ end
 -- Lua-only: the rule shape and orderings the port has to get right itself.
 do
   local surfaces = S.surfacesFromRules({
-    rule(SET, 3, 2, 1000), rule(ADD, 1, 2, 500), -- roll+yaw, yaw rule first
+    rule(SET, 3, 2, 1000), rule(ADD, 1, 2, 500), -- yaw with roll on top
     rule(SET, 13, 1, 1000), rule(SET, 3, 1, 1000), -- an AUX channel is no axis
-    rule(3, 1, 3, 1000),                       -- MUL: ignored
-    rule(SET, 2, 9, 1000),                     -- past the board's 4 servos
-    rule(SET, 13, 4, 1000),                    -- an AUX channel alone: no surface
+    rule(3, 3, 3, 1000),                       -- MUL: ignored
+    rule(SET, 3, 9, 1000),                     -- past the board's 4 servos
   }, 4)
   check("sorted by servo", surfaces[1].servo == 0 and surfaces[2].servo == 1)
-  check("an AUX channel adds nothing to steering", surfaces[1].kind == "steering"
-    and surfaces[1].flap == nil, surfaces[1].kind)
-  check("mixed surface falls back to its first axis", surfaces[2].kind == "mixed"
-    and S.primaryAxis(surfaces[2]) == "yaw", S.primaryAxis(surfaces[2]))
-  check("MUL rule and AUX channel make no surface", #surfaces == 2, #surfaces)
-  check("no flap helpers left", S.FLAP_INPUT == nil and S.outputForFlap == nil)
-  local past = S.servosPastCount({rule(SET, 2, 9, 1000), rule(SET, 2, 6, 1000), rule(SET, 2, 6, 0)}, 4, 8)
+  check("roll on top of yaw is ignored: still steering, yaw weights only",
+    surfaces[2].kind == "steering" and surfaces[2].axes.roll == nil and near(surfaces[2].axes.yaw.pos, 1))
+  check("MUL rule makes no surface", #surfaces == 2, #surfaces)
+  check("no aircraft helpers left", S.FLAP_INPUT == nil and S.outputForFlap == nil
+    and S.primaryAxis == nil and S.surfaceKind == nil)
+  local past = S.servosPastCount({rule(SET, 3, 9, 1000), rule(SET, 3, 6, 1000), rule(SET, 3, 6, 0)}, 4, 8)
   check("servosPastCount: in slots only, once each", table.concat(past, ",") == "6", table.concat(past, ","))
   -- The wizard's own call: 24 servo slots (MSP API 22.16). Outputs 25 and 26
   -- are reserved and 27 is a motor, so none of them is a missing servo.
-  past = S.servosPastCount({rule(SET, 2, 24, 1000), rule(SET, 2, 9, 1000), rule(SET, 2, 25, 1000),
-    rule(SET, 2, 26, 1000), rule(SET, 2, 27, 1000)}, 8, 24)
+  past = S.servosPastCount({rule(SET, 3, 24, 1000), rule(SET, 3, 9, 1000), rule(SET, 3, 25, 1000),
+    rule(SET, 3, 26, 1000), rule(SET, 3, 27, 1000)}, 8, 24)
   check("servosPastCount: 24 slots, the reserved outputs and the motors left out",
     table.concat(past, ",") == "9,24", table.concat(past, ","))
-  local bus = S.surfacesFromRules({rule(SET, 1, 9, 1000), rule(SET, 2, 24, 1000)}, 24)
+  local bus = S.surfacesFromRules({rule(SET, 3, 9, 1000), rule(SET, 3, 24, 1000)}, 24)
   check("a servo on a bus channel only is a surface like any other",
     #bus == 2 and bus[1].servo == 8 and bus[2].servo == 23, #bus)
-  local g = S.axisGainsFromRates({roll = 830, pitch = -1000})
-  check("axis gains from rates", near(g.roll, 0.83) and near(g.pitch, -1) and near(g.yaw, 1))
+  local g = S.axisGainsFromRates({yaw = -830})
+  check("axis gains from rates", near(g.yaw, -0.83) and g.roll == nil)
+  check("axis gains default to 1", near(S.axisGainsFromRates(nil).yaw, 1))
 end
 
 print(string.format("%d checks, %d failed", checks, failures))

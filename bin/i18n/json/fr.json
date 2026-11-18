@@ -7442,13 +7442,6 @@
           "max_length": 8,
           "reverse_text": false
         },
-        "surface_mixed": {
-          "english": "Mixed",
-          "translation": "Mixed",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 5
-        },
         "refused": {
           "english": "Disarm: the controller refused setup mode.",
           "translation": "Disarm: the controller refused setup mode.",
@@ -7637,13 +7630,6 @@
           "needs_translation": true,
           "reverse_text": false,
           "max_length": 2
-        },
-        "dir_cant_fix_fmt": {
-          "english": "Servo %s also works another axis, so reversing it would break that one. Change its mix in Mixer Rules.",
-          "translation": "Servo %s also works another axis, so reversing it would break that one. Change its mix in Mixer Rules.",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 102
         },
         "dir_continue": {
           "english": "Continue",
