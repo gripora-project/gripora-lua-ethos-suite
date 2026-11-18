@@ -66,7 +66,7 @@ ALLOWLIST_PATH = os.path.join("bin", "i18n", "allowed_untranslated.txt")
 #: replaced by another. It is the honest thing to hold all the same, because the
 #: alternative -- a recorded set of every literal in the tree -- is a file nobody would
 #: keep true.
-BASELINE_UNTRANSLATED = 69  # measured on the Ethos tree, 2026-11-18 (car alignment)
+BASELINE_UNTRANSLATED = 68  # measured on the Ethos tree, 2026-11-18 (ActiveLook allow-listed as a name)
 BASELINE_ASSEMBLED = 0
 
 #: The table fields that carry text a pilot reads. `label` and `title` are most of it;
