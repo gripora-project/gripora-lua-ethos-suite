@@ -4,12 +4,11 @@
 -- same so a model set up from either side reads the same in both. When one
 -- changes, change the other, and bin/tests/servo_names.lua with them.
 --
--- Each servo the mix drives is named after the surface it moves
--- (lib/setup_wizard_surfaces.lua's surfaceKind()): a pair of one kind is left
--- and right, in servo order (the wizards give the left surface the lower
--- servo), one alone has no side, and more are numbered; a pair of steering
--- servos is front and rear. A servo on yaw alone is a car's steering (STEER).
--- Thrust-vector servos are named after their axis.
+-- Each servo the mix drives is named after what it does
+-- (lib/setup_wizard_surfaces.lua's surfaceKind()): a servo on yaw alone is
+-- steering (STEER), anything else mixed (MIX). One alone has no prefix, a
+-- pair of steering servos is front and rear (the car setup puts the front on
+-- S1), any other pair left and right in servo order, and more are numbered.
 
 if package.loaded["grsuite.lib.servo_names"] then
   return package.loaded["grsuite.lib.servo_names"]
@@ -24,21 +23,16 @@ local M = {}
 M.SERVO_COUNT = 24
 
 local ABBREVIATIONS = {
-  aileron = "AIL",
-  flaperon = "FLPRN",
-  elevon = "ELEVON",
-  ruddervator = "VTAIL",
-  elevator = "ELEV",
-  rudder = "STEER",
-  flap = "FLAP",
+  steering = "STEER",
   mixed = "MIX",
 }
 
--- Names earlier versions generated, still cleared when the mix moves on
-local LEGACY_NAMES = {"RUDDER"}
-
--- Mixer inputs MIXER_IN_STABILIZED_TV_ROLL/PITCH/YAW
-local TV_NAMES = {[27] = "TV ROLL", [28] = "TV PITCH", [29] = "TV YAW"}
+-- Names earlier versions generated (and the aircraft mixes of the
+-- WingFlight setup this was forked from), still cleared when the mix moves
+-- on: after the optional side prefix and number, as the generated names.
+local LEGACY_NAMES = {"RUDDER", "AIL", "FLPRN", "ELEVON", "VTAIL", "ELEV", "FLAP"}
+-- Whole names, as thrust-vector servos were named after their axis.
+local LEGACY_WHOLE = {"TV ROLL", "TV PITCH", "TV YAW"}
 
 -- Names for the servos `rules` drives: names[servo] (0-based).
 function M.namesFromRules(rules)
@@ -59,24 +53,13 @@ function M.namesFromRules(rules)
     for i, servo in ipairs(servos) do
       if #servos == 1 then
         names[servo] = abbr
-      elseif #servos == 2 and kind == "rudder" then
-        -- A pair of steering servos is front and rear (the car setup puts
-        -- the front on S1).
+      elseif #servos == 2 and kind == "steering" then
         names[servo] = (i == 1 and "F " or "R ") .. abbr
       elseif #servos == 2 then
         names[servo] = (i == 1 and "L " or "R ") .. abbr
       else
         names[servo] = abbr .. " " .. i
       end
-    end
-  end
-
-  for i = 1, #rules do
-    local rule = rules[i]
-    local servo = (rule.output or 0) - 1
-    local tv = TV_NAMES[rule.input]
-    if tv and servo >= 0 and servo < M.SERVO_COUNT and not names[servo] then
-      names[servo] = tv
     end
   end
   return names
@@ -86,8 +69,8 @@ end
 -- a new mix no longer drives can be told from a name the pilot typed.
 function M.isGenerated(name)
   if not name or name == "" then return false end
-  for _, tv in pairs(TV_NAMES) do
-    if name == tv then return true end
+  for _, whole in ipairs(LEGACY_WHOLE) do
+    if name == whole then return true end
   end
   local body = name:gsub("^[LRF] ", ""):gsub(" %d+$", "")
   for _, abbr in pairs(ABBREVIATIONS) do
@@ -121,7 +104,7 @@ function M.assign(names, rules)
 end
 
 -- `label` with servo `servo`'s (0-based) name after it, e.g.
--- "Servo 1 (L AIL)". names may be nil (firmware without names).
+-- "Servo 1 (STEER)". names may be nil (firmware without names).
 function M.withName(label, names, servo)
   local name = names and names[servo]
   if name and name ~= "" then

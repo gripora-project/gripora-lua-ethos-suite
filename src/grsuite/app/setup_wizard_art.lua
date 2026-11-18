@@ -76,7 +76,7 @@ end
 
 -- The car with its steering wheels lit at centre, for a step that works one
 -- servo at a time (Center).
-function art.surfaceLayout(surfaces, kind)
+function art.surfaceLayout(surfaces)
   local l = art.baseLayout(surfaces, nil)
   l.lit = true
   return l

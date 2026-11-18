@@ -68,15 +68,15 @@ jobs:
         if: success() || failure()
         run: lua5.4 bin/tests/mode_override.lua
 
-      # lib/setup_wizard_surfaces.lua is a port of the configurator's
+      # lib/setup_wizard_surfaces.lua is a car-only port of the configurator's
       # src/tabs/setup_wizard/surfaces.js. The harness runs the configurator's own
-      # test cases against it, so the two copies cannot drift apart unnoticed.
+      # reach, trim and scale cases against it on the steering axis.
       - name: Check the Setup Wizard surface maths
         if: success() || failure()
         run: lua5.4 bin/tests/setup_wizard_surfaces.lua
 
-      # The wizard moves the control surfaces from the radio. This drives the real
-      # page and every step against the simulator's default glider mix and checks
+      # The wizard moves the steering from the radio. This drives the real
+      # page and every step against the car mixer preset and checks
       # what reaches the wire: the setup state held on open and released on every
       # way out, overrides and probes timed, nothing moved while armed, each step's
       # writes (alignment, RX map, mix, servo configs, motor protocol and a spin
@@ -94,10 +94,10 @@ jobs:
         if: success() || failure()
         run: lua5.4 bin/tests/setup_wizard_controls.lua
 
-      # lib/setup_wizard_mix.lua ports the configurator's Mixer.buildWizardRules().
-      # The expected rules are the JS builder's own output for each airframe, so a
+      # lib/setup_wizard_mix.lua ports the configurator's car mixer preset
+      # (carMixer.js). The expected rules are the JS builder's own output, so a
       # change on either side shows up here.
-      - name: Check the Setup Wizard airframe mixes
+      - name: Check the Setup Wizard car mixes
         if: success() || failure()
         run: lua5.4 bin/tests/setup_wizard_mix.lua
 

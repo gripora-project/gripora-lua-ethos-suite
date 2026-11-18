@@ -1,18 +1,20 @@
--- Pure helpers for the Setup Wizard: which servos are control surfaces, how
--- far full stick drives each one, and the scale that keeps full stick inside
--- a servo's limits.
+-- Pure helpers for the Setup Wizard: which servos the mix drives, how far
+-- full input drives each one, and the scale that keeps full input inside a
+-- servo's limits.
 --
--- A port of gripora-configurator src/tabs/setup_wizard/surfaces.js. Keep
--- the two in step: the cases in bin/tests/setup_wizard_surfaces.lua are the
--- ones in the configurator's scripts/tests/setup-wizard-surfaces.test.mjs.
+-- A port of gripora-configurator src/tabs/setup_wizard/surfaces.js, cut down
+-- to a car: a servo on stabilized yaw alone is steering, anything else the mix
+-- drives is "mixed". Roll and pitch keep their mixer inputs (the firmware
+-- holds them at zero on a car), so a servo mixed onto them still counts.
 -- Differences from the JS:
 --   * rules have the shape lib/msp_mixer_rules.lua decodes: `input` and
 --     `output` where the configurator has `src` and `dst`.
 --   * a surface's axes are a table keyed by axis, plus `axisOrder` (the axes
 --     in the order their rules came), which stands in for the JS object's key
 --     order wherever that order matters (primaryAxis()).
---   * travelReach() leaves out the servo balance curve for now; the Travel
---     step adds it when it is ported.
+--   * no aircraft surface kinds (aileron, elevator, elevon, V-tail, flap and
+--     flaperon) and no flap channel.
+--   * travelReach() leaves out the servo balance curve.
 --
 -- Mirrors the firmware signal chain (gripora-firmware flight/mixer.c
 -- mixerUpdateRules() and flight/servos.c servoUpdate()):
@@ -36,10 +38,6 @@ M.AXES = {
 
 local OP_SET = 1
 local OP_ADD = 2
-
--- MIXER_IN_RC_CHANNEL_AUX1, the channel the Mixer setup drives flaps from.
--- The wizard takes channel centre as flaps up and positive as flaps down.
-M.FLAP_INPUT = 13
 
 -- Servo config flags (SERVO_FLAG_REVERSED).
 M.SERVO_FLAG_REVERSE = 1
@@ -96,31 +94,18 @@ local function moves(w)
   return w ~= nil and (w.pos ~= 0 or w.neg ~= 0)
 end
 
-function M.surfaceKind(axes, flap, base)
-  local roll = moves(axes.roll)
-  local pitch = moves(axes.pitch)
-  local yaw = moves(axes.yaw)
-  -- A flap servo, alone or with roll ADDed on (flaps that follow the ailerons).
-  if moves(flap) and not pitch and not yaw and (not roll or base == "flap") then
-    return "flap"
+-- A servo on stabilized yaw alone is steering; anything else is "mixed".
+function M.surfaceKind(axes)
+  if moves(axes.yaw) and not moves(axes.roll) and not moves(axes.pitch) then
+    return "steering"
   end
-  if roll and pitch and not yaw then return "elevon" end
-  if pitch and yaw and not roll then return "ruddervator" end
-  if roll and not pitch and not yaw then
-    return moves(flap) and "flaperon" or "aileron"
-  end
-  if pitch and not roll and not yaw then return "elevator" end
-  if yaw and not roll and not pitch then return "rudder" end
   return "mixed"
 end
 
 -- Contribution of each stabilized axis to each servo output, as weight
 -- fractions for positive and negative input. Only SET/ADD rules count; MUL
 -- rules and conditions are ignored, since the wizard sets up the plain
--- surface mix. The flap channel is kept apart as `flap` (in the same pos/neg
--- form). `base` is the input of the servo's last SET rule (an axis key or
--- "flap"): the input the servo is built on, which the rest are ADDed onto.
--- Returns a list sorted by servo (0-based).
+-- steering mix. Returns a list sorted by servo (0-based).
 function M.surfacesFromRules(rules, servoCount)
   local byServo = {}
   local servos = {}
@@ -130,32 +115,23 @@ function M.surfacesFromRules(rules, servoCount)
     local oper = rule.oper
     local axis = axisForInput(rule.input)
     local servo = (rule.output or 0) - SERVO_OUTPUT_OFFSET
-    if (oper == OP_SET or oper == OP_ADD)
-        and (axis or rule.input == M.FLAP_INPUT)
+    if (oper == OP_SET or oper == OP_ADD) and axis
         and servo >= 0 and servo < servoCount then
       local entry = byServo[servo]
       if not entry then
-        entry = {servo = servo, axes = {}, axisOrder = {}, flap = nil, base = nil}
+        entry = {servo = servo, axes = {}, axisOrder = {}}
         byServo[servo] = entry
         servos[#servos + 1] = servo
       end
-      local prev
-      if axis then prev = entry.axes[axis.key] else prev = entry.flap end
-      prev = prev or {pos = 0, neg = 0}
+      local prev = entry.axes[axis.key] or {pos = 0, neg = 0}
       local set = oper == OP_SET
-      local nextWeights = {
+      if entry.axes[axis.key] == nil then
+        entry.axisOrder[#entry.axisOrder + 1] = axis.key
+      end
+      entry.axes[axis.key] = {
         pos = (set and 0 or prev.pos) + (rule.weight or 0) / 1000,
         neg = (set and 0 or prev.neg) + (rule.weightNeg or 0) / 1000,
       }
-      if axis then
-        if entry.axes[axis.key] == nil then
-          entry.axisOrder[#entry.axisOrder + 1] = axis.key
-        end
-        entry.axes[axis.key] = nextWeights
-      else
-        entry.flap = nextWeights
-      end
-      if set then entry.base = axis and axis.key or "flap" end
     end
   end
 
@@ -167,18 +143,18 @@ function M.surfacesFromRules(rules, servoCount)
     for _, w in pairs(s.axes) do
       if moves(w) then anyAxis = true end
     end
-    if moves(s.flap) or anyAxis then
-      s.kind = M.surfaceKind(s.axes, s.flap, s.base)
+    if anyAxis then
+      s.kind = M.surfaceKind(s.axes)
       out[#out + 1] = s
     end
   end
   return out
 end
 
--- Servo numbers (1-based) that the surface mix drives but that are past the
--- servos in use (up to `slots`), so surfacesFromRules() leaves them out. The
--- firmware only sends a servo that has a PWM output or a bus channel
--- (getServoCount() in flight/servos.c), so a flap mixed onto servo 5 of a
+-- Servo numbers (1-based) that the mix drives but that are past the servos in
+-- use (up to `slots`), so surfacesFromRules() leaves them out. The firmware
+-- only sends a servo that has a PWM output or a bus channel (getServoCount()
+-- in flight/servos.c), so a rear steering servo mixed onto servo 5 of a
 -- board with 4 servo pins and no bus output never moves.
 function M.servosPastCount(rules, servoCount, slots)
   local seen, out = {}, {}
@@ -186,7 +162,7 @@ function M.servosPastCount(rules, servoCount, slots)
     local rule = rules[i]
     local dst = rule.output or 0
     if (rule.oper == OP_SET or rule.oper == OP_ADD)
-        and (axisForInput(rule.input) or rule.input == M.FLAP_INPUT)
+        and axisForInput(rule.input)
         and not ((rule.weight or 0) == 0 and (rule.weightNeg or 0) == 0)
         and dst > servoCount and dst <= slots and not seen[dst] then
       seen[dst] = true
@@ -197,14 +173,10 @@ function M.servosPastCount(rules, servoCount, slots)
   return out
 end
 
--- The input the wizard uses to move a surface on its own: an axis key, or
--- "flap" for the flap channel.
+-- The axis the wizard uses to move a surface on its own: yaw for steering,
+-- otherwise the axis of the servo's first rule.
 function M.primaryAxis(surface)
-  local kind = surface.kind
-  if kind == "flap" then return "flap" end
-  if kind == "aileron" or kind == "flaperon" then return "roll" end
-  if kind == "rudder" then return "yaw" end
-  if surface.axes.pitch then return "pitch" end
+  if surface.kind == "steering" then return "yaw" end
   return surface.axisOrder[1]
 end
 
@@ -217,15 +189,6 @@ function M.outputForAxis(surface, axisKey, stick, axisGains)
   local input = stick * gain
   if input >= 0 then return input * w.pos end
   return input * w.neg
-end
-
--- Mixer output for this surface with the flap channel at +1 (full flap) or -1
--- and every axis at 0.
-function M.outputForFlap(surface, stick)
-  local w = surface.flap
-  if not w then return 0 end
-  if stick >= 0 then return stick * w.pos end
-  return stick * w.neg
 end
 
 -- Servo side ("pos" uses rpos/max, "neg" uses rneg/min) that a mixer output
@@ -245,8 +208,7 @@ local function reachFraction(us, limit)
 end
 
 -- Worst-case reach of each servo side with every axis at full stick in the
--- direction that pushes that side furthest (and the flap channel, if the
--- surface has one, at whichever end does the same), in us and as a fraction
+-- direction that pushes that side furthest, in us and as a fraction
 -- of the side's usable travel (usableTravel()). fraction > 1 means the
 -- surface hits its limit before full stick on every axis at once.
 function M.travelReach(surface, servoConfig, axisGains, trim)
@@ -257,14 +219,6 @@ function M.travelReach(surface, servoConfig, axisGains, trim)
   for axisKey in pairs(surface.axes) do
     local up = M.outputForAxis(surface, axisKey, 1, axisGains)
     local down = M.outputForAxis(surface, axisKey, -1, axisGains)
-    hi = hi + math.max(up, down, 0)
-    lo = lo + math.min(up, down, 0)
-  end
-
-  if surface.flap then
-    -- Flap channel at +1 (weight) and -1 (weightNeg).
-    local up = surface.flap.pos
-    local down = -surface.flap.neg
     hi = hi + math.max(up, down, 0)
     lo = lo + math.min(up, down, 0)
   end

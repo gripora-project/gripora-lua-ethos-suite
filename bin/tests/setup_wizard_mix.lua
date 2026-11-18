@@ -127,8 +127,8 @@ end
 do
   local rules = M.buildCarRules({rearSteering = true, secondEsc = true})
   local surfaces = surfacesLib.surfacesFromRules(rules, 8)
-  check("two steering servos, no ESCs", #surfaces == 2 and surfaces[1].servo == 0 and surfaces[1].kind == "rudder"
-    and surfaces[2].servo == 1 and surfaces[2].kind == "rudder")
+  check("two steering servos, no ESCs", #surfaces == 2 and surfaces[1].servo == 0 and surfaces[1].kind == "steering"
+    and surfaces[2].servo == 1 and surfaces[2].kind == "steering")
   check("rear servo at -0.5 on yaw", surfaces[2] and surfaces[2].axes.yaw.pos == -0.5)
   local escs = M.escOutputs(rules)
   check("ESC outputs M1 and M2", #escs == 2 and escs[1] == 1 and escs[2] == 2)

@@ -14,14 +14,11 @@
 -- on one.
 --
 -- The range explored is what the servo's travel and signal range allow at
--- this centre (the configurator's openRange()). A flap's limits are its end
--- points: setting one also sets the scale on that side so the flap channel's
--- end lands exactly on it (matchFlapScale()).
+-- this centre (the configurator's openRange()).
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
 local ui = requireModule("app/setup_wizard_ui.lua")
 local art = requireModule("app/setup_wizard_art.lua")
-local surfacesLib = requireModule("lib/setup_wizard_surfaces.lua")
 
 local T = {
   title = "@i18n(app.modules.setup_wizard.lim_title)@",
@@ -30,7 +27,6 @@ local T = {
   max = "@i18n(app.modules.setup_wizard.lim_todo_max)@",
   head = "@i18n(app.modules.setup_wizard.lim_head_fmt)@",
   now = "@i18n(app.modules.setup_wizard.lim_now_fmt)@",
-  flap = "@i18n(app.modules.setup_wizard.lim_flap)@",
   howBind = "@i18n(app.modules.setup_wizard.lim_how_bind)@",
   howBack = "@i18n(app.modules.setup_wizard.lim_how_back)@",
   set = "@i18n(app.modules.setup_wizard.lim_set)@",
@@ -110,26 +106,11 @@ local function new(wiz)
     wiz.rebuild()
   end
 
-  -- A flap's limit sets that side's scale so the flap channel's end lands on
-  -- it (StepLimits.svelte matchFlapScale()).
-  local function matchFlapScale(surface, config, which, limit)
-    if surface.kind ~= "flap" then return end
-    local reversed = ((config.flags or 0) & surfacesLib.SERVO_FLAG_REVERSE) ~= 0
-    for _, stick in ipairs({1, -1}) do
-      local output = surfacesLib.outputForFlap(surface, stick)
-      if output ~= 0 and ((surfacesLib.servoSide(output, reversed) == "pos") == (which == "max")) then
-        config[which == "max" and "rpos" or "rneg"] = surfacesLib.maxScale(output, math.abs(limit))
-        return
-      end
-    end
-  end
-
   local function setHere()
     if not onSide() or not wiz.canMove() then return end
     local s = current()
     wiz.editServo(s.servo, function(config)
       config[side] = position
-      matchFlapScale(s, config, side, position)
     end)
     show(screenNumber() + 1)
   end
@@ -217,7 +198,7 @@ local function new(wiz)
     end
     local s = current()
     scr:text(string.format(T.head, wiz.surfaceName(s), side == "min" and T.minLabel or T.maxLabel),
-      side == "min" and T.min or T.max, s.kind == "flap" and T.flap or nil,
+      side == "min" and T.min or T.max, nil,
       string.format(T.progress, screenNumber(), 2 * #surfaces))
     scr:draw(drawServo, nil, true)
     local specs = {}
