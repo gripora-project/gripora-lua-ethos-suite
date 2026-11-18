@@ -28,7 +28,7 @@ Requires a running background task and a flight controller connection.
 | Speed | Rule speed parameter, 0–60,000 in the editor's raw scale. |
 | Curve | None or one of the eight Mixer curve slots. Edit its points under Curves. |
 | Condition | None or one of the offered condition slots. |
-| Role | None, Flap Compensation or Diff. Thrust Steering. |
+| Role | None. The aircraft roles (Flap Compensation, Diff. Thrust Steering) are listed only when a loaded rule already carries one, so it can be cleared. |
 
 ## Notes
 
