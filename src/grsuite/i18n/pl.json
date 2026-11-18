@@ -127,115 +127,6 @@
         "translation": "NA"
       }
     },
-    "GOVERNOR_CONFIG": {
-      "governor_auto_throttle": {
-        "english": "Auto throttle",
-        "max_length": 13,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "Automatyczna przepustnica"
-      },
-      "governor_idle_throttle": {
-        "english": "Idle throttle",
-        "max_length": 13,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "Wolna przepustnica"
-      },
-      "tbl_govmode_direct": {
-        "english": "DIRECT",
-        "max_length": 6,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "BEZPOŚREDNI"
-      },
-      "tbl_govmode_electric": {
-        "english": "ELECTRIC",
-        "max_length": 8,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "ELEKTRYCZNY"
-      },
-      "tbl_govmode_limit": {
-        "english": "LIMIT",
-        "max_length": 5,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "LIMIT"
-      },
-      "tbl_govmode_nitro": {
-        "english": "NITRO",
-        "max_length": 5,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "NITRO"
-      },
-      "tbl_govmode_off": {
-        "english": "OFF",
-        "max_length": 3,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "WYŁĄCZONY"
-      },
-      "tbl_throttle_type_function": {
-        "english": "FUNCTION",
-        "max_length": 8,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "FUNKCJONOWAĆ"
-      },
-      "tbl_throttle_type_normal": {
-        "english": "NORMAL",
-        "max_length": 6,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "NORMALNA"
-      },
-      "tbl_throttle_type_switch": {
-        "english": "SWITCH",
-        "max_length": 6,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "PRZEŁĄCZNIK"
-      }
-    },
-    "MIXER_CONFIG": {
-      "tbl_ccw": {
-        "english": "CCW",
-        "max_length": 3,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "CCW"
-      },
-      "tbl_cw": {
-        "english": "CW",
-        "max_length": 2,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "CW"
-      },
-      "tbl_tail_bidirectional": {
-        "english": "Bidirectional",
-        "max_length": 13,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "Dwukierunkowy"
-      },
-      "tbl_tail_motororized_tail": {
-        "english": "Motorized Tail",
-        "max_length": 14,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "Motorized Ogon"
-      },
-      "tbl_tail_variable_pitch": {
-        "english": "Variable Pitch",
-        "max_length": 14,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "Zmienna wysokość"
-      }
-    },
     "MIXER_INPUT": {
       "tbl_normal": {
         "english": "Normal",
@@ -911,22 +802,6 @@
           "translation": "Myszkować"
         }
       },
-      "autolevel": {
-        "angle_limits": {
-          "english": "Angle limits",
-          "max_length": 12,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Angle limits"
-        },
-        "trainer_limits": {
-          "english": "Trainer limits",
-          "max_length": 14,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Trainer limits"
-        }
-      },
       "beepers": {
         "dshot_tone": {
           "english": "ESC beacon tone",
@@ -1505,13 +1380,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "translation": "LED_STRIP"
-        },
-        "feature_thrust_vector": {
-          "english": "THRUST_VECTORING",
-          "max_length": 16,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "THRUST_VECTORING"
         },
         "name": {
           "english": "Configuration",
@@ -4423,13 +4291,6 @@
           "reverse_text": false,
           "translation": "AUX %d"
         },
-        "collective": {
-          "english": "Collective",
-          "max_length": 10,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kolektyw"
-        },
         "menu_channel_fallback": {
           "english": "Ch. Fallback",
           "max_length": 12,
@@ -5013,274 +4874,6 @@
           "translation": "Speed Range"
         }
       },
-      "governor": {
-        "auto_timeout": {
-          "english": "Autorotation Timeout",
-          "max_length": 20,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Autorotacja Timeout"
-        },
-        "col": {
-          "english": "Col",
-          "max_length": 3,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przełęcz"
-        },
-        "cyc": {
-          "english": "Cyc",
-          "max_length": 3,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Cykl"
-        },
-        "d": {
-          "english": "D",
-          "max_length": 1,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "D"
-        },
-        "dyn_min_throttle": {
-          "english": "Dyn Min Throttle",
-          "max_length": 16,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Dyn Min. przepustnica"
-        },
-        "f": {
-          "english": "F",
-          "max_length": 1,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "FF"
-        },
-        "fallback_drop": {
-          "english": "Fallback Drop",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Fallback Drop"
-        },
-        "fallback_precomp": {
-          "english": "Fallback Precomp",
-          "max_length": 16,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Fallback Prekomp"
-        },
-        "full_headspeed": {
-          "english": "Full Headspeed",
-          "max_length": 14,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Prędkość obrotowa Full"
-        },
-        "gains": {
-          "english": "Gains",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Zyski"
-        },
-        "gov_d_filter": {
-          "english": "D-Term Cutoff",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Termin odcięcia D"
-        },
-        "gov_ff_filter": {
-          "english": "Precomp Bandwidth",
-          "max_length": 17,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Prekompilowana przepustowość"
-        },
-        "gov_pwr_filter": {
-          "english": "Voltage Filter Cutoff",
-          "max_length": 21,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Odcięcie filtra napięcia"
-        },
-        "gov_tta_filter": {
-          "english": "TTA Bandwidth",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przepustowość TTA"
-        },
-        "handover_throttle": {
-          "english": "Handover throttle%",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przepustnica przekazania%"
-        },
-        "i": {
-          "english": "I",
-          "max_length": 1,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "I"
-        },
-        "max_throttle": {
-          "english": "Max Throttle",
-          "max_length": 12,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Maks. przepustnica"
-        },
-        "menu_curves": {
-          "english": "Bypass Curve",
-          "max_length": 12,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Krzywa obejściowa"
-        },
-        "menu_curves_long": {
-          "english": "Governor Bypass Curve",
-          "max_length": 21,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Krzywa obejścia gubernatora"
-        },
-        "menu_filters": {
-          "english": "Filters",
-          "max_length": 7,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Filtry"
-        },
-        "menu_flags": {
-          "english": "Behaviour",
-          "max_length": 9,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Zachowanie"
-        },
-        "menu_general": {
-          "english": "General",
-          "max_length": 7,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ogole"
-        },
-        "menu_time": {
-          "english": "Ramp Time",
-          "max_length": 9,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ramp Czas"
-        },
-        "min_throttle": {
-          "english": "Min Throttle",
-          "max_length": 12,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Min. przepustnica"
-        },
-        "p": {
-          "english": "P",
-          "max_length": 1,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "P"
-        },
-        "pid_spoolup": {
-          "english": "PID Spoolup",
-          "max_length": 11,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Buforowanie PID"
-        },
-        "precomp": {
-          "english": "Precomp",
-          "max_length": 7,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Prekomp"
-        },
-        "recovery_time": {
-          "english": "Recovery time",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Recovery Czas"
-        },
-        "spooldown_time": {
-          "english": "Spooldown time",
-          "max_length": 14,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Spooldown Czas"
-        },
-        "spoolup_time": {
-          "english": "Spoolup time",
-          "max_length": 12,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Spoolup Czas"
-        },
-        "startup_time": {
-          "english": "Startup time",
-          "max_length": 12,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Startup Czas"
-        },
-        "tbl_off": {
-          "english": "Off",
-          "max_length": 3,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Wyłączony"
-        },
-        "tbl_on": {
-          "english": "On",
-          "max_length": 2,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "NA"
-        },
-        "throttle_hold_timeout": {
-          "english": "Throttle hold timeout",
-          "max_length": 21,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przekroczono limit czasu trzymania przepustnicy"
-        },
-        "throttle_type": {
-          "english": "Throttle type",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Typ przepustnicy"
-        },
-        "tracking_time": {
-          "english": "Tracking time",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Tracking Czas"
-        },
-        "voltage_comp": {
-          "english": "Voltage Comp",
-          "max_length": 12,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Komp.nap"
-        },
-        "yaw": {
-          "english": "Yaw",
-          "max_length": 3,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Myszkować"
-        }
-      },
       "hardware_setup": {
         "name": {
           "english": "Setup",
@@ -5427,43 +5020,6 @@
           "translation": "Dzienniki"
         }
       },
-      "main_rotor": {
-        "collective_pitch_comp": {
-          "english": "Collective Pitch Comp",
-          "max_length": 21,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kolektyw Pitch Comp"
-        },
-        "cyclic_cross_coupling_cutoff": {
-          "english": "Cyclic Cross Coupling: Cutoff",
-          "max_length": 29,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Cykliczne sprzęganie krzyżowe: odcięcie"
-        },
-        "cyclic_cross_coupling_gain": {
-          "english": "Cyclic Cross Coupling: Gain",
-          "max_length": 27,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Cykliczne sprzęganie krzyżowe: wzmocnienie"
-        },
-        "cyclic_cross_coupling_ratio": {
-          "english": "Cyclic Cross Coupling: Ratio",
-          "max_length": 28,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Cykliczne sprzęgło krzyżowe: Ratio"
-        },
-        "name": {
-          "english": "Main Rotor",
-          "max_length": 10,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Główny Rotor"
-        }
-      },
       "master_gains": {
         "axis_speed": {
           "english": "Speed",
@@ -5530,117 +5086,12 @@
         }
       },
       "mixer": {
-        "aileron_direction": {
-          "english": "Aileron Direction",
-          "max_length": 17,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kierunek lotek"
-        },
-        "collective_calibration": {
-          "english": "Collective Calibration",
-          "max_length": 22,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kolektyw Calibration"
-        },
-        "collective_direction": {
-          "english": "Collective Direction",
-          "max_length": 20,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kolektyw Direction"
-        },
-        "collective_pitch_limit": {
-          "english": "Collective Pitch Limit",
-          "max_length": 22,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kolektyw Pitch Limit"
-        },
-        "collective_tilt_correction_neg": {
-          "english": "Collective Tilt Correction -",
-          "max_length": 28,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kolektyw Tilt Korekta -"
-        },
-        "collective_tilt_correction_pos": {
-          "english": "Collective Tilt Correction +",
-          "max_length": 28,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kolektyw Tilt Korekta +"
-        },
-        "cyclic_calibration": {
-          "english": "Cyclic Calibration",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Cyklicz Calibration"
-        },
-        "cyclic_pitch_limit": {
-          "english": "Cyclic Pitch Limit",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Cyklicz Pitch Limit"
-        },
-        "disable_swash_override": {
-          "english": "Disable swash setup mode",
-          "max_length": 24,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Wyłącz tryb konfiguracji Swash"
-        },
-        "disable_swash_override_message": {
-          "english": "Disable swash setup mode and return mixer control to the flight controller.",
-          "max_length": 75,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Wyłącz tryb konfiguracji Swash i zwróć sterowanie mikserem do kontrolera lotu."
-        },
-        "elevator_direction": {
-          "english": "Elevator Direction",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kierunek windy"
-        },
-        "enable_swash_override": {
-          "english": "Enable swash setup mode",
-          "max_length": 23,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Włącz tryb konfiguracji Swash"
-        },
-        "enable_swash_override_message": {
-          "english": "Enable passthrough mixer override so you can move the sticks while adjusting swash geometry. \r\n\r\nLive changes from this page are sent to the flight controller.",
-          "max_length": 159,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Włącz obejście miksera przelotowego, aby móc przesuwać drążki podczas dostosowywania geometrii obrotu. \r\n\r\nZmiany na żywo z tej strony są wysyłane do kontrolera lotu."
-        },
         "gain": {
           "english": "Throw",
           "max_length": 5,
           "needs_translation": true,
           "reverse_text": false,
           "translation": "Throw"
-        },
-        "geo_correction": {
-          "english": "Geo Correction",
-          "max_length": 14,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Geo Korekta"
-        },
-        "geometry": {
-          "english": "Geometry",
-          "max_length": 8,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Geometria"
         },
         "gyro_direction": {
           "english": "Gyro Direction",
@@ -5663,13 +5114,6 @@
           "reverse_text": false,
           "translation": "Odwrócon"
         },
-        "main_rotor_dir": {
-          "english": "Rotor Direction",
-          "max_length": 15,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kierunek wirnika"
-        },
         "name": {
           "english": "Mixer",
           "max_length": 5,
@@ -5683,104 +5127,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "translation": "Normal"
-        },
-        "swash": {
-          "english": "Swash",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Plusk"
-        },
-        "swash_phase": {
-          "english": "Phase Angle",
-          "max_length": 11,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Phase Kat"
-        },
-        "swash_pitch_limit": {
-          "english": "Total Pitch Limit",
-          "max_length": 17,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Razem Pitch Limit"
-        },
-        "swash_type": {
-          "english": "Swash Type",
-          "max_length": 10,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Typ przemywania"
-        },
-        "tail": {
-          "english": "Tail",
-          "max_length": 4,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ogon"
-        },
-        "tail_center_offset": {
-          "english": "Tail Center Offset",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ogon Srodek Offset"
-        },
-        "tail_motor_idle": {
-          "english": "Tail Idle Thr%",
-          "max_length": 14,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ogon Idle Thr%"
-        },
-        "tail_rotor_mode": {
-          "english": "Tail Mode",
-          "max_length": 9,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ogon Mode"
-        },
-        "trims": {
-          "english": "Trims",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Wykończenia"
-        },
-        "yaw_calibration": {
-          "english": "Yaw Calibration",
-          "max_length": 15,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kalibracja odchylenia"
-        },
-        "yaw_ccw_limit": {
-          "english": "Yaw CCW Limit",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Odchylenie CCW Limit"
-        },
-        "yaw_center_trim": {
-          "english": "Yaw Center Trim",
-          "max_length": 15,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Yaw Srodek Trim"
-        },
-        "yaw_cw_limit": {
-          "english": "Yaw CW Limit",
-          "max_length": 12,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Odchylenie CW Limit"
-        },
-        "yaw_direction": {
-          "english": "Yaw Direction",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kierunek odchylenia"
         }
       },
       "mixer_rules": {
@@ -6466,13 +5812,6 @@
           "reverse_text": false,
           "translation": "Błąd uziemienia Decay"
         },
-        "hsi_offset_limit": {
-          "english": "HSI Offset Limit",
-          "max_length": 16,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ograniczenie HSI Offset"
-        },
         "inflight_error_decay": {
           "english": "I-Term Decay Max Rate",
           "max_length": 21,
@@ -7094,13 +6433,6 @@
         }
       },
       "rates": {
-        "collective": {
-          "english": "Collective",
-          "max_length": 10,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przełęcz"
-        },
         "name": {
           "english": "Rates",
           "max_length": 5,
@@ -7194,34 +6526,6 @@
           "reverse_text": false,
           "translation": "Limit przyspieszenia"
         },
-        "col": {
-          "english": "Col",
-          "max_length": 3,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przełęcz"
-        },
-        "cyclic_behaviour": {
-          "english": "Cyclic Behaviour",
-          "max_length": 16,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Zachowanie cykliczne"
-        },
-        "cyclic_polarity": {
-          "english": "Cyclic Polarity",
-          "max_length": 15,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Współrzędne biegunowe"
-        },
-        "cyclic_ring": {
-          "english": "Cyclic Ring",
-          "max_length": 11,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Pierścień cykliczny"
-        },
         "dyn_ceiling_gain": {
           "english": "Dynamic Ceiling Gain",
           "max_length": 20,
@@ -7298,141 +6602,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "translation": "NA"
-        }
-      },
-      "rescue": {
-        "accel": {
-          "english": "Accel",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przyspiesz"
-        },
-        "climb": {
-          "english": "Climb",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Wspinaczka"
-        },
-        "collective": {
-          "english": "Collective",
-          "max_length": 10,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Zbiorowy"
-        },
-        "exit_time": {
-          "english": "Exit Time",
-          "max_length": 9,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Czas wyjścia"
-        },
-        "fail_time": {
-          "english": "Fail Time",
-          "max_length": 9,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Fail Czas"
-        },
-        "flip": {
-          "english": "Flip",
-          "max_length": 4,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Flip"
-        },
-        "flip_upright": {
-          "english": "Flip to Upright",
-          "max_length": 15,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Flip do wspornika"
-        },
-        "gains": {
-          "english": "Gains",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Zyski"
-        },
-        "hover": {
-          "english": "Hover",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Unieś się"
-        },
-        "level_gain": {
-          "english": "Level",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Poziom"
-        },
-        "mode_enable": {
-          "english": "Rescue Mode Enable",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Włącz tryb ratunkowy"
-        },
-        "name": {
-          "english": "Rescue",
-          "max_length": 6,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ratunek"
-        },
-        "pull_up": {
-          "english": "Pull-up",
-          "max_length": 7,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Puzupełnienie"
-        },
-        "rate": {
-          "english": "Rate",
-          "max_length": 4,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Wskaźnik"
-        },
-        "tbl_flip": {
-          "english": "Flip",
-          "max_length": 4,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Flip"
-        },
-        "tbl_noflip": {
-          "english": "No Flip",
-          "max_length": 7,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Nie Flip"
-        },
-        "tbl_off": {
-          "english": "Off",
-          "max_length": 3,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Wyłączony"
-        },
-        "tbl_on": {
-          "english": "On",
-          "max_length": 2,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "NA"
-        },
-        "time": {
-          "english": "Time",
-          "max_length": 4,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Czas"
         }
       },
       "rfstatus": {
@@ -7573,27 +6742,6 @@
           "reverse_text": false,
           "translation": "Srodek"
         },
-        "cyc_left": {
-          "english": "CYC.LEFT",
-          "max_length": 8,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "CYK.LEWY"
-        },
-        "cyc_pitch": {
-          "english": "CYC.PITCH",
-          "max_length": 9,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "CYC.PITCH"
-        },
-        "cyc_right": {
-          "english": "CYC.RIGHT",
-          "max_length": 9,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "CYK.PRAWY"
-        },
         "disable_servo_override": {
           "english": "Disable servo override",
           "max_length": 22,
@@ -7621,13 +6769,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "translation": "Servo override allows you to 'trim' your servo Srodek point in real Czas."
-        },
-        "geometry": {
-          "english": "Geometry",
-          "max_length": 8,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Geometria"
         },
         "maximum": {
           "english": "Maximum",
@@ -7691,13 +6832,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "translation": "Predkosc"
-        },
-        "tail": {
-          "english": "TAIL",
-          "max_length": 4,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "OGON"
         },
         "tbl_no": {
           "english": "NO",
@@ -10076,13 +9210,6 @@
           "reverse_text": false,
           "translation": "No motor"
         },
-        "mot_none_help": {
-          "english": "Gliders, or a motor not on the flight controller.",
-          "max_length": 49,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Gliders, or a motor not on the flight controller."
-        },
         "mot_other": {
           "english": "Other",
           "max_length": 5,
@@ -11038,92 +10165,6 @@
           "translation": "Total Run Time"
         }
       },
-      "tail_rotor": {
-        "ccw": {
-          "english": "CCW",
-          "max_length": 3,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "CCW"
-        },
-        "cutoff": {
-          "english": "Cutoff",
-          "max_length": 6,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Odcięcie"
-        },
-        "cw": {
-          "english": "CW",
-          "max_length": 2,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "CW"
-        },
-        "gain": {
-          "english": "Gain",
-          "max_length": 4,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Zysk"
-        },
-        "inertia_precomp": {
-          "english": "Inertia Precomp",
-          "max_length": 15,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Inertia Prekomp"
-        },
-        "limit": {
-          "english": "Limit",
-          "max_length": 5,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Limit"
-        },
-        "name": {
-          "english": "Tail Rotor",
-          "max_length": 10,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ogon Rotor"
-        },
-        "tail_torque_assist": {
-          "english": "Tail Torque Assist",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Tail Torque Assist"
-        },
-        "yaw_collective_ff_gain": {
-          "english": "Yaw Collective FF Gain",
-          "max_length": 22,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Yaw Kolektyw FF Wzmocnienie"
-        },
-        "yaw_cyclic_ff_gain": {
-          "english": "Yaw Cyclic FF Gain",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Yaw Cykliczne wzmocnienie FF"
-        },
-        "yaw_precomp_cutoff": {
-          "english": "Yaw Precomp Cutoff",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Odchylenie przed kompilacją"
-        },
-        "yaw_stop_gain": {
-          "english": "Yaw Stop Gain",
-          "max_length": 13,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Yaw Stop Wzmocnienie"
-        }
-      },
       "telemetry": {
         "msg_set_defaults": {
           "english": "Apply default sensors?",
@@ -11145,71 +10186,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "translation": "No more than 40 Czujniki can be enabled at once"
-        }
-      },
-      "trim": {
-        "collective_trim": {
-          "english": "Col. trim %",
-          "max_length": 11,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Kol. przytnij%"
-        },
-        "disable_mixer_message": {
-          "english": "Return control of the servos to the flight controller.",
-          "max_length": 54,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przywróć kontrolę nad serwami kontrolerowi lotu."
-        },
-        "disable_mixer_override": {
-          "english": "Disable mixer override",
-          "max_length": 22,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Wyłącz obejście miksera"
-        },
-        "enable_mixer_message": {
-          "english": "Set all servos to their configured center position. \r\n\r\nThis will result in all values on this page being saved when adjusting the servo trim.",
-          "max_length": 142,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Set all servos to their configured Srodek position. \r\n\r\nThis will result in all values on this page being saved when adjusting the servo trim."
-        },
-        "enable_mixer_override": {
-          "english": "Enable mixer override",
-          "max_length": 21,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Włącz obejście miksera"
-        },
-        "pitch_trim": {
-          "english": "Pitch trim %",
-          "max_length": 12,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Przycięcie wysokości %"
-        },
-        "roll_trim": {
-          "english": "Roll trim %",
-          "max_length": 11,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Rolka przycinania%"
-        },
-        "tail_motor_idle": {
-          "english": "Tail Motor idle  %",
-          "max_length": 18,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Ogon Silnik idle  %"
-        },
-        "yaw_trim": {
-          "english": "Yaw. trim %",
-          "max_length": 11,
-          "needs_translation": false,
-          "reverse_text": false,
-          "translation": "Myszkować. przycinać %"
         }
       }
     },
@@ -12078,13 +11054,6 @@
       "reverse_text": false,
       "translation": "Oceń profil"
     },
-    "sensor_rescue": {
-      "english": "Rescue",
-      "max_length": 6,
-      "needs_translation": false,
-      "reverse_text": false,
-      "translation": "Ratunek"
-    },
     "sensor_roll_attitude": {
       "english": "Roll Attitude",
       "max_length": 13,
@@ -12133,13 +11102,6 @@
       "needs_translation": false,
       "reverse_text": false,
       "translation": "Przepustnica%"
-    },
-    "sensor_tv_profile": {
-      "english": "TV Profile",
-      "max_length": 10,
-      "needs_translation": true,
-      "reverse_text": false,
-      "translation": "TV Profile"
     },
     "sensor_voltage": {
       "english": "Voltage",
@@ -12383,13 +11345,6 @@
         "needs_translation": false,
         "reverse_text": false,
         "translation": "Pozostało paliwa"
-      },
-      "headspeed": {
-        "english": "RPM",
-        "max_length": 3,
-        "needs_translation": false,
-        "reverse_text": false,
-        "translation": "RPM"
       },
       "info_armed": {
         "english": "Armed",

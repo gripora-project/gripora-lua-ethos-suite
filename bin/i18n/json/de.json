@@ -389,13 +389,6 @@
           "reverse_text": false,
           "max_length": 11
         },
-        "hsi_offset_limit": {
-          "english": "HSI Offset Limit",
-          "translation": "HSI Offset-Grenze",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 16
-        },
         "iterm_relax_type": {
           "english": "Iterm Relax: Type",
           "translation": "Iterm Relax: Typ",
@@ -439,397 +432,6 @@
           "max_length": 18
         }
       },
-      "tail_rotor": {
-        "name": {
-          "english": "Tail Rotor",
-          "translation": "Heck Rotor",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 10
-        },
-        "yaw_stop_gain": {
-          "english": "Yaw Stop Gain",
-          "translation": "Yaw Stop Gain",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
-        "cw": {
-          "english": "CW",
-          "translation": "CW",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 2
-        },
-        "ccw": {
-          "english": "CCW",
-          "translation": "CCW",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "yaw_precomp_cutoff": {
-          "english": "Yaw Precomp Cutoff",
-          "translation": "Yaw Precomp Cutoff",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "yaw_cyclic_ff_gain": {
-          "english": "Yaw Cyclic FF Gain",
-          "translation": "Yaw Zyklische FF Verstärkung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "yaw_collective_ff_gain": {
-          "english": "Yaw Collective FF Gain",
-          "translation": "Yaw Kollektiver FF-Gewinn",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 22
-        },
-        "inertia_precomp": {
-          "english": "Inertia Precomp",
-          "translation": "Inertia Precomp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 15
-        },
-        "gain": {
-          "english": "Gain",
-          "translation": "Gewinn",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
-        },
-        "cutoff": {
-          "english": "Cutoff",
-          "translation": "G-freq.",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 6
-        },
-        "tail_torque_assist": {
-          "english": "Tail Torque Assist",
-          "translation": "Tail Torque Assist",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "limit": {
-          "english": "Limit",
-          "translation": "Grenze",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        }
-      },
-      "governor": {
-        "menu_general": {
-          "english": "General",
-          "translation": "Allgemein",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 7
-        },
-        "full_headspeed": {
-          "english": "Full Headspeed",
-          "translation": "Full Headspeed",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 14
-        },
-        "min_throttle": {
-          "english": "Min Throttle",
-          "translation": "Min. Gas",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 12
-        },
-        "max_throttle": {
-          "english": "Max Throttle",
-          "translation": "Maximales Gas",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 12
-        },
-        "fallback_drop": {
-          "english": "Fallback Drop",
-          "translation": "Fallback Drop",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
-        "gains": {
-          "english": "Gains",
-          "translation": "Gewinne",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        },
-        "p": {
-          "english": "P",
-          "translation": "P",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 1
-        },
-        "i": {
-          "english": "I",
-          "translation": "I",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 1
-        },
-        "d": {
-          "english": "D",
-          "translation": "D",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 1
-        },
-        "f": {
-          "english": "F",
-          "translation": "FF",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 1
-        },
-        "precomp": {
-          "english": "Precomp",
-          "translation": "Precomp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 7
-        },
-        "yaw": {
-          "english": "Yaw",
-          "translation": "Gier",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "cyc": {
-          "english": "Cyc",
-          "translation": "Cyc",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "col": {
-          "english": "Col",
-          "translation": "Kol",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "menu_flags": {
-          "english": "Behaviour",
-          "translation": "Verhalten",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 9
-        },
-        "fallback_precomp": {
-          "english": "Fallback Precomp",
-          "translation": "Fallback Precomp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 16
-        },
-        "pid_spoolup": {
-          "english": "PID Spoolup",
-          "translation": "PID Spoolup",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 11
-        },
-        "voltage_comp": {
-          "english": "Voltage Comp",
-          "translation": "Spannungskomp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 12
-        },
-        "dyn_min_throttle": {
-          "english": "Dyn Min Throttle",
-          "translation": "Dyn Min. Drossel",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 16
-        },
-        "tbl_off": {
-          "english": "Off",
-          "translation": "Aus",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "tbl_on": {
-          "english": "On",
-          "translation": "On",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 2
-        },
-        "auto_timeout": {
-          "english": "Autorotation Timeout",
-          "translation": "Autorotations-Timeout",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 20
-        },
-        "gov_d_filter": {
-          "english": "D-Term Cutoff",
-          "translation": "D-Term Grenzwert",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
-        "gov_ff_filter": {
-          "english": "Precomp Bandwidth",
-          "translation": "Vorkomp. Bandbreite",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 17
-        },
-        "gov_pwr_filter": {
-          "english": "Voltage Filter Cutoff",
-          "translation": "Spannungsfilter Grenzwert",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 21
-        },
-        "gov_tta_filter": {
-          "english": "TTA Bandwidth",
-          "translation": "TTA-Bandbreite",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
-        "handover_throttle": {
-          "english": "Handover throttle%",
-          "translation": "Übergabe-Gas%",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "menu_curves": {
-          "english": "Bypass Curve",
-          "translation": "Bypass-Kurve",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 12
-        },
-        "menu_curves_long": {
-          "english": "Governor Bypass Curve",
-          "translation": "Governor-Bypass-Kurve",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 21
-        },
-        "menu_filters": {
-          "english": "Filters",
-          "translation": "Filter",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 7
-        },
-        "menu_time": {
-          "english": "Ramp Time",
-          "translation": "Rampenzeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 9
-        },
-        "recovery_time": {
-          "english": "Recovery time",
-          "translation": "Erholungszeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
-        "spooldown_time": {
-          "english": "Spooldown time",
-          "translation": "Spooldown-Zeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 14
-        },
-        "spoolup_time": {
-          "english": "Spoolup time",
-          "translation": "Spoolup-Zeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 12
-        },
-        "startup_time": {
-          "english": "Startup time",
-          "translation": "Startzeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 12
-        },
-        "throttle_hold_timeout": {
-          "english": "Throttle hold timeout",
-          "translation": "Gas-Hold Timeout",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 21
-        },
-        "throttle_type": {
-          "english": "Throttle type",
-          "translation": "Gastyp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
-        "tracking_time": {
-          "english": "Tracking time",
-          "translation": "Tracking-Zeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        }
-      },
-      "main_rotor": {
-        "name": {
-          "english": "Main Rotor",
-          "translation": "Haupt-Rotor",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 10
-        },
-        "collective_pitch_comp": {
-          "english": "Collective Pitch Comp",
-          "translation": "Kollektiv Pitch Comp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 21
-        },
-        "cyclic_cross_coupling_gain": {
-          "english": "Cyclic Cross Coupling: Gain",
-          "translation": "Zyklische Kreuzkopplung: Verstärkung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 27
-        },
-        "cyclic_cross_coupling_ratio": {
-          "english": "Cyclic Cross Coupling: Ratio",
-          "translation": "Zyklische Kreuzkopplung: Ratio",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 28
-        },
-        "cyclic_cross_coupling_cutoff": {
-          "english": "Cyclic Cross Coupling: Cutoff",
-          "translation": "Zyklische Kreuzkopplung: Cutoff",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 29
-        }
-      },
       "pid_bandwidth": {
         "name": {
           "english": "PID Bandwidth",
@@ -858,22 +460,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 13
-        }
-      },
-      "autolevel": {
-        "trainer_limits": {
-          "english": "Trainer limits",
-          "max_length": 14,
-          "needs_translation": true,
-          "translation": "Trainer limits",
-          "reverse_text": false
-        },
-        "angle_limits": {
-          "english": "Angle limits",
-          "max_length": 12,
-          "needs_translation": true,
-          "translation": "Angle limits",
-          "reverse_text": false
         }
       },
       "filters": {
@@ -1089,13 +675,6 @@
           "reverse_text": false,
           "max_length": 7
         },
-        "collective": {
-          "english": "Collective",
-          "translation": "Kol",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 10
-        },
         "tbl_none": {
           "english": "None",
           "translation": "Keine",
@@ -1161,13 +740,6 @@
           "reverse_text": false,
           "max_length": 8
         },
-        "cyclic_behaviour": {
-          "english": "Cyclic Behaviour",
-          "translation": "Zyklik-Verhalten",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 16
-        },
         "rate_table": {
           "english": "Rate Table",
           "translation": "Rate-Tabelle",
@@ -1224,27 +796,6 @@
           "reverse_text": false,
           "max_length": 23
         },
-        "col": {
-          "english": "Col",
-          "translation": "Kol",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "cyclic_ring": {
-          "english": "Cyclic Ring",
-          "translation": "Zyklik-Ring",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 11
-        },
-        "cyclic_polarity": {
-          "english": "Cyclic Polarity",
-          "translation": "Polarkoordinaten",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 15
-        },
         "tbl_off": {
           "english": "Off",
           "translation": "Aus",
@@ -1258,141 +809,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 2
-        }
-      },
-      "rescue": {
-        "name": {
-          "english": "Rescue",
-          "translation": "Rescue",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 6
-        },
-        "mode_enable": {
-          "english": "Rescue Mode Enable",
-          "translation": "Rescue-Modus aktivieren",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "flip_upright": {
-          "english": "Flip to Upright",
-          "translation": "Flip zum Pfosten",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 15
-        },
-        "pull_up": {
-          "english": "Pull-up",
-          "translation": "Pull-up",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 7
-        },
-        "climb": {
-          "english": "Climb",
-          "translation": "Klettern",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        },
-        "hover": {
-          "english": "Hover",
-          "translation": "Schweben",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        },
-        "flip": {
-          "english": "Flip",
-          "translation": "Flip",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
-        },
-        "gains": {
-          "english": "Gains",
-          "translation": "Gewinne",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        },
-        "collective": {
-          "english": "Collective",
-          "translation": "Kollektiv",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 10
-        },
-        "time": {
-          "english": "Time",
-          "translation": "Zeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
-        },
-        "fail_time": {
-          "english": "Fail Time",
-          "translation": "Fail-Zeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 9
-        },
-        "exit_time": {
-          "english": "Exit Time",
-          "translation": "Ausstiegszeit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 9
-        },
-        "level_gain": {
-          "english": "Level",
-          "translation": "Ebene",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        },
-        "rate": {
-          "english": "Rate",
-          "translation": "Drehrate",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
-        },
-        "accel": {
-          "english": "Accel",
-          "translation": "Beschleunigung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        },
-        "tbl_off": {
-          "english": "Off",
-          "translation": "Aus",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "tbl_on": {
-          "english": "On",
-          "translation": "On",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 2
-        },
-        "tbl_noflip": {
-          "english": "No Flip",
-          "translation": "Kein Flip",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 7
-        },
-        "tbl_flip": {
-          "english": "Flip",
-          "translation": "Flip",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
         }
       },
       "hardware_setup": {
@@ -1411,27 +827,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 6
-        },
-        "cyc_left": {
-          "english": "CYC.LEFT",
-          "translation": "ZYK. LINKS",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 8
-        },
-        "cyc_pitch": {
-          "english": "CYC.PITCH",
-          "translation": "ZYK. PITCH",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 9
-        },
-        "cyc_right": {
-          "english": "CYC.RIGHT",
-          "translation": "ZYK. RECHTS",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 9
         },
         "disable_servo_override": {
           "english": "Disable servo override",
@@ -1460,13 +855,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 73
-        },
-        "geometry": {
-          "english": "Geometry",
-          "translation": "Geometrie",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 8
         },
         "maximum": {
           "english": "Maximum",
@@ -1531,13 +919,6 @@
           "reverse_text": false,
           "max_length": 5
         },
-        "tail": {
-          "english": "TAIL",
-          "translation": "HECK",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
-        },
         "tbl_no": {
           "english": "NO",
           "translation": "NEIN",
@@ -1588,13 +969,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 9
-        },
-        "feature_thrust_vector": {
-          "english": "THRUST_VECTORING",
-          "translation": "THRUST_VECTORING",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 16
         },
         "tbl_off": {
           "english": "Off",
@@ -2970,117 +2344,12 @@
         }
       },
       "mixer": {
-        "aileron_direction": {
-          "english": "Aileron Direction",
-          "translation": "Querruder-Richtung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 17
-        },
-        "collective_calibration": {
-          "english": "Collective Calibration",
-          "translation": "Kollektive Kalibrierung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 22
-        },
-        "collective_direction": {
-          "english": "Collective Direction",
-          "translation": "Kollektiv-Richtung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 20
-        },
-        "collective_pitch_limit": {
-          "english": "Collective Pitch Limit",
-          "translation": "Kollektives Pitch-Limit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 22
-        },
-        "collective_tilt_correction_neg": {
-          "english": "Collective Tilt Correction -",
-          "translation": "Kollektive Neigungskorrektur -",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 28
-        },
-        "collective_tilt_correction_pos": {
-          "english": "Collective Tilt Correction +",
-          "translation": "Kollektive Neigungskorrektur +",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 28
-        },
-        "cyclic_calibration": {
-          "english": "Cyclic Calibration",
-          "translation": "Zyklische Kalibrierung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "cyclic_pitch_limit": {
-          "english": "Cyclic Pitch Limit",
-          "translation": "Zyklisches Pitch-Limit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "disable_swash_override": {
-          "english": "Disable swash setup mode",
-          "translation": "Taumelscheiben-Einstellmodus deaktivieren",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 24
-        },
-        "disable_swash_override_message": {
-          "english": "Disable swash setup mode and return mixer control to the flight controller.",
-          "translation": "Taumelscheiben-Einstellmodus deaktivieren und die Mischersteuerung an den Flugcontroller zurückgeben.",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 75
-        },
-        "elevator_direction": {
-          "english": "Elevator Direction",
-          "translation": "Höhenruder-Richtung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "enable_swash_override": {
-          "english": "Enable swash setup mode",
-          "translation": "Taumelscheiben-Einstellmodus aktivieren",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 23
-        },
-        "enable_swash_override_message": {
-          "english": "Enable passthrough mixer override so you can move the sticks while adjusting swash geometry. \r\n\r\nLive changes from this page are sent to the flight controller.",
-          "translation": "Passthrough-Mischer-Override aktivieren, damit Sie die Sticks bewegen können, während Sie die Taumelscheiben-Geometrie anpassen. \r\n\r\nLive-Änderungen von dieser Seite werden an den Flugcontroller gesendet.",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 159
-        },
         "gain": {
           "english": "Throw",
           "translation": "Throw",
           "needs_translation": true,
           "max_length": 5,
           "reverse_text": false
-        },
-        "geo_correction": {
-          "english": "Geo Correction",
-          "translation": "Geo-Korrektur",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 14
-        },
-        "geometry": {
-          "english": "Geometry",
-          "translation": "Geometrie",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 8
         },
         "invert": {
           "english": "Invert",
@@ -3096,13 +2365,6 @@
           "reverse_text": false,
           "max_length": 8
         },
-        "main_rotor_dir": {
-          "english": "Rotor Direction",
-          "translation": "Rotordrehrichtung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 15
-        },
         "name": {
           "english": "Mixer",
           "translation": "Mischer",
@@ -3117,175 +2379,12 @@
           "reverse_text": false,
           "max_length": 6
         },
-        "swash": {
-          "english": "Swash",
-          "translation": "Taumelscheibe",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        },
-        "swash_phase": {
-          "english": "Phase Angle",
-          "translation": "Phasenwinkel",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 11
-        },
-        "swash_pitch_limit": {
-          "english": "Total Pitch Limit",
-          "translation": "Gesamter Pitch-Limit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 17
-        },
-        "swash_type": {
-          "english": "Swash Type",
-          "translation": "Taumelscheibentyp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 10
-        },
-        "tail": {
-          "english": "Tail",
-          "translation": "Heck",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
-        },
-        "tail_center_offset": {
-          "english": "Tail Center Offset",
-          "translation": "Heck-Mittenversatz",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "tail_motor_idle": {
-          "english": "Tail Idle Thr%",
-          "translation": "Heckleerlauf-Gas%",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 14
-        },
-        "tail_rotor_mode": {
-          "english": "Tail Mode",
-          "translation": "Heckmodus",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 9
-        },
-        "trims": {
-          "english": "Trims",
-          "translation": "Trimmungen",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 5
-        },
-        "yaw_calibration": {
-          "english": "Yaw Calibration",
-          "translation": "Gier-Kalibrierung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 15
-        },
-        "yaw_ccw_limit": {
-          "english": "Yaw CCW Limit",
-          "translation": "Gier CCW-Limit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
-        "yaw_center_trim": {
-          "english": "Yaw Center Trim",
-          "translation": "Gier-Mitten-Trimmung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 15
-        },
-        "yaw_cw_limit": {
-          "english": "Yaw CW Limit",
-          "translation": "Gier CW-Limit",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 12
-        },
-        "yaw_direction": {
-          "english": "Yaw Direction",
-          "translation": "Gier-Richtung",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
         "gyro_direction": {
           "english": "Gyro Direction",
           "translation": "Gyro Direction",
           "needs_translation": true,
           "reverse_text": false,
           "max_length": 14
-        }
-      },
-      "trim": {
-        "collective_trim": {
-          "english": "Col. trim %",
-          "translation": "Kollektiv-Trimmung %",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 11
-        },
-        "disable_mixer_message": {
-          "english": "Return control of the servos to the flight controller.",
-          "translation": "Gibt die Steuerung der Servos an den Flugcontroller zurück.",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 54
-        },
-        "disable_mixer_override": {
-          "english": "Disable mixer override",
-          "translation": "Mischer-Überschreibung deaktivieren",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 22
-        },
-        "enable_mixer_message": {
-          "english": "Set all servos to their configured center position. \r\n\r\nThis will result in all values on this page being saved when adjusting the servo trim.",
-          "translation": "Alle Servos auf ihre konfigurierte Mittelposition setzen. \r\n\r\nAlle Werte auf dieser Seite werden gespeichert, wenn die Servo-Trimmung angepasst wird.",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 142
-        },
-        "enable_mixer_override": {
-          "english": "Enable mixer override",
-          "translation": "Mischer-Überschreibung aktivieren",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 21
-        },
-        "pitch_trim": {
-          "english": "Pitch trim %",
-          "translation": "Nick-Trimmung %",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 12
-        },
-        "roll_trim": {
-          "english": "Roll trim %",
-          "translation": "Roll-Trimmung %",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 11
-        },
-        "tail_motor_idle": {
-          "english": "Tail Motor idle  %",
-          "translation": "Heckmotor-Leerlauf %",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "yaw_trim": {
-          "english": "Yaw. trim %",
-          "translation": "Gier-Trimmung %",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 11
         }
       },
       "modes": {
@@ -3733,13 +2832,6 @@
           "needs_translation": true,
           "max_length": 6,
           "reverse_text": false
-        },
-        "collective": {
-          "english": "Collective",
-          "translation": "Kollektiv",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 10
         },
         "menu_channel_fallback": {
           "english": "Ch. Fallback",
@@ -9351,13 +8443,6 @@
           "reverse_text": false,
           "max_length": 8
         },
-        "mot_none_help": {
-          "english": "Gliders, or a motor not on the flight controller.",
-          "translation": "Gliders, or a motor not on the flight controller.",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 49
-        },
         "mot_other_help": {
           "english": "No motor, DShot600 (short ESC leads only) and the rest.",
           "translation": "No motor, DShot600 (short ESC leads only) and the rest.",
@@ -11760,13 +10845,6 @@
       "reverse_text": false,
       "max_length": 12
     },
-    "sensor_rescue": {
-      "english": "Rescue",
-      "translation": "Rescue",
-      "needs_translation": false,
-      "reverse_text": false,
-      "max_length": 6
-    },
     "sensor_roll_attitude": {
       "english": "Roll Attitude",
       "translation": "Roll Lage",
@@ -11823,13 +10901,6 @@
       "reverse_text": false,
       "max_length": 10
     },
-    "sensor_tv_profile": {
-      "english": "TV Profile",
-      "translation": "TV Profile",
-      "needs_translation": true,
-      "reverse_text": false,
-      "max_length": 10
-    },
     "sensor_voltage": {
       "english": "Voltage",
       "translation": "Spannun",
@@ -11860,43 +10931,6 @@
     }
   },
   "api": {
-    "MIXER_CONFIG": {
-      "tbl_ccw": {
-        "english": "CCW",
-        "translation": "CCW",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 3
-      },
-      "tbl_cw": {
-        "english": "CW",
-        "translation": "CW",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 2
-      },
-      "tbl_tail_bidirectional": {
-        "english": "Bidirectional",
-        "translation": "Bidirektional",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 13
-      },
-      "tbl_tail_motororized_tail": {
-        "english": "Motorized Tail",
-        "translation": "Motorisiertes Heck",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 14
-      },
-      "tbl_tail_variable_pitch": {
-        "english": "Variable Pitch",
-        "translation": "Variabler Pitch",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 14
-      }
-    },
     "MIXER_INPUT": {
       "tbl_normal": {
         "english": "Normal",
@@ -12040,78 +11074,6 @@
         "needs_translation": false,
         "reverse_text": false,
         "max_length": 2
-      }
-    },
-    "GOVERNOR_CONFIG": {
-      "governor_auto_throttle": {
-        "english": "Auto throttle",
-        "translation": "Automatikgas",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 13
-      },
-      "governor_idle_throttle": {
-        "english": "Idle throttle",
-        "translation": "Leerlaufgas",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 13
-      },
-      "tbl_govmode_direct": {
-        "english": "DIRECT",
-        "translation": "DIREKT",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 6
-      },
-      "tbl_govmode_electric": {
-        "english": "ELECTRIC",
-        "translation": "ELEKTRISCH",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 8
-      },
-      "tbl_govmode_limit": {
-        "english": "LIMIT",
-        "translation": "LIMIT",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 5
-      },
-      "tbl_govmode_nitro": {
-        "english": "NITRO",
-        "translation": "NITRO",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 5
-      },
-      "tbl_govmode_off": {
-        "english": "OFF",
-        "translation": "AUS",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 3
-      },
-      "tbl_throttle_type_function": {
-        "english": "FUNCTION",
-        "translation": "FUNKTION",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 8
-      },
-      "tbl_throttle_type_normal": {
-        "english": "NORMAL",
-        "translation": "NORMAL",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 6
-      },
-      "tbl_throttle_type_switch": {
-        "english": "SWITCH",
-        "translation": "SCHALTER",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 6
       }
     },
     "SRXL2_ESC_CONFIG": {
@@ -12595,13 +11557,6 @@
         "needs_translation": false,
         "reverse_text": false,
         "max_length": 14
-      },
-      "headspeed": {
-        "english": "RPM",
-        "translation": "RPM",
-        "needs_translation": false,
-        "reverse_text": false,
-        "max_length": 3
       },
       "info_armed": {
         "english": "Armed",

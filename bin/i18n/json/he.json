@@ -389,13 +389,6 @@
           "reverse_text": true,
           "max_length": 11
         },
-        "hsi_offset_limit": {
-          "english": "HSI Offset Limit",
-          "translation": "מגבלת HSI Offset",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 16
-        },
         "iterm_relax_type": {
           "english": "Iterm Relax: Type",
           "translation": "Iterm Relax: סוג",
@@ -439,397 +432,6 @@
           "max_length": 18
         }
       },
-      "tail_rotor": {
-        "name": {
-          "english": "Tail Rotor",
-          "translation": "זנב Rotor",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 10
-        },
-        "yaw_stop_gain": {
-          "english": "Yaw Stop Gain",
-          "translation": "Yaw עצור רווח",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 13
-        },
-        "cw": {
-          "english": "CW",
-          "translation": "CW",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 2
-        },
-        "ccw": {
-          "english": "CCW",
-          "translation": "CCW",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "yaw_precomp_cutoff": {
-          "english": "Yaw Precomp Cutoff",
-          "translation": "Yaw Precomp Cutoff",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "yaw_cyclic_ff_gain": {
-          "english": "Yaw Cyclic FF Gain",
-          "translation": "Yaw מחזורי FF רווח",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 18
-        },
-        "yaw_collective_ff_gain": {
-          "english": "Yaw Collective FF Gain",
-          "translation": "Yaw קולקטיבי FF רווח",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 22
-        },
-        "inertia_precomp": {
-          "english": "Inertia Precomp",
-          "translation": "Inertia Precomp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 15
-        },
-        "gain": {
-          "english": "Gain",
-          "translation": "רווח",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 4
-        },
-        "cutoff": {
-          "english": "Cutoff",
-          "translation": "חיתוך",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 6
-        },
-        "tail_torque_assist": {
-          "english": "Tail Torque Assist",
-          "translation": "Tail Torque Assist",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 18
-        },
-        "limit": {
-          "english": "Limit",
-          "translation": "הגבלה",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 5
-        }
-      },
-      "governor": {
-        "menu_general": {
-          "english": "General",
-          "max_length": 7,
-          "needs_translation": false,
-          "translation": "כללי",
-          "reverse_text": true
-        },
-        "full_headspeed": {
-          "english": "Full Headspeed",
-          "translation": "מהירות ראש של Full",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 14
-        },
-        "min_throttle": {
-          "english": "Min Throttle",
-          "translation": "מצערת מינימלית",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 12
-        },
-        "max_throttle": {
-          "english": "Max Throttle",
-          "translation": "מצערת מקסימלית",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 12
-        },
-        "fallback_drop": {
-          "english": "Fallback Drop",
-          "translation": "Fallback Drop",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 13
-        },
-        "gains": {
-          "english": "Gains",
-          "translation": "רווחים",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 5
-        },
-        "p": {
-          "english": "P",
-          "translation": "פ",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 1
-        },
-        "i": {
-          "english": "I",
-          "translation": "אֲנִי",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 1
-        },
-        "d": {
-          "english": "D",
-          "translation": "ד",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 1
-        },
-        "f": {
-          "english": "F",
-          "translation": "FF",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 1
-        },
-        "precomp": {
-          "english": "Precomp",
-          "translation": "Precomp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 7
-        },
-        "yaw": {
-          "english": "Yaw",
-          "translation": "Yaw",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 3
-        },
-        "cyc": {
-          "english": "Cyc",
-          "translation": "סי",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 3
-        },
-        "col": {
-          "english": "Col",
-          "translation": "אל\"מ",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 3
-        },
-        "menu_flags": {
-          "english": "Behaviour",
-          "max_length": 9,
-          "needs_translation": false,
-          "translation": "התנהגות",
-          "reverse_text": true
-        },
-        "fallback_precomp": {
-          "english": "Fallback Precomp",
-          "translation": "Fallback Precomp",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 16
-        },
-        "pid_spoolup": {
-          "english": "PID Spoolup",
-          "translation": "PID Spoolup",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 11
-        },
-        "voltage_comp": {
-          "english": "Voltage Comp",
-          "translation": "מתח מתח",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 12
-        },
-        "dyn_min_throttle": {
-          "english": "Dyn Min Throttle",
-          "translation": "Dyn מצערת מינימלית",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 16
-        },
-        "tbl_off": {
-          "english": "Off",
-          "translation": "כבוי",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 3
-        },
-        "tbl_on": {
-          "english": "On",
-          "translation": "On",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 2
-        },
-        "auto_timeout": {
-          "english": "Autorotation Timeout",
-          "max_length": 20,
-          "needs_translation": false,
-          "translation": "Timeout לאוטורוטציה",
-          "reverse_text": true
-        },
-        "gov_d_filter": {
-          "english": "D-Term Cutoff",
-          "max_length": 13,
-          "needs_translation": false,
-          "translation": "חיתוך D-Term",
-          "reverse_text": true
-        },
-        "gov_ff_filter": {
-          "english": "Precomp Bandwidth",
-          "max_length": 17,
-          "needs_translation": false,
-          "translation": "רוחב פס קדם-פיצוי",
-          "reverse_text": true
-        },
-        "gov_pwr_filter": {
-          "english": "Voltage Filter Cutoff",
-          "max_length": 21,
-          "needs_translation": false,
-          "translation": "חיתוך מסנן מתח",
-          "reverse_text": true
-        },
-        "gov_tta_filter": {
-          "english": "TTA Bandwidth",
-          "max_length": 13,
-          "needs_translation": false,
-          "translation": "רוחב פס TTA",
-          "reverse_text": true
-        },
-        "handover_throttle": {
-          "english": "Handover throttle%",
-          "max_length": 18,
-          "needs_translation": false,
-          "translation": "מצערת העברה%",
-          "reverse_text": true
-        },
-        "menu_curves": {
-          "english": "Bypass Curve",
-          "max_length": 12,
-          "needs_translation": false,
-          "translation": "עקומת עקיפה",
-          "reverse_text": true
-        },
-        "menu_curves_long": {
-          "english": "Governor Bypass Curve",
-          "max_length": 21,
-          "needs_translation": false,
-          "translation": "עקומת עקיפה למושל",
-          "reverse_text": true
-        },
-        "menu_filters": {
-          "english": "Filters",
-          "max_length": 7,
-          "needs_translation": false,
-          "translation": "מסננים",
-          "reverse_text": true
-        },
-        "menu_time": {
-          "english": "Ramp Time",
-          "max_length": 9,
-          "needs_translation": false,
-          "translation": "זמן רמפה",
-          "reverse_text": true
-        },
-        "recovery_time": {
-          "english": "Recovery time",
-          "max_length": 13,
-          "needs_translation": false,
-          "translation": "זמן התאוששות",
-          "reverse_text": true
-        },
-        "spooldown_time": {
-          "english": "Spooldown time",
-          "max_length": 14,
-          "needs_translation": false,
-          "translation": "זמן האטת סליל",
-          "reverse_text": true
-        },
-        "spoolup_time": {
-          "english": "Spoolup time",
-          "max_length": 12,
-          "needs_translation": false,
-          "translation": "זמן ספול-אפ",
-          "reverse_text": true
-        },
-        "startup_time": {
-          "english": "Startup time",
-          "max_length": 12,
-          "needs_translation": false,
-          "translation": "זמן התנעה",
-          "reverse_text": true
-        },
-        "throttle_hold_timeout": {
-          "english": "Throttle hold timeout",
-          "max_length": 21,
-          "needs_translation": false,
-          "translation": "Timeout להחזקת מצערת",
-          "reverse_text": true
-        },
-        "throttle_type": {
-          "english": "Throttle type",
-          "max_length": 13,
-          "needs_translation": false,
-          "translation": "סוג מצערת",
-          "reverse_text": true
-        },
-        "tracking_time": {
-          "english": "Tracking time",
-          "max_length": 13,
-          "needs_translation": false,
-          "translation": "זמן מעקב",
-          "reverse_text": true
-        }
-      },
-      "main_rotor": {
-        "name": {
-          "english": "Main Rotor",
-          "translation": "ראשי Rotor",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 10
-        },
-        "collective_pitch_comp": {
-          "english": "Collective Pitch Comp",
-          "translation": "קולקטיבי Pitch Comp",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 21
-        },
-        "cyclic_cross_coupling_gain": {
-          "english": "Cyclic Cross Coupling: Gain",
-          "translation": "צימוד צולב מחזורי: רווח",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 27
-        },
-        "cyclic_cross_coupling_ratio": {
-          "english": "Cyclic Cross Coupling: Ratio",
-          "translation": "צימוד צולב מחזורי: Ratio",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 28
-        },
-        "cyclic_cross_coupling_cutoff": {
-          "english": "Cyclic Cross Coupling: Cutoff",
-          "translation": "צימוד צולב מחזורי: ניתוק",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 29
-        }
-      },
       "pid_bandwidth": {
         "name": {
           "english": "PID Bandwidth",
@@ -858,22 +460,6 @@
           "needs_translation": false,
           "reverse_text": true,
           "max_length": 13
-        }
-      },
-      "autolevel": {
-        "trainer_limits": {
-          "english": "Trainer limits",
-          "max_length": 14,
-          "needs_translation": true,
-          "translation": "Trainer limits",
-          "reverse_text": false
-        },
-        "angle_limits": {
-          "english": "Angle limits",
-          "max_length": 12,
-          "needs_translation": true,
-          "translation": "Angle limits",
-          "reverse_text": false
         }
       },
       "filters": {
@@ -1089,13 +675,6 @@
           "reverse_text": false,
           "max_length": 7
         },
-        "collective": {
-          "english": "Collective",
-          "max_length": 10,
-          "needs_translation": false,
-          "translation": "אל\"מ",
-          "reverse_text": true
-        },
         "tbl_none": {
           "english": "None",
           "translation": "אין",
@@ -1161,13 +740,6 @@
           "reverse_text": true,
           "max_length": 8
         },
-        "cyclic_behaviour": {
-          "english": "Cyclic Behaviour",
-          "translation": "התנהגות מחזורית",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 16
-        },
         "rate_table": {
           "english": "Rate Table",
           "max_length": 10,
@@ -1224,27 +796,6 @@
           "translation": "מסנן דדבנד דינמי",
           "reverse_text": true
         },
-        "col": {
-          "english": "Col",
-          "max_length": 3,
-          "needs_translation": false,
-          "translation": "אל\"מ",
-          "reverse_text": true
-        },
-        "cyclic_ring": {
-          "english": "Cyclic Ring",
-          "translation": "טבעת מחזורית",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 11
-        },
-        "cyclic_polarity": {
-          "english": "Cyclic Polarity",
-          "translation": "קואורדינטות קוטביות",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 15
-        },
         "tbl_off": {
           "english": "Off",
           "translation": "כבוי",
@@ -1258,141 +809,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 2
-        }
-      },
-      "rescue": {
-        "name": {
-          "english": "Rescue",
-          "translation": "לְהַצִיל",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 6
-        },
-        "mode_enable": {
-          "english": "Rescue Mode Enable",
-          "translation": "הפעלת מצב Rescue",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 18
-        },
-        "flip_upright": {
-          "english": "Flip to Upright",
-          "translation": "Flip לזקוף",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 15
-        },
-        "pull_up": {
-          "english": "Pull-up",
-          "translation": "Pull-up",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 7
-        },
-        "climb": {
-          "english": "Climb",
-          "translation": "טיפוס",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 5
-        },
-        "hover": {
-          "english": "Hover",
-          "translation": "רחף",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 5
-        },
-        "flip": {
-          "english": "Flip",
-          "translation": "Flip",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
-        },
-        "gains": {
-          "english": "Gains",
-          "translation": "רווחים",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 5
-        },
-        "collective": {
-          "english": "Collective",
-          "translation": "קולקטיב",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 10
-        },
-        "time": {
-          "english": "Time",
-          "translation": "זמן",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 4
-        },
-        "fail_time": {
-          "english": "Fail Time",
-          "translation": "זמן Fail",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 9
-        },
-        "exit_time": {
-          "english": "Exit Time",
-          "translation": "זמן יציאה",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 9
-        },
-        "level_gain": {
-          "english": "Level",
-          "translation": "רמה",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 5
-        },
-        "rate": {
-          "english": "Rate",
-          "translation": "Rate",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
-        },
-        "accel": {
-          "english": "Accel",
-          "translation": "האצה",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 5
-        },
-        "tbl_off": {
-          "english": "Off",
-          "translation": "כבוי",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 3
-        },
-        "tbl_on": {
-          "english": "On",
-          "translation": "On",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 2
-        },
-        "tbl_noflip": {
-          "english": "No Flip",
-          "translation": "אין Flip",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 7
-        },
-        "tbl_flip": {
-          "english": "Flip",
-          "translation": "Flip",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 4
         }
       },
       "hardware_setup": {
@@ -1411,27 +827,6 @@
           "needs_translation": false,
           "translation": "מרכז",
           "reverse_text": true
-        },
-        "cyc_left": {
-          "english": "CYC.LEFT",
-          "max_length": 8,
-          "needs_translation": false,
-          "translation": "CYC.LEFT",
-          "reverse_text": false
-        },
-        "cyc_pitch": {
-          "english": "CYC.PITCH",
-          "max_length": 9,
-          "needs_translation": false,
-          "translation": "CYC.PITCH",
-          "reverse_text": false
-        },
-        "cyc_right": {
-          "english": "CYC.RIGHT",
-          "max_length": 9,
-          "needs_translation": false,
-          "translation": "CYC.RIGHT",
-          "reverse_text": false
         },
         "disable_servo_override": {
           "english": "Disable servo override",
@@ -1459,13 +854,6 @@
           "max_length": 73,
           "needs_translation": false,
           "translation": "Override לסרוו מאפשר לך \"לטרים\" את נקודת המרכז של הסרוו בזמן אמת.",
-          "reverse_text": true
-        },
-        "geometry": {
-          "english": "Geometry",
-          "max_length": 8,
-          "needs_translation": false,
-          "translation": "גאומטריה",
           "reverse_text": true
         },
         "maximum": {
@@ -1531,13 +919,6 @@
           "translation": "מהירות",
           "reverse_text": true
         },
-        "tail": {
-          "english": "TAIL",
-          "max_length": 4,
-          "needs_translation": false,
-          "translation": "זָנָב",
-          "reverse_text": true
-        },
         "tbl_no": {
           "english": "NO",
           "max_length": 2,
@@ -1588,13 +969,6 @@
           "needs_translation": false,
           "reverse_text": false,
           "max_length": 9
-        },
-        "feature_thrust_vector": {
-          "english": "THRUST_VECTORING",
-          "translation": "THRUST_VECTORING",
-          "needs_translation": false,
-          "reverse_text": false,
-          "max_length": 16
         },
         "tbl_off": {
           "english": "Off",
@@ -2970,117 +2344,12 @@
         }
       },
       "mixer": {
-        "aileron_direction": {
-          "english": "Aileron Direction",
-          "max_length": 17,
-          "needs_translation": false,
-          "translation": "כיוון איילרון",
-          "reverse_text": true
-        },
-        "collective_calibration": {
-          "english": "Collective Calibration",
-          "max_length": 22,
-          "needs_translation": false,
-          "translation": "כיול קולקטיב",
-          "reverse_text": true
-        },
-        "collective_direction": {
-          "english": "Collective Direction",
-          "max_length": 20,
-          "needs_translation": false,
-          "translation": "כיוון קולקטיב",
-          "reverse_text": true
-        },
-        "collective_pitch_limit": {
-          "english": "Collective Pitch Limit",
-          "max_length": 22,
-          "needs_translation": false,
-          "translation": "מגבלת פיץ' קולקטיבי",
-          "reverse_text": true
-        },
-        "collective_tilt_correction_neg": {
-          "english": "Collective Tilt Correction -",
-          "max_length": 28,
-          "needs_translation": false,
-          "translation": "תיקון הטיית קולקטיב -",
-          "reverse_text": true
-        },
-        "collective_tilt_correction_pos": {
-          "english": "Collective Tilt Correction +",
-          "max_length": 28,
-          "needs_translation": false,
-          "translation": "תיקון הטיית קולקטיב +",
-          "reverse_text": true
-        },
-        "cyclic_calibration": {
-          "english": "Cyclic Calibration",
-          "max_length": 18,
-          "needs_translation": false,
-          "translation": "כיול cyclic",
-          "reverse_text": true
-        },
-        "cyclic_pitch_limit": {
-          "english": "Cyclic Pitch Limit",
-          "max_length": 18,
-          "needs_translation": false,
-          "translation": "מגבלת פיץ' cyclic",
-          "reverse_text": true
-        },
-        "disable_swash_override": {
-          "english": "Disable swash setup mode",
-          "translation": "השבת את מצב הגדרת swash",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 24
-        },
-        "disable_swash_override_message": {
-          "english": "Disable swash setup mode and return mixer control to the flight controller.",
-          "translation": "השבת את מצב הגדרת הסוואש והחזר את בקרת המיקסר לבקר הטיסה.",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 75
-        },
-        "elevator_direction": {
-          "english": "Elevator Direction",
-          "max_length": 18,
-          "needs_translation": false,
-          "translation": "כיוון אליבטור",
-          "reverse_text": true
-        },
-        "enable_swash_override": {
-          "english": "Enable swash setup mode",
-          "translation": "הפעל את מצב הגדרת swash",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 23
-        },
-        "enable_swash_override_message": {
-          "english": "Enable passthrough mixer override so you can move the sticks while adjusting swash geometry. \r\n\r\nLive changes from this page are sent to the flight controller.",
-          "translation": "אפשר ביטול מיקסר מעבר כדי שתוכל להזיז את המקלות תוך התאמת גיאומטריית הסוואש. \r\n\r\nשינויים חיים מדף זה נשלחים לבקר הטיסה.",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 159
-        },
         "gain": {
           "english": "Throw",
           "translation": "Throw",
           "needs_translation": true,
           "max_length": 5,
           "reverse_text": false
-        },
-        "geo_correction": {
-          "english": "Geo Correction",
-          "max_length": 14,
-          "needs_translation": false,
-          "translation": "תיקון גאומטרי",
-          "reverse_text": true
-        },
-        "geometry": {
-          "english": "Geometry",
-          "max_length": 8,
-          "needs_translation": false,
-          "translation": "גאומטריה",
-          "reverse_text": true
         },
         "invert": {
           "english": "Invert",
@@ -3096,13 +2365,6 @@
           "reverse_text": true,
           "max_length": 8
         },
-        "main_rotor_dir": {
-          "english": "Rotor Direction",
-          "max_length": 15,
-          "needs_translation": false,
-          "translation": "כיוון רוטור",
-          "reverse_text": true
-        },
         "name": {
           "english": "Mixer",
           "max_length": 5,
@@ -3117,175 +2379,12 @@
           "reverse_text": true,
           "max_length": 6
         },
-        "swash": {
-          "english": "Swash",
-          "max_length": 5,
-          "needs_translation": false,
-          "translation": "סוואש",
-          "reverse_text": true
-        },
-        "swash_phase": {
-          "english": "Phase Angle",
-          "max_length": 11,
-          "needs_translation": false,
-          "translation": "זווית פאזה",
-          "reverse_text": true
-        },
-        "swash_pitch_limit": {
-          "english": "Total Pitch Limit",
-          "max_length": 17,
-          "needs_translation": false,
-          "translation": "מגבלת פיץ' כוללת",
-          "reverse_text": true
-        },
-        "swash_type": {
-          "english": "Swash Type",
-          "max_length": 10,
-          "needs_translation": false,
-          "translation": "סוג סוואש",
-          "reverse_text": true
-        },
-        "tail": {
-          "english": "Tail",
-          "max_length": 4,
-          "needs_translation": false,
-          "translation": "זנב",
-          "reverse_text": true
-        },
-        "tail_center_offset": {
-          "english": "Tail Center Offset",
-          "max_length": 18,
-          "needs_translation": false,
-          "translation": "היסט מרכז זנב",
-          "reverse_text": true
-        },
-        "tail_motor_idle": {
-          "english": "Tail Idle Thr%",
-          "max_length": 14,
-          "needs_translation": false,
-          "translation": "סרק מצערת זנב%",
-          "reverse_text": true
-        },
-        "tail_rotor_mode": {
-          "english": "Tail Mode",
-          "max_length": 9,
-          "needs_translation": false,
-          "translation": "מצב זנב",
-          "reverse_text": true
-        },
-        "trims": {
-          "english": "Trims",
-          "max_length": 5,
-          "needs_translation": false,
-          "translation": "טרימים",
-          "reverse_text": true
-        },
-        "yaw_calibration": {
-          "english": "Yaw Calibration",
-          "max_length": 15,
-          "needs_translation": false,
-          "translation": "כיול yaw",
-          "reverse_text": true
-        },
-        "yaw_ccw_limit": {
-          "english": "Yaw CCW Limit",
-          "max_length": 13,
-          "needs_translation": false,
-          "translation": "מגבלת yaw CCW",
-          "reverse_text": true
-        },
-        "yaw_center_trim": {
-          "english": "Yaw Center Trim",
-          "max_length": 15,
-          "needs_translation": false,
-          "translation": "טרים מרכז yaw",
-          "reverse_text": true
-        },
-        "yaw_cw_limit": {
-          "english": "Yaw CW Limit",
-          "max_length": 12,
-          "needs_translation": false,
-          "translation": "מגבלת yaw CW",
-          "reverse_text": true
-        },
-        "yaw_direction": {
-          "english": "Yaw Direction",
-          "max_length": 13,
-          "needs_translation": false,
-          "translation": "כיוון yaw",
-          "reverse_text": true
-        },
         "gyro_direction": {
           "english": "Gyro Direction",
           "translation": "Gyro Direction",
           "needs_translation": true,
           "reverse_text": false,
           "max_length": 14
-        }
-      },
-      "trim": {
-        "collective_trim": {
-          "english": "Col. trim %",
-          "max_length": 11,
-          "needs_translation": false,
-          "translation": "טרים קולקטיב %",
-          "reverse_text": true
-        },
-        "disable_mixer_message": {
-          "english": "Return control of the servos to the flight controller.",
-          "max_length": 54,
-          "needs_translation": false,
-          "translation": "החזר את השליטה בסרווים לבקר הטיסה.",
-          "reverse_text": true
-        },
-        "disable_mixer_override": {
-          "english": "Disable mixer override",
-          "max_length": 22,
-          "needs_translation": false,
-          "translation": "בטל Override למיקסר",
-          "reverse_text": true
-        },
-        "enable_mixer_message": {
-          "english": "Set all servos to their configured center position. \r\n\r\nThis will result in all values on this page being saved when adjusting the servo trim.",
-          "max_length": 142,
-          "needs_translation": false,
-          "translation": "הגדר את כל הסרווים למצב המרכזי שהוגדר.\n\nזה יגרום לכל הערכים בדף זה להישמר בעת כיוון טרים הסרוו.",
-          "reverse_text": true
-        },
-        "enable_mixer_override": {
-          "english": "Enable mixer override",
-          "max_length": 21,
-          "needs_translation": false,
-          "translation": "אפשר Override למיקסר",
-          "reverse_text": true
-        },
-        "pitch_trim": {
-          "english": "Pitch trim %",
-          "max_length": 12,
-          "needs_translation": false,
-          "translation": "טרים פיץ' %",
-          "reverse_text": true
-        },
-        "roll_trim": {
-          "english": "Roll trim %",
-          "max_length": 11,
-          "needs_translation": false,
-          "translation": "טרים רול %",
-          "reverse_text": true
-        },
-        "tail_motor_idle": {
-          "english": "Tail Motor idle  %",
-          "max_length": 18,
-          "needs_translation": false,
-          "translation": "סרק מנוע זנב %",
-          "reverse_text": true
-        },
-        "yaw_trim": {
-          "english": "Yaw. trim %",
-          "max_length": 11,
-          "needs_translation": false,
-          "translation": "טרים יאו %",
-          "reverse_text": true
         }
       },
       "modes": {
@@ -3733,13 +2832,6 @@
           "needs_translation": true,
           "max_length": 6,
           "reverse_text": false
-        },
-        "collective": {
-          "english": "Collective",
-          "translation": "קְבוּצָתִי",
-          "needs_translation": false,
-          "reverse_text": true,
-          "max_length": 10
         },
         "menu_channel_fallback": {
           "english": "Ch. Fallback",
@@ -9351,13 +8443,6 @@
           "reverse_text": false,
           "max_length": 8
         },
-        "mot_none_help": {
-          "english": "Gliders, or a motor not on the flight controller.",
-          "translation": "Gliders, or a motor not on the flight controller.",
-          "needs_translation": true,
-          "reverse_text": false,
-          "max_length": 49
-        },
         "mot_other_help": {
           "english": "No motor, DShot600 (short ESC leads only) and the rest.",
           "translation": "No motor, DShot600 (short ESC leads only) and the rest.",
@@ -11760,13 +10845,6 @@
       "reverse_text": true,
       "max_length": 12
     },
-    "sensor_rescue": {
-      "english": "Rescue",
-      "translation": "לְהַצִיל",
-      "needs_translation": false,
-      "reverse_text": true,
-      "max_length": 6
-    },
     "sensor_roll_attitude": {
       "english": "Roll Attitude",
       "translation": "יחס Roll",
@@ -11823,13 +10901,6 @@
       "reverse_text": true,
       "max_length": 10
     },
-    "sensor_tv_profile": {
-      "english": "TV Profile",
-      "translation": "TV Profile",
-      "needs_translation": true,
-      "reverse_text": false,
-      "max_length": 10
-    },
     "sensor_voltage": {
       "english": "Voltage",
       "translation": "מֶתַח",
@@ -11860,43 +10931,6 @@
     }
   },
   "api": {
-    "MIXER_CONFIG": {
-      "tbl_ccw": {
-        "english": "CCW",
-        "max_length": 3,
-        "needs_translation": false,
-        "translation": "CCW",
-        "reverse_text": false
-      },
-      "tbl_cw": {
-        "english": "CW",
-        "max_length": 2,
-        "needs_translation": false,
-        "translation": "CW",
-        "reverse_text": false
-      },
-      "tbl_tail_bidirectional": {
-        "english": "Bidirectional",
-        "max_length": 13,
-        "needs_translation": false,
-        "translation": "דו-כיווני",
-        "reverse_text": true
-      },
-      "tbl_tail_motororized_tail": {
-        "english": "Motorized Tail",
-        "max_length": 14,
-        "needs_translation": false,
-        "translation": "זנב ממונע",
-        "reverse_text": true
-      },
-      "tbl_tail_variable_pitch": {
-        "english": "Variable Pitch",
-        "max_length": 14,
-        "needs_translation": false,
-        "translation": "פיץ' משתנה",
-        "reverse_text": true
-      }
-    },
     "MIXER_INPUT": {
       "tbl_normal": {
         "english": "Normal",
@@ -12039,78 +11073,6 @@
         "max_length": 2,
         "needs_translation": false,
         "translation": "מופעל",
-        "reverse_text": true
-      }
-    },
-    "GOVERNOR_CONFIG": {
-      "governor_auto_throttle": {
-        "english": "Auto throttle",
-        "max_length": 13,
-        "needs_translation": false,
-        "translation": "מצערת אוטומטית",
-        "reverse_text": true
-      },
-      "governor_idle_throttle": {
-        "english": "Idle throttle",
-        "max_length": 13,
-        "needs_translation": false,
-        "translation": "מצערת סרק",
-        "reverse_text": true
-      },
-      "tbl_govmode_direct": {
-        "english": "DIRECT",
-        "max_length": 6,
-        "needs_translation": false,
-        "translation": "ישיר",
-        "reverse_text": true
-      },
-      "tbl_govmode_electric": {
-        "english": "ELECTRIC",
-        "max_length": 8,
-        "needs_translation": false,
-        "translation": "חשמלי",
-        "reverse_text": true
-      },
-      "tbl_govmode_limit": {
-        "english": "LIMIT",
-        "max_length": 5,
-        "needs_translation": false,
-        "translation": "מוגבל",
-        "reverse_text": true
-      },
-      "tbl_govmode_nitro": {
-        "english": "NITRO",
-        "max_length": 5,
-        "needs_translation": false,
-        "translation": "ניטרו",
-        "reverse_text": true
-      },
-      "tbl_govmode_off": {
-        "english": "OFF",
-        "max_length": 3,
-        "needs_translation": false,
-        "translation": "כבוי",
-        "reverse_text": true
-      },
-      "tbl_throttle_type_function": {
-        "english": "FUNCTION",
-        "max_length": 8,
-        "needs_translation": false,
-        "translation": "פונקציה",
-        "reverse_text": true
-      },
-      "tbl_throttle_type_normal": {
-        "english": "NORMAL",
-        "max_length": 6,
-        "needs_translation": false,
-        "translation": "רגיל",
-        "reverse_text": true
-      },
-      "tbl_throttle_type_switch": {
-        "english": "SWITCH",
-        "max_length": 6,
-        "needs_translation": false,
-        "translation": "מתג",
         "reverse_text": true
       }
     },
@@ -12595,13 +11557,6 @@
         "needs_translation": false,
         "translation": "דלק שנותר",
         "reverse_text": true
-      },
-      "headspeed": {
-        "english": "RPM",
-        "max_length": 3,
-        "needs_translation": false,
-        "translation": "RPM",
-        "reverse_text": false
       },
       "info_armed": {
         "english": "Armed",
