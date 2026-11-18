@@ -8,7 +8,7 @@
 --
 -- layout() runs when a screen is built; draw() runs from paint and only does
 -- arithmetic and drawing on what layout() worked out, so it allocates
--- nothing. The Sensors step's 3D car is app/plane3d.lua (art.airframe()).
+-- nothing. The Sensors step's 3D car is app/plane3d.lua.
 
 if package.loaded["grsuite.app.setup_wizard_art"] then
   return package.loaded["grsuite.app.setup_wizard_art"]
@@ -119,12 +119,6 @@ end
 -- The 3D pictures' background work (plane3d.service()): the wizard calls
 -- it from every wakeup.
 art.service = plane3d.service
-
--- The 3D car (app/plane3d.lua) for the Sensors step's attitude pictures.
-local CAR_SPEC = {car = true}
-function art.airframe(surfaces)
-  return CAR_SPEC
-end
 
 -- A rectangle (half sizes hw x hh) centred on cx, cy and turned by angle
 -- (radians, clockwise on screen), as two triangles.

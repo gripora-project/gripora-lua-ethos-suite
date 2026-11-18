@@ -36,7 +36,6 @@ local boardAlignment = requireModule("lib/msp_board_alignment_config.lua")
 local mountTrim = requireModule("lib/msp_board_mount_trim.lua")
 local attitude = requireModule("lib/msp_attitude.lua")
 local plane3d = requireModule("app/plane3d.lua")
-local art = requireModule("app/setup_wizard_art.lua")
 
 local T = {
   title = "@i18n(app.modules.setup_wizard.sen_title)@",
@@ -132,10 +131,7 @@ local function new(wiz)
   end
 
   -- The 3D car.
-  local airframe = art.airframe(wiz.surfaces())
   local function plane(x, y, w, h, roll, pitch, yaw, zoom)
-    plane3d.setup(airframe)
-    plane3d.pose(nil)
     plane3d.draw(x, y, w, h, roll, pitch, yaw, zoom)
   end
 
