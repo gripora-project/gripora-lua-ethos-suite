@@ -8405,10 +8405,10 @@
           "translation": "Arms the motor. Nothing else works without it."
         },
         "mod_help_drive_aids_off": {
-          "english": "Turns ABS off: the throttle and brake go straight to the ESC. The gyro still steers.",
+          "english": "Turns ABS, traction and launch control off: throttle and brake go straight to the ESC. The gyro still steers.",
           "max_length": 84,
           "needs_translation": false,
-          "translation": "Turns ABS off: the throttle and brake go straight to the ESC. The gyro still steers."
+          "translation": "Turns ABS, traction and launch control off: throttle and brake go straight to the ESC. The gyro still steers."
         },
         "mod_help_gyro_off": {
           "english": "Turns the gyro off: steering and throttle pass straight from the transmitter, with no gyro correction. Put it on a switch you can reach while driving.",

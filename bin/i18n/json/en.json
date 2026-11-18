@@ -8567,8 +8567,8 @@
           "max_length": 150
         },
         "mod_help_drive_aids_off": {
-          "english": "Turns ABS off: the throttle and brake go straight to the ESC. The gyro still steers.",
-          "translation": "Turns ABS off: the throttle and brake go straight to the ESC. The gyro still steers.",
+          "english": "Turns ABS, traction and launch control off: throttle and brake go straight to the ESC. The gyro still steers.",
+          "translation": "Turns ABS, traction and launch control off: throttle and brake go straight to the ESC. The gyro still steers.",
           "needs_translation": false,
           "max_length": 84
         },
