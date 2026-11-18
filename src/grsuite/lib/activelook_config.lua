@@ -54,6 +54,11 @@ config.SENSOR_KEYS = {
   "voltage_max",
   "rpm_min",
   "rpm_max",
+  -- The car's drive state. Appended: a stored slot is its key, but the choice
+  -- fields use the position.
+  "speed",
+  "speed_max",
+  "drive_aids",
 }
 
 config.SENSOR_CHOICES = {
@@ -82,6 +87,9 @@ config.SENSOR_CHOICES = {
   {"Max Voltage", 23},
   {"Min RPM", 24},
   {"Max RPM", 25},
+  {"@i18n(widgets.dashboard.speed)@", 26},
+  {"@i18n(widgets.dashboard.top_speed)@", 27},
+  {"@i18n(widgets.dashboard.drive_aids)@", 28},
 }
 
 config.LAYOUT_KEYS = {

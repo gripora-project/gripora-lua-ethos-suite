@@ -36,7 +36,8 @@ SENSOR_FILES = {
     "pidProfile": "pid_profile",
     "rateProfile": "rate_profile",
     "batteryProfile": "battery_profile",
-    "altitude": "altitude",
+    "speed": "drive_speed",
+    "driveStatus": "drive_status",
 }
 LAYOUT_KEYS = {
     "two_top_one_bottom",
@@ -49,7 +50,7 @@ SENSOR_KEYS = {
     "off", "flightmode", "timer", "armed", "temp_esc", "temp_mcu", "link", "fuel",
     "current", "voltage", "cell_voltage", "rpm", "consumption", "temp_esc_max", "temp_mcu_max",
     "link_min", "link_max", "fuel_min", "fuel_max", "current_min", "current_max", "voltage_min",
-    "voltage_max", "rpm_min", "rpm_max",
+    "voltage_max", "rpm_min", "rpm_max", "speed", "speed_max", "drive_aids",
 }
 PHASES = ("preflight", "inflight", "postflight")
 MISSING_REVISION = "missing"
@@ -214,7 +215,7 @@ def telemetry_payload() -> dict:
     for field in (
         "current", "becVoltage", "fuel", "rpm", "tempEsc", "tempMcu",
         "consumption", "cellCount", "throttlePercent",
-        "pidProfile", "rateProfile", "batteryProfile", "altitude",
+        "pidProfile", "rateProfile", "batteryProfile", "driveStatus",
     ):
         if field in raw:
             values[field] = raw[field]
@@ -222,6 +223,8 @@ def telemetry_payload() -> dict:
         values["voltage"] = raw["voltage"] / 100
     if "becVoltage" in raw:
         values["becVoltage"] = raw["becVoltage"] / 100
+    if "speed" in raw:
+        values["speed"] = raw["speed"] / 10
     if "armflags" in raw:
         values["armed"] = (int(raw["armflags"]) & 1) == 1
 

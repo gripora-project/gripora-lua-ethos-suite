@@ -367,7 +367,7 @@ local function buildBoxes(W)
             bgcolor = statusTileRightEdgeBg,
             titlecolor = colorMode.titlecolor,
             thresholds = {
-                {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor}, {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
+                {value = "@i18n(widgets.armstate.DISARMED)@", textcolor = colorMode.fillcritcolor}, {value = "@i18n(widgets.armstate.ARMED)@", textcolor = colorMode.fillcolor},
                 }
         }
     }

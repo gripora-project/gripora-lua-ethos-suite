@@ -174,10 +174,8 @@ local function buildBoxes(W)
             colspan = 2,
             rowspan = 2,
             type = "text",
-            subtype = "armflags",
-            thresholds = {
-                {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor}, {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
-                },
+            subtype = "driveaids",
+            offcolor = colorMode.fillcritcolor, activecolor = colorMode.fillwarncolor, oncolor = colorMode.fillcolor,
             bgcolor = colorMode.bgcolor,
             titlecolor = colorMode.titlecolor,
             textcolor = colorMode.titlecolor

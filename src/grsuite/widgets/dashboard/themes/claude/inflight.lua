@@ -166,20 +166,17 @@ local function buildBoxes(W)
             bgcolor    = colorMode.panelbg,
         },
 
-        -- ── RIGHT BOTTOM: Arming state ─────────────────────────────────
+        -- ── RIGHT BOTTOM: Drive aids / driving mode ─────────────────────
         {
             col = 15, row = 9, colspan = 6, rowspan = 2,
-            type = "text", subtype = "armflags",
-            title = "@i18n(widgets.dashboard.info_arming):upper()@", titlepos = "top", titlealign = "center",
+            type = "text", subtype = "driveaids",
+            title = "@i18n(widgets.dashboard.drive_aids):upper()@", titlepos = "top", titlealign = "center",
             valuealign = "center",
             font = opts.titlefont, titlefont = opts.titlefont,
             textcolor  = colorMode.textcolor,
             titlecolor = colorMode.titlecolor,
             bgcolor    = colorMode.paneldarkbg,
-            thresholds = {
-                {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor},
-                {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
-            },
+            offcolor = colorMode.fillcritcolor, activecolor = colorMode.fillwarncolor, oncolor = colorMode.fillcolor,
         },
 
     }

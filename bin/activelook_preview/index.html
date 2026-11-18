@@ -338,7 +338,8 @@
                 <label class="field"><span class="field-label">ESC temperature · °C</span><input data-value="tempEsc" data-feed="tempEsc" type="number" min="-20" max="200" step="1" value="58"></label>
                 <label class="field"><span class="field-label">MCU temperature · °C</span><input data-value="tempMcu" data-feed="tempMcu" type="number" min="-20" max="150" step="1" value="42"></label>
                 <label class="field"><span class="field-label">Throttle · %</span><input data-value="throttlePercent" data-feed="throttlePercent" type="number" min="0" max="100" step="1" value="76"></label>
-                <label class="field"><span class="field-label">Altitude · m</span><input data-value="altitude" data-feed="altitude" type="number" min="-1000" max="1000" step="1" value="25"></label>
+                <label class="field"><span class="field-label">Wheel speed · km/h</span><input data-value="speed" data-feed="speed" type="number" min="-30" max="150" step="0.1" value="40"></label>
+                <label class="field"><span class="field-label">Drive aids</span><select data-value="driveStatus" data-feed="driveStatus"><option value="8192">Off (disarmed)</option><option value="8193" selected>Aids on</option><option value="8195">ABS braking</option><option value="8199">ABS releasing</option><option value="8201">TC driving</option><option value="8217">TC holding back</option><option value="9249">Launch staged</option><option value="9281">Launching</option><option value="8705">DRIFT</option><option value="10240">DRIVE AIDS OFF</option><option value="8448">GYRO OFF</option></select></label>
                 <label class="field"><span class="field-label">Cell count</span><input data-value="cellCount" data-feed="cellCount" type="number" min="1" max="12" step="1" value="6"></label>
               </div>
             </section>
@@ -373,7 +374,8 @@
         ["fuel_max", "Max Fuel"], ["current_min", "Min Current"],
         ["current_max", "Max Current"], ["voltage_min", "Min Voltage"],
         ["voltage_max", "Max Voltage"], ["rpm_min", "Min RPM"],
-        ["rpm_max", "Max RPM"],
+        ["rpm_max", "Max RPM"], ["speed", "Speed"], ["speed_max", "Top Speed"],
+        ["drive_aids", "Drive Aids"],
       ];
       const legacySlotAliases = {headspeed: "rpm", headspeed_min: "rpm_min", headspeed_max: "rpm_max"};
       const layouts = [
@@ -390,7 +392,7 @@
       };
       const sensors = {
         current: 18.6, voltage: 24.8, becVoltage: 8, fuel: 76, timer: 92, rpm: 1840,
-        tempEsc: 58, tempMcu: 42, link: 82, consumption: 428, cellCount: 6, altitude: 25,
+        tempEsc: 58, tempMcu: 42, link: 82, consumption: 428, cellCount: 6, speed: 40, driveStatus: 8193,
         throttlePercent: 76, pidProfile: 1, rateProfile: 1, batteryProfile: 0,
         armed: false,
       };
@@ -494,7 +496,7 @@
       }
 
       function recordFlightStats() {
-        for (const [key, value] of Object.entries({fuel: sensors.fuel, current: sensors.current, voltage: sensors.voltage, rpm: sensors.rpm, temp_esc: sensors.tempEsc, temp_mcu: sensors.tempMcu, link: sensors.link})) {
+        for (const [key, value] of Object.entries({fuel: sensors.fuel, current: sensors.current, voltage: sensors.voltage, rpm: sensors.rpm, temp_esc: sensors.tempEsc, temp_mcu: sensors.tempMcu, link: sensors.link, speed: sensors.speed})) {
           const sample = Number(value);
           if (!Number.isFinite(sample)) continue;
           if (!stats[key]) stats[key] = {min: sample, max: sample};
@@ -656,6 +658,22 @@
         }
       }
 
+      // src/grsuite/lib/drive_status.lua's state(), most urgent first.
+      function driveAidsText(raw) {
+        const v = Number(raw);
+        if (!Number.isFinite(v)) return null;
+        if (v & 256) return "GYRO OFF";
+        if (v & 4) return "ABS";
+        if (v & 16) return "TC";
+        if (v & 96) return "LAUNCH";
+        if (v & 512) return "DRIFT";
+        if (v & 2048) return "AIDS OFF";
+        if (v & 2) return "ABS";
+        if (v & 8) return "TC";
+        if (v & 1) return "AIDS ON";
+        return "OFF";
+      }
+
       function valueFor(key) {
         const stat = (name, kind) => stats[name]?.[kind];
         const values = {
@@ -678,6 +696,8 @@
           rpm_min: stat("rpm", "min"), rpm_max: stat("rpm", "max"),
           temp_esc_max: stat("temp_esc", "max"), temp_mcu_max: stat("temp_mcu", "max"),
           link_min: stat("link", "min"), link_max: stat("link", "max"),
+          speed: `${Math.round(sensors.speed)}km/h`, speed_max: stat("speed", "max"),
+          drive_aids: driveAidsText(sensors.driveStatus),
         };
         const value = values[key];
         if (value === undefined || value === null) return "-";
@@ -688,6 +708,7 @@
         if (["rpm_min", "rpm_max"].includes(key)) return String(Math.round(value));
         if (["temp_esc_max", "temp_mcu_max"].includes(key)) return `${Math.round(value)}°C`;
         if (["link_min", "link_max"].includes(key)) return `${Math.round(value)}dB`;
+        if (key === "speed_max") return `${Math.round(value)}km/h`;
         return String(value);
       }
 

@@ -116,9 +116,9 @@ function render.wakeup(box)
             -- whole-value check like value == 1 or 3 stops matching once
             -- either has been set.
             if (floor(value) & 1) == 1 then
-                displayValue = "@i18n(widgets.governor.ARMED)@"
+                displayValue = "@i18n(widgets.armstate.ARMED)@"
             else
-                displayValue = "@i18n(widgets.governor.DISARMED)@"
+                displayValue = "@i18n(widgets.armstate.DISARMED)@"
             end
         end
     end

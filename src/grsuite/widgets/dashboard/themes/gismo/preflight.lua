@@ -149,8 +149,8 @@ local function buildBoxes(W)
          titlepaddingtop = opts.titlepaddingtop, valuepaddingtop = opts.valuepaddingtop,
          textcolor = colorMode.textcolor, titlecolor = colorMode.titlecolor, bgcolor = colorMode.paneldarkbg,
          thresholds = {
-             {value = "@i18n(widgets.governor.DISARMED)@", textcolor = colorMode.fillcritcolor},
-             {value = "@i18n(widgets.governor.ARMED)@", textcolor = colorMode.fillcolor},
+             {value = "@i18n(widgets.armstate.DISARMED)@", textcolor = colorMode.fillcritcolor},
+             {value = "@i18n(widgets.armstate.ARMED)@", textcolor = colorMode.fillcolor},
          }},
 
         -- Rate (rows 8-10, left half)

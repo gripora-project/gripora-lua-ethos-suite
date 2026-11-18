@@ -1,28 +1,34 @@
 --[[
-  Copyright (C) 2025 Rotorflight Project
-  GPLv3 — https://www.gnu.org/licenses/gpl-3.0.en.html
-]] --
+    Car tilt view (type "navigation", subtype "ah"). The subtype keeps the name of the inherited
+    artificial horizon, so a theme that placed one still loads; for a car it shows how far the
+    body leans, from the attitude telemetry sensors:
 
---[[
-    wakeupinterval      : number   -- Optional wakeup interval in seconds (default: 0.2)
-    pixelsperdeg        : number   -- Pixels per degree for pitch & compass (default: 2.0)
-    dynamicscalemin     : number   -- Minimum scale factor (default: 1.05)
-    dynamicscalemax     : number   -- Maximum scale factor (default: 1.95)
-    showarc             : bool     -- Show arc markers (default: true)
-    showladder          : bool     -- Show pitch ladder (default: true)
-    showcompass         : bool     -- Show compass ribbon (default: true)
-    showaltitude        : bool     -- Show altitude bar on right (default: false)
-    showgroundspeed           : bool     -- Show groundspeed bar on left (default: false)
-    arccolor            : color    -- Color for arc markings (default: white)
-    laddercolor         : color    -- Color for pitch ladder (default: white)
-    compasscolor        : color    -- Color for compass (default: white)
-    crosshaircolor      : color    -- Color for central cross marker (default: white)
-    altitudecolor       : color    -- Color for altitude bar (default: white)
-    groundspeedcolor          : color    -- Color for groundspeed bar (default: white)
-    altitudemin         : number   -- Minimum displayed altitude (default: 0)
-    altitudemax         : number   -- Maximum displayed altitude (default: 200)
-    groundspeedmin            : number   -- Minimum displayed groundspeed (default: 0)
-    groundspeedmax            : number   -- Maximum displayed groundspeed (default: 100)
+      - left: the car seen from behind, tipping by the roll angle over the edge of its lower
+        tyre, on a level ground line;
+      - right: the car seen from the side (nose to the right), tipping by the pitch angle;
+      - under each, the angle in degrees.
+
+    The car turns warncolor from warnangle and critcolor from critangle, either axis. Pitch is
+    gripora-firmware's attitude convention, positive nose down (set invertpitch if the nose goes
+    the wrong way). The heli/plane horizon's parameters (pixelsperdeg, showcompass, showaltitude,
+    ...) are ignored.
+
+    wakeupinterval      : number   -- Optional wakeup interval in seconds
+    bgcolor             : color    -- Box background (theme fallback if nil)
+    bodycolor           : color    -- Car body (default: theme fillcolor)
+    windowcolor         : color    -- Windows (default: theme bgcolor)
+    wheelcolor          : color    -- Tyres (default: dark grey)
+    lightcolor          : color    -- Tail lights (default: red)
+    groundcolor         : color    -- Ground line (default: theme textcolor)
+    textcolor           : color    -- Angle text (default: theme textcolor)
+    warnangle           : number   -- Degrees from which the car is drawn in warncolor (default: 20)
+    critangle           : number   -- Degrees from which the car is drawn in critcolor (default: 35)
+    warncolor           : color    -- (default: theme fillwarncolor)
+    critcolor           : color    -- (default: theme fillcritcolor)
+    invertpitch         : bool     -- Tip the side view the other way (default: false)
+    showpitch           : bool     -- Show the side view (default: true); false gives the whole box to the rear view
+    showvalues          : bool     -- Show the angles (default: true)
+    font                : font     -- Angle text font (default: FONT_XS)
 ]]
 
 local requireModule = package.loaded["grsuite.lib.require"] or assert(loadfile("lib/require.lua"))()
@@ -30,246 +36,272 @@ local grsuite = requireModule("widgets/dashboard/context.lua")
 local lcd = lcd
 
 local floor = math.floor
+local abs = math.abs
 local min = math.min
-local max = math.max
 local sin = math.sin
 local cos = math.cos
+local rad = math.rad
 local format = string.format
-local ipairs = ipairs
-local tostring = tostring
 
 local render = {}
 local utils = grsuite.widgets.dashboard.utils
 local getParam = utils.getParam
 local resolveThemeColor = utils.resolveThemeColor
 
-local ARC_ANGLES = {-60, -45, -30, -20, -10, 0, 10, 20, 30, 45, 60}
-local COMPASS_LABELS = {[0] = "N", [45] = "NE", [90] = "E", [135] = "SE", [180] = "S", [225] = "SW", [270] = "W", [315] = "NW"}
+-- Car outlines in car units, y down, (0, 0) the middle of the body. Each part is a convex quad
+-- (x1, y1, ..., x4, y4) drawn as two triangles, in this order; `role` picks its colour.
+-- Rear view: half-width 1, tyres on the ground at y = 0.55.
+local REAR = {
+    {"wheel", -1.00, -0.05, -0.62, -0.05, -0.62, 0.55, -1.00, 0.55},
+    {"wheel", 0.62, -0.05, 1.00, -0.05, 1.00, 0.55, 0.62, 0.55},
+    {"body", -0.80, -0.15, 0.80, -0.15, 0.70, 0.32, -0.70, 0.32},
+    {"body", -0.58, -0.15, -0.40, -0.52, 0.40, -0.52, 0.58, -0.15},
+    {"window", -0.47, -0.20, -0.33, -0.45, 0.33, -0.45, 0.47, -0.20},
+    {"body", -0.34, -0.66, -0.27, -0.66, -0.27, -0.50, -0.34, -0.50},
+    {"body", 0.27, -0.66, 0.34, -0.66, 0.34, -0.50, 0.27, -0.50},
+    {"body", -0.90, -0.75, 0.90, -0.75, 0.90, -0.65, -0.90, -0.65},
+    {"light", -0.66, -0.08, -0.46, -0.08, -0.46, 0.05, -0.66, 0.05},
+    {"light", 0.46, -0.08, 0.66, -0.08, 0.66, 0.05, 0.46, 0.05},
+}
+-- Side view: half-length 1, nose at +x, wheels (below) on the ground at y = 0.55.
+local SIDE = {
+    {"body", -1.00, -0.12, 0.95, -0.02, 1.00, 0.25, -1.00, 0.25},
+    {"body", -0.55, -0.12, -0.35, -0.45, 0.25, -0.45, 0.45, -0.07},
+    {"window", -0.44, -0.14, -0.30, -0.39, 0.18, -0.39, 0.33, -0.09},
+    {"body", -0.92, -0.48, -0.86, -0.48, -0.86, -0.11, -0.92, -0.11},
+    {"body", -1.06, -0.56, -0.70, -0.56, -0.70, -0.48, -1.06, -0.48},
+}
+local SIDE_WHEELS = {-0.62, 0.30, 0.62, 0.30} -- centres (x, y); radius below
+local SIDE_WHEEL_R = 0.25
+-- The car tips over the edge of its low side, the way it would roll over: the rear view about
+-- the outer edge of the lower tyre, the side view about the lower wheel's contact.
+local GROUND_Y = 0.55
+local REAR_EDGE_X = 1.00
+local SIDE_EDGE_X = 0.62
 
-function render.invalidate(box) box._cfg = nil end
-
-local function rotate(px, py, cx, cy, angle)
-    local s = sin(angle)
-    local c = cos(angle)
-    px, py = px - cx, py - cy
-    local xnew = px * c - py * s
-    local ynew = px * s + py * c
-    return xnew + cx, ynew + cy
+function render.invalidate(box)
+    box._cfg = nil
+    box._geoKey = nil
 end
 
 local function ensureCfg(box)
     return utils.ensureCfg(box, function(cfg, box)
-        cfg.ppd = getParam(box, "pixelsperdeg") or 2.0
-        cfg.dMin = getParam(box, "dynamicscalemin") or 1.05
-        cfg.dMax = getParam(box, "dynamicscalemax") or ((getParam(box, "dynamicscalemin") or 1.05) + 0.9)
-
-        cfg.showarc = getParam(box, "showarc") ~= false
-        cfg.showladder = getParam(box, "showladder") ~= false
-        cfg.showcompass = getParam(box, "showcompass") ~= false
-        cfg.showaltitude = getParam(box, "showaltitude") ~= false
-        cfg.showgroundspeed = getParam(box, "showgroundspeed") ~= false
-
-        cfg.arccolor = resolveThemeColor("arccolor", getParam(box, "arccolor") or lcd.RGB(255, 255, 255))
-        cfg.laddercolor = resolveThemeColor("laddercolor", getParam(box, "laddercolor") or lcd.RGB(255, 255, 255))
-        cfg.compasscolor = resolveThemeColor("compasscolor", getParam(box, "compasscolor") or lcd.RGB(255, 255, 255))
-        cfg.crosshaircolor = resolveThemeColor("crosshaircolor", getParam(box, "crosshaircolor") or lcd.RGB(255, 255, 255))
-        cfg.altitudecolor = resolveThemeColor("altitudecolor", getParam(box, "altitudecolor") or lcd.RGB(255, 255, 255))
-        cfg.groundspeedcolor = resolveThemeColor("groundspeedcolor", getParam(box, "groundspeedcolor") or lcd.RGB(255, 255, 255))
-
-        cfg.altitudemin = getParam(box, "altitudemin") or 0
-        cfg.altitudemax = getParam(box, "altitudemax") or 200
-        cfg.groundspeedmin = getParam(box, "groundspeedmin") or 0
-        cfg.groundspeedmax = getParam(box, "groundspeedmax") or 100
+        cfg.bgcolor = resolveThemeColor("bgcolor", getParam(box, "bgcolor"))
+        cfg.body = resolveThemeColor("fillcolor", getParam(box, "bodycolor"))
+        cfg.window = resolveThemeColor("bgcolor", getParam(box, "windowcolor")) or lcd.RGB(0, 0, 0)
+        cfg.wheel = resolveThemeColor("wheelcolor", getParam(box, "wheelcolor") or "darkgrey")
+        cfg.light = resolveThemeColor("lightcolor", getParam(box, "lightcolor") or "red")
+        cfg.ground = resolveThemeColor("textcolor", getParam(box, "groundcolor"))
+        cfg.text = resolveThemeColor("textcolor", getParam(box, "textcolor"))
+        cfg.warn = resolveThemeColor("fillwarncolor", getParam(box, "warncolor"))
+        cfg.crit = resolveThemeColor("fillcritcolor", getParam(box, "critcolor"))
+        cfg.warnangle = tonumber(getParam(box, "warnangle")) or 20
+        cfg.critangle = tonumber(getParam(box, "critangle")) or 35
+        cfg.pitchSign = getParam(box, "invertpitch") == true and -1 or 1
+        cfg.showpitch = getParam(box, "showpitch") ~= false
+        cfg.showvalues = getParam(box, "showvalues") ~= false
+        cfg.font = getParam(box, "font") or FONT_XS
+        if type(cfg.font) == "string" then cfg.font = _G[cfg.font] or FONT_XS end
+        cfg.rollLabel = "@i18n(widgets.dashboard.roll)@"
+        cfg.pitchLabel = "@i18n(widgets.dashboard.pitch)@"
     end)
 end
 
-function render.dirty(box)
-    local d = box._dyn
-    if not d then return false end
-    local l = box._last
-    if not l then
-        l = {}
-        box._last = l
-    end
-    if d.pitch ~= l.pitch or d.roll ~= l.roll or d.yaw ~= l.yaw or d.altitude ~= l.altitude or d.groundspeed ~= l.groundspeed then
-        l.pitch = d.pitch
-        l.roll = d.roll
-        l.yaw = d.yaw
-        l.altitude = d.altitude
-        l.groundspeed = d.groundspeed
-        return true
-    end
-    return false
+-- Angles are drawn to the whole degree: a reading that moves by less repaints nothing.
+local function quantize(value)
+    value = tonumber(value)
+    if value == nil then return nil end
+    if value >= 0 then return floor(value + 0.5) end
+    return -floor(-value + 0.5)
+end
+
+local function angleText(label, value)
+    if value == nil then return label .. " --" end
+    return format("%s %d°", label, value)
 end
 
 function render.wakeup(box)
-    ensureCfg(box)
-
+    local cfg = ensureCfg(box)
     local telemetry = grsuite.tasks.telemetry
-    if not telemetry then return end
-    local getSensor = telemetry.getSensor
-
-    local pitch = getSensor("attpitch") or 0
-    local roll = getSensor("attroll") or 0
-    local yaw = getSensor("attyaw") or 0
-    local altitude = getSensor("altitude") or 20
-    local groundspeed = getSensor("groundspeed") or 20
+    local getSensor = telemetry and telemetry.getSensor
+    local roll = getSensor and quantize(getSensor("attroll"))
+    local pitch = getSensor and quantize(getSensor("attpitch"))
 
     local d = box._dyn
     if not d then
         d = {}
         box._dyn = d
     end
-    d.pitch = pitch
-    d.roll = roll
-    d.yaw = yaw
-    d.altitude = altitude
-    d.groundspeed = groundspeed
+    if roll ~= d.roll or d.rollText == nil then
+        d.roll = roll
+        d.rollText = angleText(cfg.rollLabel, roll)
+    end
+    if pitch ~= d.pitch or d.pitchText == nil then
+        d.pitch = pitch
+        d.pitchText = angleText(cfg.pitchLabel, pitch)
+    end
+end
+
+function render.dirty(box)
+    local d = box._dyn
+    if not d then return false end
+    if d.roll ~= d.paintedRoll or d.pitch ~= d.paintedPitch then
+        d.paintedRoll = d.roll
+        d.paintedPitch = d.pitch
+        return true
+    end
+    return false
+end
+
+-- Turns `parts` (car units) into the corners of their quads in `out`, 8 numbers per part,
+-- rotated by `angle` (radians, clockwise on screen) about the car point (edgeX, GROUND_Y), which
+-- lands on the screen at (px, py); `scale` pixels per car unit. Returns the count written.
+local function placeParts(parts, out, px, py, scale, angle, edgeX)
+    local s, c = sin(angle), cos(angle)
+    local n = 0
+    for i = 1, #parts do
+        local part = parts[i]
+        for k = 0, 3 do
+            local ux = (part[2 + k * 2] - edgeX) * scale
+            local uy = (part[3 + k * 2] - GROUND_Y) * scale
+            out[n + 1 + k * 2] = px + ux * c - uy * s
+            out[n + 2 + k * 2] = py + ux * s + uy * c
+        end
+        n = n + 8
+    end
+    return n
+end
+
+-- Screen geometry, rebuilt only when the box moves or an angle changes.
+local function ensureGeometry(box, c, d, x, y, w, h)
+    local key = x + y * 4096 + w * 16777216 + h * 68719476736
+    if box._geoKey == key and box._geoRoll == d.roll and box._geoPitch == d.pitch then return box._geo end
+    box._geoKey, box._geoRoll, box._geoPitch = key, d.roll, d.pitch
+
+    local g = box._geo
+    if not g then
+        g = {rear = {}, side = {}, wheels = {}}
+        box._geo = g
+    end
+
+    local textH = 0
+    if c.showvalues then
+        lcd.font(c.font)
+        local _, th = lcd.getTextSize("0")
+        textH = (th or 12) + 2
+    end
+    local rearW = c.showpitch and floor(w * 0.6) or w
+    local sideW = w - rearW
+    -- Room above the ground line, with some to spare for a tipped car's corners.
+    local room = h - textH - 10
+    -- Tipping over an edge moves the car towards that side: keep room for it at 30 degrees.
+    local rearScale = min(rearW * 0.30, room / 1.6)
+    local sideScale = min(sideW * 0.34, room / 1.5)
+    -- The car (1.3 units above the ground), the ground line and the text, centred in the box.
+    local carH = 1.3 * rearScale
+    local groundY = floor(y + (h - carH - textH - 3) / 2 + carH)
+
+    g.groundY = groundY
+    g.textY = groundY + 3
+    g.rearCx = x + rearW / 2
+    g.sideCx = x + rearW + sideW / 2
+
+    -- Positive angles tip the car clockwise on screen: its right side (rear view) or its nose
+    -- (side view) goes down, so it turns over that side's edge.
+    local roll = d.roll or 0
+    local edge = roll >= 0 and REAR_EDGE_X or -REAR_EDGE_X
+    g.rearN = placeParts(REAR, g.rear, g.rearCx + edge * rearScale, groundY, rearScale, rad(roll), edge)
+
+    local pitch = (d.pitch or 0) * c.pitchSign
+    if c.showpitch then
+        local angle = rad(pitch)
+        edge = pitch >= 0 and SIDE_EDGE_X or -SIDE_EDGE_X
+        local px = g.sideCx + edge * sideScale
+        g.sideN = placeParts(SIDE, g.side, px, groundY, sideScale, angle, edge)
+        local s, co = sin(angle), cos(angle)
+        for i = 1, #SIDE_WHEELS, 2 do
+            local ux = (SIDE_WHEELS[i] - edge) * sideScale
+            local uy = (SIDE_WHEELS[i + 1] - GROUND_Y) * sideScale
+            g.wheels[i] = px + ux * co - uy * s
+            g.wheels[i + 1] = groundY + ux * s + uy * co
+        end
+        g.wheelR = SIDE_WHEEL_R * sideScale
+    else
+        g.sideN = 0
+    end
+
+    local worst = abs(roll)
+    if c.showpitch and abs(pitch) > worst then worst = abs(pitch) end
+    if worst >= c.critangle then
+        g.bodyColor = c.crit or c.body
+    elseif worst >= c.warnangle then
+        g.bodyColor = c.warn or c.body
+    else
+        g.bodyColor = c.body
+    end
+    return g
+end
+
+local function drawParts(parts, pts, n, c, bodyColor)
+    local tri = lcd.drawFilledTriangle
+    for i = 0, n - 1, 8 do
+        local role = parts[i // 8 + 1][1]
+        local color
+        if role == "wheel" then
+            color = c.wheel
+        elseif role == "window" then
+            color = c.window
+        elseif role == "light" then
+            color = c.light
+        else
+            color = bodyColor
+        end
+        if color then
+            lcd.color(color)
+            tri(pts[i + 1], pts[i + 2], pts[i + 3], pts[i + 4], pts[i + 5], pts[i + 6])
+            tri(pts[i + 1], pts[i + 2], pts[i + 5], pts[i + 6], pts[i + 7], pts[i + 8])
+        end
+    end
 end
 
 function render.paint(x, y, w, h, box)
-    local c = box._cfg;
-    if not c then return end
-    local d = box._dyn;
-    if not d then return end
+    local c = box._cfg
+    local d = box._dyn
+    if not c or not d then return end
 
-    local pitch, roll, yaw = d.pitch, d.roll, d.yaw
-    local ppd = c.ppd
-    local cx, cy = x + w / 2, y + h / 2
-
-    local skyColor = lcd.RGB(70, 130, 180)
-    local groundColor = lcd.RGB(160, 82, 45)
+    x, y, w, h = utils.drawBoxBackground(x, y, w, h, c.bgcolor)
+    local g = ensureGeometry(box, c, d, x, y, w, h)
 
     lcd.setClipping(x, y, w, h)
 
-    lcd.color(pitch >= 0 and skyColor or groundColor)
-    lcd.drawFilledRectangle(x, y, w, h)
-
-    local horizonY = cy + pitch * ppd
-    local rollRad = math.rad(roll)
-
-    local xL, yL = rotate(cx - 3 * w, horizonY, cx, horizonY, rollRad)
-    local xR, yR = rotate(cx + 3 * w, horizonY, cx, horizonY, rollRad)
-
-    local nx, ny = -sin(rollRad), cos(rollRad)
-
-    local overlayColor = (pitch >= 0) and groundColor or skyColor
-    lcd.color(overlayColor)
-
-    local BIG = 4 * max(w, h)
-    local sx, sy
-    if pitch >= 0 then
-        sx, sy = nx * BIG, ny * BIG
-    else
-        sx, sy = -nx * BIG, -ny * BIG
+    if c.ground then
+        lcd.color(c.ground)
+        lcd.drawLine(x + 2, g.groundY, x + w - 3, g.groundY)
     end
 
-    local p1x, p1y = xL + sx, yL + sy
-    local p2x, p2y = xR + sx, yR + sy
-    local p3x, p3y = xR, yR
-    local p4x, p4y = xL, yL
+    drawParts(REAR, g.rear, g.rearN, c, g.bodyColor)
 
-    lcd.drawFilledTriangle(p1x, p1y, p2x, p2y, p3x, p3y)
-    lcd.drawFilledTriangle(p1x, p1y, p3x, p3y, p4x, p4y)
-
-    lcd.color(c.crosshaircolor)
-    lcd.drawLine(cx - 5, cy, cx + 5, cy)
-    lcd.drawLine(cx, cy - 5, cx, cy + 5)
-    lcd.drawCircle(cx, cy, 3)
-
-    if c.showarc then
-        lcd.color(c.arccolor)
-        local arcR = w * 0.4
-        for _, ang in ipairs(ARC_ANGLES) do
-            local rad = math.rad(ang)
-            local x1 = cx + arcR * sin(rad)
-            local y1 = y + 10 + arcR * (1 - cos(rad))
-            local x2 = cx + (arcR - 6) * sin(rad)
-            local y2 = y + 10 + (arcR - 6) * (1 - cos(rad))
-            lcd.drawLine(x1, y1, x2, y2)
-        end
-        lcd.drawFilledTriangle(cx, y + 5, cx - 6, y + 15, cx + 6, y + 15)
-    end
-
-    if c.showladder then
-        lcd.color(c.laddercolor)
-        for ang = -90, 90, 10 do
-            local off = (pitch - ang) * ppd
-            local py = cy + off
-            if py > y - 40 and py < y + h + 40 then
-                local major = (ang % 20 == 0)
-                local len = major and 25 or 15
-                local x1, y1 = rotate(cx - len, py, cx, cy, math.rad(roll))
-                local x2, y2 = rotate(cx + len, py, cx, cy, math.rad(roll))
-                lcd.drawLine(x1, y1, x2, y2)
-                if major then
-                    local lbl = tostring(ang)
-                    local lx, ly = rotate(cx - len - 10, py - 4, cx, cy, math.rad(roll))
-                    local rx, ry = rotate(cx + len + 2, py - 4, cx, cy, math.rad(roll))
-                    lcd.drawText(lx, ly, lbl, RIGHT)
-                    lcd.drawText(rx, ry, lbl, LEFT)
-                end
+    if c.showpitch then
+        drawParts(SIDE, g.side, g.sideN, c, g.bodyColor)
+        if c.wheel then
+            lcd.color(c.wheel)
+            local wheels = g.wheels
+            for i = 1, #wheels, 2 do
+                lcd.drawFilledCircle(wheels[i], wheels[i + 1], g.wheelR)
             end
         end
     end
 
-    if c.showcompass then
-        lcd.color(c.compasscolor)
-        local heading = floor((yaw + 360) % 360)
-        local compassY = y + h - 24
-        for ang = -90, 90, 10 do
-            local hdg = (heading + ang + 360) % 360
-            local px = cx + ang * ppd
-            if px > x and px < x + w then
-                local th = (hdg % 30 == 0) and 8 or 4
-                lcd.drawLine(px, compassY, px, compassY - th)
-                if hdg % 30 == 0 then lcd.drawText(px, compassY - th - 8, COMPASS_LABELS[hdg] or tostring(hdg), CENTERED + FONT_XS) end
-            end
-        end
-        lcd.drawFilledTriangle(cx, compassY + 1, cx - 5, compassY - 7, cx + 5, compassY - 7)
-
-        local bw, bh = 60, 14
-        local bx, by = cx - bw / 2, compassY + 6
-        if by + bh < y + h then
-            lcd.color(lcd.RGB(0, 0, 0));
-            lcd.drawFilledRectangle(bx, by, bw, bh)
-            lcd.color(c.compasscolor);
-            lcd.drawRectangle(bx, by, bw, bh)
-            lcd.drawText(cx, by + 1, format("%03d° %s", heading, COMPASS_LABELS[heading - (heading % 45)] or (heading .. "°")), CENTERED + FONT_XS)
-        end
-    end
-
-    if c.showaltitude then
-        lcd.color(c.altitudecolor)
-        local barX = x + w - 10
-        local barY = y + 5
-        local barH = h - 10
-        local fillH = floor((d.altitude - c.altitudemin) / (c.altitudemax - c.altitudemin) * barH)
-        fillH = max(0, min(barH, fillH))
-        lcd.drawRectangle(barX, barY, 6, barH)
-        lcd.drawFilledRectangle(barX, barY + barH - fillH, 6, fillH)
-        lcd.font(FONT_XS)
-        local label = format("%d m", floor(d.altitude))
-        lcd.drawText(barX - 4, barY + barH - fillH - 6, label, RIGHT)
-    end
-
-    if c.showgroundspeed then
-        lcd.color(c.groundspeedcolor)
-        local barX = x + 4
-        local barY = y + 5
-        local barH = h - 10
-        local fillH = floor((d.groundspeed - c.groundspeedmin) / (c.groundspeedmax - c.groundspeedmin) * barH)
-        fillH = max(0, min(barH, fillH))
-        lcd.drawRectangle(barX, barY, 6, barH)
-        lcd.drawFilledRectangle(barX, barY + barH - fillH, 6, fillH)
-        lcd.font(FONT_XS)
-        local label = format("%d knots", floor(d.groundspeed))
-        lcd.drawText(barX + 10, barY + barH - fillH - 6, label, LEFT)
+    if c.showvalues and c.text then
+        lcd.font(c.font)
+        lcd.color(c.text)
+        lcd.drawText(g.rearCx, g.textY, d.rollText, CENTERED)
+        if c.showpitch then lcd.drawText(g.sideCx, g.textY, d.pitchText, CENTERED) end
     end
 
     lcd.setClipping(0, 0, lcd.getWindowSize())
 end
 
-render.scheduler = 0.01
+render.scheduler = 0.1
 
 return render
