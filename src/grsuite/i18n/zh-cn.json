@@ -8139,13 +8139,6 @@
           "reverse_text": false,
           "translation": "steering"
         },
-        "dir_cant_fix_fmt": {
-          "english": "Servo %s also works another axis, so reversing it would break that one. Change its mix in Mixer Rules.",
-          "max_length": 102,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Servo %s also works another axis, so reversing it would break that one. Change its mix in Mixer Rules."
-        },
         "dir_change_axis_fmt": {
           "english": "%s inverted",
           "max_length": 11,
@@ -9902,13 +9895,6 @@
           "needs_translation": true,
           "reverse_text": false,
           "translation": "Beginners, scale cars and first runs."
-        },
-        "surface_mixed": {
-          "english": "Mixed",
-          "max_length": 5,
-          "needs_translation": true,
-          "reverse_text": false,
-          "translation": "Mixed"
         },
         "surface_steering": {
           "english": "Steering",

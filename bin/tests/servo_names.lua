@@ -1,8 +1,9 @@
 -- Run from the repository root with Lua 5.4: lua5.4 bin/tests/servo_names.lua
--- lib/servo_names.lua is a car-only port of gripora-configurator's
--- src/js/ServoNames.js: steering (STEER) and mixed (MIX) servos, with the
--- aircraft names the configurator still generates kept only as names to
--- clear. The rule sets are carried as oper,input,output,weight,weightNeg,role.
+-- lib/servo_names.lua is a port of gripora-configurator's src/js/ServoNames.js:
+-- steering servos are STEER (F STEER / R STEER for a pair), servos on any
+-- other input get no name, and the old aircraft names (and MIX) are kept only
+-- as names to clear. The rule sets are carried as
+-- oper,input,output,weight,weightNeg,role.
 -- Also covers lib/msp_servo_names.lua's wire format.
 
 local ROOT = "src/grsuite/"
@@ -45,9 +46,11 @@ local RULES = {
   car = "1,3,1,1000,1000,0;1,4,27,1000,1000,0",
   carRear = "1,3,1,1000,1000,0;1,4,27,1000,1000,0;1,3,2,-500,-500,0",
   carRearTwoEsc = "1,3,1,1000,1000,0;1,4,27,1000,1000,0;1,3,2,500,500,0;1,4,28,1000,1000,0",
-  -- What the car leaves at zero still mixes: one servo each, then a pair.
+  -- Roll and pitch are held at zero on a car: a servo on them alone is not
+  -- named, and one on yaw with pitch on top is steering like any other.
+  rollServo = "1,3,1,1000,1000,0;1,1,2,1000,1000,0;1,4,27,1000,1000,0",
   pitchServo = "1,3,1,1000,1000,0;1,2,2,1000,1000,0;1,4,27,1000,1000,0",
-  mixedPair = "1,3,1,1000,1000,0;2,2,1,500,500,0;1,3,2,1000,1000,0;2,2,2,-500,-500,0",
+  steerWithPitch = "1,3,1,1000,1000,0;2,2,1,500,500,0;1,3,2,1000,1000,0;2,2,2,-500,-500,0",
   -- Thrust-vector and flap inputs name nothing now.
   oldInputs = "1,3,1,1000,1000,0;1,28,2,1000,1000,0;1,13,3,1000,1000,0",
 }
@@ -67,8 +70,9 @@ local CASES = {
   {name = "car", names = "0=STEER"},
   {name = "carRear", names = "0=F STEER;1=R STEER"},
   {name = "carRearTwoEsc", names = "0=F STEER;1=R STEER"},
-  {name = "pitchServo", names = "0=STEER;1=MIX"},
-  {name = "mixedPair", names = "0=L MIX;1=R MIX"},
+  {name = "rollServo", names = "0=STEER"},
+  {name = "pitchServo", names = "0=STEER"},
+  {name = "steerWithPitch", names = "0=F STEER;1=R STEER"},
   {name = "oldInputs", names = "0=STEER"},
 }
 
@@ -93,13 +97,15 @@ current[5] = "TOWHOOK"
 current[6] = "L FLAP"
 current[7] = "TV ROLL"
 current[2] = "L AIL"
+current[8] = "MIX 2"
 local changed = names.assign(current, parseRules(RULES.carRear))
 check("assign names the mix, over a typed name too",
   current[0] == "F STEER" and current[1] == "R STEER" and current[3] == "MYSERVO", render(current))
 check("assign keeps a typed name off the mix", current[5] == "TOWHOOK", current[5])
-check("assign clears generated and old aircraft names off the mix",
-  current[2] == "" and current[6] == "" and current[7] == "", current[2] .. "|" .. current[6] .. "|" .. current[7])
-check("assign reports exactly the changed servos", table.concat(changed, ",") == "0,1,2,6,7", table.concat(changed, ","))
+check("assign clears generated, old aircraft and MIX names off the mix",
+  current[2] == "" and current[6] == "" and current[7] == "" and current[8] == "",
+  current[2] .. "|" .. current[6] .. "|" .. current[7] .. "|" .. current[8])
+check("assign reports exactly the changed servos", table.concat(changed, ",") == "0,1,2,6,7,8", table.concat(changed, ","))
 check("assign again changes nothing", #names.assign(current, parseRules(RULES.carRear)) == 0)
 
 check("isGenerated", names.isGenerated("R MIX") and names.isGenerated("STEER 3")

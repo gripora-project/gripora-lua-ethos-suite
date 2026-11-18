@@ -14,15 +14,11 @@
 --   check    one axis: picture, "Like this" / "Not like this"
 --   all      several surfaces and one was wrong: all of them, or only some?
 --   identify only some: each surface's servo wiggles in turn, "this one?"
---   cantfix  a wrong servo that also works another axis cannot simply be
---            reversed: say so
 --   done     what the wizard changed; check again, or save and go on
 --
--- The fixes, as in the Configurator: a wrong servo on steering alone has
--- its servo reversed; when every steering servo is wrong the steering is
--- inverted (its Axis Throw negated). A wrong servo that also works another
--- axis is left alone, with a pointer to Mixer Rules. After a fix the same
--- check runs again.
+-- The fixes, as in the Configurator: a wrong servo has its servo reversed;
+-- when every steering servo is wrong the steering is inverted (its Axis
+-- Throw negated). After a fix the same check runs again.
 --
 -- Yaw + is a left turn, since RC yaw is negated once in the firmware's
 -- setpoint.c, so steering right is -1.
@@ -87,7 +83,6 @@ local function new(wiz)
   local status = nil           -- line shown on the check screen after a fix
   local moved = {}             -- surfaces the current check moves
   local identifyIndex, wrongOnes = 1, {}
-  local cantFix = {}
   local reversed = {}          -- servo -> true when reversed an odd number of times
   local inverted = {}          -- axis -> true when inverted an odd number of times
 
@@ -97,7 +92,6 @@ local function new(wiz)
   local motion, motionServo, phase, nextMoveAt = nil, nil, false, 0
 
   local function check() return checks[ci] end
-  local function own(surface) return surfacesLib.primaryAxis(surface) == check().axis end
 
   local function stopMotion()
     if motion == "servo" and motionServo then wiz.releaseServo(motionServo) end
@@ -149,24 +143,15 @@ local function new(wiz)
     end
   end
 
-  -- Reverse the ones that can be; the rest go to the cantfix screen.
+  -- Reverse the wrong ones, then check again.
   local function fix(list)
-    local done = {}
-    cantFix = {}
-    for i = 1, #list do
-      if own(list[i]) then
-        reverse(list[i])
-        done[#done + 1] = list[i]
-      else
-        cantFix[#cantFix + 1] = list[i]
-      end
-    end
-    if #done > 0 then
-      status = string.format("@i18n(app.modules.setup_wizard.dir_status_reversed_fmt)@", servoList(done))
+    for i = 1, #list do reverse(list[i]) end
+    if #list > 0 then
+      status = string.format("@i18n(app.modules.setup_wizard.dir_status_reversed_fmt)@", servoList(list))
     else
       status = "@i18n(app.modules.setup_wizard.dir_status_none)@"
     end
-    go(#cantFix > 0 and "cantfix" or "check")
+    go("check")
   end
 
   local function allWrong()
@@ -264,13 +249,6 @@ local function new(wiz)
         {text = "@i18n(app.modules.setup_wizard.dir_yes)@", needsMotion = true,
           press = function() answerIdentify(true) end},
       }, false)
-
-    elseif screen == "cantfix" then
-      stopMotion()
-      scr:text(c.title, string.format("@i18n(app.modules.setup_wizard.dir_cant_fix_fmt)@", servoList(cantFix)),
-        nil, true)
-      focus = scr:row(function() go("check") end, nil,
-        {text = "@i18n(app.modules.setup_wizard.btn_next)@", press = function() go("check") end})
 
     else -- done
       stopMotion()

@@ -680,7 +680,6 @@ local function open(opts)
 
   local KIND_NAMES = {
     steering = "@i18n(app.modules.setup_wizard.surface_steering)@",
-    mixed = "@i18n(app.modules.setup_wizard.surface_mixed)@",
   }
 
   function wiz.kindName(kind) return KIND_NAMES[kind] or kind end

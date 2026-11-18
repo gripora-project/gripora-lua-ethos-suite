@@ -4,11 +4,10 @@
 -- same so a model set up from either side reads the same in both. When one
 -- changes, change the other, and bin/tests/servo_names.lua with them.
 --
--- Each servo the mix drives is named after what it does
--- (lib/setup_wizard_surfaces.lua's surfaceKind()): a servo on yaw alone is
--- steering (STEER), anything else mixed (MIX). One alone has no prefix, a
--- pair of steering servos is front and rear (the car setup puts the front on
--- S1), any other pair left and right in servo order, and more are numbered.
+-- Every servo stabilized yaw drives (lib/setup_wizard_surfaces.lua's
+-- surfacesFromRules()) is a steering servo, STEER: one alone has no prefix,
+-- a pair is front and rear in servo order (the car setup puts the front on
+-- S1), and more are numbered. Servos on any other input are not named.
 
 if package.loaded["grsuite.lib.servo_names"] then
   return package.loaded["grsuite.lib.servo_names"]
@@ -22,44 +21,27 @@ local M = {}
 -- Every servo the firmware has a name for (MAX_SUPPORTED_SERVOS)
 M.SERVO_COUNT = 24
 
-local ABBREVIATIONS = {
-  steering = "STEER",
-  mixed = "MIX",
-}
+local STEER = "STEER"
 
--- Names earlier versions generated (and the aircraft mixes of the
--- WingFlight setup this was forked from), still cleared when the mix moves
--- on: after the optional side prefix and number, as the generated names.
-local LEGACY_NAMES = {"RUDDER", "AIL", "FLPRN", "ELEVON", "VTAIL", "ELEV", "FLAP"}
+-- Names earlier versions generated (the aircraft surface names of the
+-- WingFlight setup this was forked from, and MIX, among them), still cleared
+-- when the mix moves on: after the optional side prefix and number, as the
+-- generated names.
+local LEGACY_NAMES = {"RUDDER", "AIL", "FLPRN", "ELEVON", "VTAIL", "ELEV", "FLAP", "MIX"}
 -- Whole names, as thrust-vector servos were named after their axis.
 local LEGACY_WHOLE = {"TV ROLL", "TV PITCH", "TV YAW"}
 
 -- Names for the servos `rules` drives: names[servo] (0-based).
 function M.namesFromRules(rules)
   local names = {}
-  local byKind, kinds = {}, {}
-  for _, surface in ipairs(surfacesLib.surfacesFromRules(rules, M.SERVO_COUNT)) do
-    local list = byKind[surface.kind]
-    if not list then
-      list = {}
-      byKind[surface.kind] = list
-      kinds[#kinds + 1] = surface.kind
-    end
-    list[#list + 1] = surface.servo
-  end
-  for _, kind in ipairs(kinds) do
-    local servos = byKind[kind]
-    local abbr = ABBREVIATIONS[kind] or ABBREVIATIONS.mixed
-    for i, servo in ipairs(servos) do
-      if #servos == 1 then
-        names[servo] = abbr
-      elseif #servos == 2 and kind == "steering" then
-        names[servo] = (i == 1 and "F " or "R ") .. abbr
-      elseif #servos == 2 then
-        names[servo] = (i == 1 and "L " or "R ") .. abbr
-      else
-        names[servo] = abbr .. " " .. i
-      end
+  local surfaces = surfacesLib.surfacesFromRules(rules, M.SERVO_COUNT)
+  for i, surface in ipairs(surfaces) do
+    if #surfaces == 1 then
+      names[surface.servo] = STEER
+    elseif #surfaces == 2 then
+      names[surface.servo] = (i == 1 and "F " or "R ") .. STEER
+    else
+      names[surface.servo] = STEER .. " " .. i
     end
   end
   return names
@@ -73,9 +55,7 @@ function M.isGenerated(name)
     if name == whole then return true end
   end
   local body = name:gsub("^[LRF] ", ""):gsub(" %d+$", "")
-  for _, abbr in pairs(ABBREVIATIONS) do
-    if body == abbr then return true end
-  end
+  if body == STEER then return true end
   for _, abbr in ipairs(LEGACY_NAMES) do
     if body == abbr then return true end
   end
