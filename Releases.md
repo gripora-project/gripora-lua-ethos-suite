@@ -1,3 +1,7 @@
+# 0.0.5
+
+Version bump for release alignment; no suite-relevant changes this cycle.
+
 # 0.0.4
 
 First Gripora release of the Ethos suite, for RC cars. Require MSP API 33.0 (the 0.0.2 firmware and later; the 0.0.4 firmware for the drive telemetry); WingFlight and Gripora 0.0.1 firmware are refused. It installs to SCRIPTS:/grsuite, so it can sit beside the WingFlight suite.
