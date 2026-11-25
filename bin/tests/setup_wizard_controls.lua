@@ -62,6 +62,26 @@ check("movedChannel: a clear winner", C.movedChannel({10, 450, 20, 0}) == 1)
 check("movedChannel: two together is not clear", C.movedChannel({400, 450, 0, 0}) == -1)
 check("movedChannel ignores channels found", C.movedChannel({500, 30, 420, 0}, {0}) == 2)
 check("movedChannel: only the found one moved", C.movedChannel({500, 0, 0, 0}, {0}) == -1)
+-- Stick center: samples are {steering, throttle} in us.
+do
+  local s, c = C.centreFromSamples({{1519, 1520}, {1520, 1521}, {1521, 1519}})
+  check("centreFromSamples: 1520 us centre", s == "ok" and c == 1520, s .. " " .. tostring(c))
+  check("centreIsOff 1520 vs 1500", C.centreIsOff(1520, 1500))
+  check("centreIsOff 1502 vs 1500 is not", not C.centreIsOff(1502, 1500))
+  check("centreFromSamples: no samples", C.centreFromSamples({}) == "noSignal")
+  check("centreFromSamples: a channel reads 0", C.centreFromSamples({{1500, 0}}) == "noSignal")
+  check("centreFromSamples: a control moved", C.centreFromSamples({{1500, 1500}, {1500, 1530}}) == "moving")
+  s, c = C.centreFromSamples({{1520, 1540}})
+  check("centreFromSamples: a trim off", s == "trim" and c == 1530, s .. " " .. tostring(c))
+  check("centreFromSamples: within CENTRE_AGREE_US is fine", C.centreFromSamples({{1518, 1522}}) == "ok")
+  s, c = C.centreFromSamples({{1700, 1700}})
+  check("centreFromSamples: outside the range", s == "range" and c == 1700)
+  check("centreFromSamples: only the first n samples", C.centreFromSamples({{1520, 1520}, {1600, 1500}}, 1) == "ok")
+  check("suggestedCentre: 1520", C.suggestedCentre({{1520, 1520}}, 1, 1500) == 1520)
+  check("suggestedCentre: already right", C.suggestedCentre({{1501, 1500}}, 1, 1500) == nil)
+  check("suggestedCentre: held elsewhere", C.suggestedCentre({{1590, 1590}}, 1, 1500) == nil)
+  check("suggestedCentre: trim off", C.suggestedCentre({{1520, 1540}}, 1, 1500) == nil)
+end
 
 -- modeRanges.js
 check("2-position switch, low to high", range(C.rangeForSwitch(1000, 2000)) == "1500-2100")

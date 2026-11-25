@@ -95,6 +95,73 @@ function M.movedChannel(peaks, exclude, minUs)
 end
 
 ---------------------------------------------------------------------------
+-- Receiver: stick center (rc_center), receiver.js centreFromSamples().
+-- Radios don't all send 1500 us at neutral (some ELRS setups send 1520),
+-- and an offset reads as the wheel and trigger slightly off neutral:
+-- throttle is signed around rc_center, so the car creeps or brakes.
+---------------------------------------------------------------------------
+
+-- The range rc_center accepts here (lib/msp_rc_config.lua FIELD_META).
+M.CENTRE_MIN = 1400
+M.CENTRE_MAX = 1600
+-- A channel whose readings spread more than this (us) is still moving.
+M.CENTRE_STILL_US = 10
+-- The controls must agree to within this (us); otherwise a trim (or
+-- subtrim) is off center.
+M.CENTRE_AGREE_US = 5
+-- Center is worth changing when it is off by more than this (us).
+M.CENTRE_OFF_US = 3
+-- Controls resting this close (us) to rc_center are taken to be at neutral.
+local CENTRE_NEAR_US = 60
+
+-- From samples[1..n] of the controls at neutral, each {steering, throttle}
+-- in us: status, centre. Returns values, not a table, so the live hint
+-- allocates nothing. Status is one of:
+--   "ok", centre
+--   "noSignal"       no samples, or a channel reads 0
+--   "moving"         a control moved while sampling
+--   "trim", centre   the controls differ by more than CENTRE_AGREE_US
+--   "range", centre  centre outside CENTRE_MIN..CENTRE_MAX
+function M.centreFromSamples(samples, n)
+  n = n or #samples
+  if n < 1 then return "noSignal" end
+  local count = #samples[1]
+  local total, lowMean, highMean = 0, math.huge, -math.huge
+  for c = 1, count do
+    local lo, hi, sum = math.huge, -math.huge, 0
+    for i = 1, n do
+      local v = samples[i][c] or 0
+      if v < lo then lo = v end
+      if v > hi then hi = v end
+      sum = sum + v
+    end
+    if lo <= 0 then return "noSignal" end
+    if hi - lo > M.CENTRE_STILL_US then return "moving" end
+    local mean = sum / n
+    total = total + mean
+    if mean < lowMean then lowMean = mean end
+    if mean > highMean then highMean = mean end
+  end
+  local centre = round(total / count)
+  if highMean - lowMean > M.CENTRE_AGREE_US then return "trim", centre end
+  if centre < M.CENTRE_MIN or centre > M.CENTRE_MAX then return "range", centre end
+  return "ok", centre
+end
+
+-- Whether a measured centre differs enough from rc_center to change it.
+function M.centreIsOff(centre, rcCenter)
+  return math.abs(centre - rcCenter) > M.CENTRE_OFF_US
+end
+
+-- For the live hint: the centre the controls show while they rest near
+-- rc_center, when it differs from rc_center, otherwise nil.
+function M.suggestedCentre(samples, n, rcCenter)
+  local status, centre = M.centreFromSamples(samples, n)
+  if status ~= "ok" or math.abs(centre - rcCenter) > CENTRE_NEAR_US then return nil end
+  return M.centreIsOff(centre, rcCenter) and centre or nil
+end
+
+---------------------------------------------------------------------------
 -- Mode switches (modeRanges.js)
 ---------------------------------------------------------------------------
 
