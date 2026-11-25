@@ -681,6 +681,38 @@ do
   replies[114] = nil
 end
 
+-- Receiver: the stick center. Steering (CH1) and throttle (CH2) rest at
+-- 1520, as on some ELRS radios; rc_center is 1500.
+do
+  local raw = {1520, 1520, 1000, 1000, 1000, 1000, 1000, 1000}
+  replies[114] = function() return u16list(raw) end
+  openPage(CURRENT, "receiver")
+  settle()
+  for _ = 1, 12 do tick(0.15) end
+  check("receiver: hints that the controls at rest are off center", shows("rx_centre_hint_fmt"))
+  press(T("rx_centre_btn"))
+  check("receiver: the center screen", shows("rx_centre_text"))
+  -- Throttle trimmed to 1540: the two differ, nothing written.
+  raw[2] = 1540
+  settle()
+  before = #sent
+  press(T("rx_centre_detect"))
+  for _ = 1, 16 do tick(0.15) end
+  check("receiver: a trim off is reported", shows("rx_centre_trim"))
+  check("receiver: nothing written for a trim off", #writesOf(67, before + 1) == 0)
+  raw[2] = 1520
+  settle()
+  before = #sent
+  press(T("rx_centre_detect"))
+  for _ = 1, 16 do tick(0.15) end
+  local w = writesOf(67, before + 1)
+  check("receiver: rc_center 1520 is written",
+    #w == 1 and u16(w[1].payload, 1) == 1520, w[1] and bytes(w[1].payload))
+  check("receiver: the rest of the RC config is kept", w[1] and u16(w[1].payload, 3) == 510)
+  check("receiver: says the center is set", shows("rx_centre_set_fmt"))
+  replies[114] = nil
+end
+
 -- Model: Car with rear steering and a second ESC replaces the mix.
 openPage(CURRENT, "airframe")
 settle()
